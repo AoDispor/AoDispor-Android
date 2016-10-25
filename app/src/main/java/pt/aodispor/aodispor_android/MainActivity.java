@@ -5,10 +5,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
+/**
+ * This class serves as the main activity for the application which extends AppCompatActivity.
+ * <p>
+ *     This is where the application initializes its lifecycle. This activity has a custom ViewPager
+ *     object that holds the pages of a tabbed view and has also a TabPagerAdapter that controls
+ *     the page switching for the tabbed pages.
+ * </p>
+ */
 public class MainActivity extends AppCompatActivity {
     private TabPagerAdapter mSectionsPagerAdapter;
     private MyViewPager mViewPager;
 
+    /**
+     * This method is called when the main activity is created.
+     * @param savedInstanceState object with saved states of previously created activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
     }
 
+    /**
+     * Returns this activity's custom ViewPager.
+     * @return the custom ViewPager.
+     */
     public MyViewPager getViewPager(){
         return mViewPager;
     }

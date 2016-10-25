@@ -1,0 +1,96 @@
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pt.aodispor.aodispor_android.MainActivity"
+    android:id="@+id/card"
+    android:orientation="vertical"
+    android:background="@drawable/card"
+    android:layout_height="450dp"
+    android:layout_width="300dp"
+    android:layout_centerInParent="true"
+    android:padding="5dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        app:civ_border_width="2dp"
+        app:civ_border_color="@color/grey"
+        android:layout_width="200dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_height="200dp" />
+
+    <TextView
+        android:id="@+id/price"
+        android:background="@drawable/round_rectangle"
+        android:layout_width="wrap_content"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:textColor="@color/white"
+        android:layout_alignTop="@+id/profile_image"
+        android:layout_alignRight="@+id/profile_image" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/name"
+        android:layout_below="@+id/profile_image"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:textSize="24sp"
+        android:fontFamily="serif"
+        android:textColor="@color/aoDispor"
+        android:textStyle="normal|bold"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/location"
+        android:layout_below="@+id/profession"
+        android:textSize="18sp"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/black"
+        android:fontFamily="serif"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profession"
+        android:textSize="22sp"
+        android:textStyle="normal|bold"
+        android:fontFamily="serif"
+        android:layout_below="@+id/name"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/description"
+        android:layout_below="@+id/location"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:text="Descartar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/discard"
+        android:background="@drawable/round_rectangle_red"
+        android:textColor="@color/white"
+        android:textAllCaps="true"
+        android:textSize="24sp"
+        android:alpha="0"
+        android:padding="5dp"
+        android:layout_below="@+id/price"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

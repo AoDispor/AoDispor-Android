@@ -122,6 +122,12 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         cards[1].setLayoutParams(params);
     }
 
+    /**		 public static int dpToPx(int dp) {
+     -     * Auxiliary method to convert density independent pixels to actual pixels on the screen
+     -     * depending on the systems metrics.
+     * @param dp the number of density independent pixels.
+    * @return the number of actual pixels on the screen.
+    */
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }

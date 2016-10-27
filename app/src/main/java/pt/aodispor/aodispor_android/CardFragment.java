@@ -1,28 +1,30 @@
-package com.example.pedrobarbosa.tabapplication;
+package pt.aodispor.aodispor_android;
 
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.example.pedrobarbosa.tabapplication.API.ApiJSON;
-import com.example.pedrobarbosa.tabapplication.API.HttpRequestTask;
-import com.example.pedrobarbosa.tabapplication.API.Links;
-import com.example.pedrobarbosa.tabapplication.API.OnHttpRequestCompleted;
-import com.example.pedrobarbosa.tabapplication.API.Professional;
-import com.example.pedrobarbosa.tabapplication.API.SearchQueryResult;
-
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
 import de.hdodenhof.circleimageview.CircleImageView;
+import pt.aodispor.aodispor_android.API.ApiJSON;
+import pt.aodispor.aodispor_android.API.HttpRequestTask;
+import pt.aodispor.aodispor_android.API.Links;
+import pt.aodispor.aodispor_android.API.OnHttpRequestCompleted;
+import pt.aodispor.aodispor_android.API.Professional;
+import pt.aodispor.aodispor_android.API.SearchQueryResult;
 
+/**
+ *  Class representing a card stack fragment.
+ *  <p>
+ *      This class controls all the behaviours of the card stack such as the discarding of a card.
+ *      This class initializes the stack of cards in an array of RelativeLayout and iterates them.
+ *  </p>
+ */
 public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     /** used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query */
@@ -46,17 +48,31 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     private LayoutInflater inflater;
     private ViewGroup container;
 
-
+    /**
+     * Default constructor for CardFragment class.
+     */
     public CardFragment() {}
 
+    /**
+     * Factory method to create a new instance of CardFragment class. This is needed because of how
+     * a ViewPager handles the creation of a Fragment.
+     * @return the CardFragment object created.
+     */
     public static CardFragment newInstance() {
         CardFragment fragment = new CardFragment();
         return fragment;
     }
 
+    /**
+     * This method creates the View of this card stack fragment.
+     * @param i the LayoutInflater object to inflate card_zone.xml and card.xml.
+     * @param c the root ViewGroup.
+     * @param savedInstanceState object with saved states of previously created fragment.
+     * @return returns the root view of the fragment. Not to be confused with the root ViewGroup of
+     * this fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater i, ViewGroup c, Bundle savedInstanceState) {
-        //counter = 0;
         currentSetCardIndex=0;
         inflater = i;
         container = c;
@@ -103,6 +119,11 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     //region CARD POSITIONING UTILITIES
 
+    /**
+     * This method sets a card's margin from the stack so that it gives the illusion of seeing the
+     * stack in perspective with the cards on top of each other.
+     * @param position the position in the stack of a card.
+     */
     public void setCardMargin(int position){
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[position].getLayoutParams());
         params.addRule(RelativeLayout.ALIGN_LEFT,cards[position-1].getId());
@@ -112,6 +133,9 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         cards[position].setLayoutParams(params);
     }
 
+    /**
+     *  This method centers the first card of the stack to the center of this fragment.
+     */
     private void centerFirstCard(){
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[1].getLayoutParams());
         params.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
@@ -122,12 +146,12 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         cards[1].setLayoutParams(params);
     }
 
-    /**		 public static int dpToPx(int dp) {
-     -     * Auxiliary method to convert density independent pixels to actual pixels on the screen
-     -     * depending on the systems metrics.
+    /**
+     * Auxiliary method to convert density independent pixels to actual pixels on the screen
+     * depending on the systems metrics.
      * @param dp the number of density independent pixels.
-    * @return the number of actual pixels on the screen.
-    */
+     * @return the number of actual pixels on the screen.
+     */
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
@@ -136,8 +160,12 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     //region NAVIGATION/PAGINATION
 
-    /**discards the card at the top of the stack
-     * <br>also responsable for requesting the loading of the next page and updating the currentSet and nextSet
+    /**
+     * This method discards the top card of the card stack, destroys it and brings the other cards
+     * one position further in the stack. After that creates a new card to be on the bottom of the
+     * stack.
+     * <br>
+     *     Also responsible for requesting the loading of the next page and updating the currentSet and nextSet.
      */
     public void discardTopCard(){
         currentSetCardIndex++;
@@ -205,7 +233,8 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         }
     }
 
-    /**recovers the previous discarded card
+    /**
+     * Recovers the previous discarded card
      * <also> reponsable for requesting the loading of the previous page and updating the currentSet and nextSet
      */
     public void restorePreviousCard() //TODO finish implementation and test restorePreviousCard
@@ -292,7 +321,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     {
         RelativeLayout card = createProfessionalCard(p.getFullName(),p.getTitle(),p.getLocation(),p.getDescription(),p.getRate());
         //TODO fetch professional image from web
-        ((CircleImageView)card.findViewById(R.id.profile_image)).setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.placeholder));
+        //((CircleImageView)card.findViewById(R.id.profile_image)).setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.placeholder));
         return card;
     }
 
@@ -327,7 +356,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         return QueryResult.emptySet;
     }
 
-    /**will try to load next page on background via AsyncTask (nonblocking)*/
+    /** will try to load next page on background via AsyncTask (nonblocking) */
     public void prepareNextPage()
     {
         requestType = RequestType.nextSet;
@@ -341,7 +370,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         }
     }
 
-    /**will wait for task to end or timeout (blocking)*/
+    /** will wait for task to end or timeout (blocking) */
     public QueryResult preparePreviousPage() //TODO replace test request with the actual request
     {
         requestType = RequestType.prevSet;
@@ -380,7 +409,8 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     //region MISC
 
-    /**this should never be accessed from the outside, except for testing purposes! (not your typical getter)
+    /**
+     * This should never be accessed from the outside, except for testing purposes! (not your typical getter)
      * <br>was made this way to avoid implementing cloning
      * @return */
     public SearchQueryResult getCurrentSet()

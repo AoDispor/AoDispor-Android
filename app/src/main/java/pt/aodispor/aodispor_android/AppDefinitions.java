@@ -1,8 +1,4 @@
-package com.example.pedrobarbosa.tabapplication;
-
-/**
- * Created by Bruno Madeira on 24/10/2016.
- */
+package pt.aodispor.aodispor_android;
 
 public class AppDefinitions {
     /* NOTE related to anything that uses [API SearchQueryResult.java]

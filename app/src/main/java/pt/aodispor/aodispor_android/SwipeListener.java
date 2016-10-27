@@ -1,4 +1,4 @@
-package com.example.pedrobarbosa.tabapplication;
+package pt.aodispor.aodispor_android;
 
 import android.animation.Animator;
 import android.content.Intent;

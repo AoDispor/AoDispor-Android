@@ -9,6 +9,13 @@ import android.widget.TextView;
 
 import java.util.Date;
 
+/**
+ * Class for controlling the motion of the professional cards with the gestures the user makes.
+ * <p>
+ *     This card manipulates the cards position through the use of animations. To see the
+ *     animations working the system must have the animations turned on.
+ * </p>
+ */
 public class SwipeListener implements View.OnTouchListener{
     private View view;
     private MyViewPager viewPager;
@@ -23,6 +30,12 @@ public class SwipeListener implements View.OnTouchListener{
     Date cardTouchStart;
     int discardAnimationDuration =0;
 
+    /**
+     * The constructor of the SwipeListener.
+     * @param v the card view to control.
+     * @param vp the MyViewPager object that controls the pager.
+     * @param cf the CradFragment object where this card is on.
+     */
     public SwipeListener(View v, MyViewPager vp, CardFragment cf){
         view = v;
         viewPager = vp;
@@ -31,6 +44,18 @@ public class SwipeListener implements View.OnTouchListener{
         enableCall = false;
     }
 
+    /**
+     * This method is fired when the user touches the card.
+     * <p>
+     *     When the card is touched it disables the ViewPager so that the user can move the card
+     *     without interfering with the ViewPager gesture detection. If the card is dropped with a
+     *     certain distance of the center of the fragment view the card is discarded. If not, the
+     *     card goes back to it's original position.
+     * </p>
+     * @param v the view of the card or its children views.
+     * @param event the event triggered on the card.
+     * @return whether the event propagates or not.
+     */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         final float x = event.getRawX();

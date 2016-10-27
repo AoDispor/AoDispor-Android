@@ -23,13 +23,6 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
         </android.support.v7.widget.Toolbar>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/aoDispor"
-            app:tabIndicatorColor="@color/aoDispor2" />
-
     </android.support.design.widget.AppBarLayout>
 
     <pt.aodispor.aodispor_android.MyViewPager

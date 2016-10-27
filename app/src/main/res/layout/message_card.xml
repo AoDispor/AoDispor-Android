@@ -1,0 +1,40 @@
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.pedrobarbosa.tabapplication.MainActivity$CardFragment"
+    android:id="@+id/message_card"
+    android:tag="msg"
+    android:orientation="vertical"
+    android:background="@drawable/card"
+    android:layout_height="450dp"
+    android:layout_width="300dp"
+    android:layout_centerInParent="true"
+    android:padding="5dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/title"
+        android:layout_below="@+id/profile_image"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:textSize="24sp"
+        android:fontFamily="serif"
+        android:textColor="@color/aoDispor"
+        android:textStyle="normal|bold"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/message"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/title" />
+
+</RelativeLayout>

@@ -1,6 +1,5 @@
 package pt.aodispor.aodispor_android;
 
-import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +13,6 @@ import android.support.v7.widget.Toolbar;
  * </p>
  */
 public class MainActivity extends AppCompatActivity {
-    private TabPagerAdapter mSectionsPagerAdapter;
     private MyViewPager mViewPager;
 
     /**
@@ -29,13 +27,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        TabPagerAdapter mSectionsPagerAdapter;
         mSectionsPagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
 
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
     }
 
     /**

@@ -297,7 +297,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     public RelativeLayout createProfessionalCard(String n, String p, String l, String d, String pr){
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
-        TextView name = (TextView) card.findViewById(R.id.title);
+        TextView name = (TextView) card.findViewById(R.id.name);
         name.setText(n);
         TextView profession = (TextView) card.findViewById(R.id.profession);
         profession.setText(p);

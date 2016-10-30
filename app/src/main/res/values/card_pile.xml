@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_results_title">Sem Resultados</string>
+    <string name="no_results_msg">Não foram encontrados resultados para\n</string>
+
+    <string name="pile_end_title">É tudo</string>
+    <string name="pile_end_msg">Chegou ao final da pilha</string>
+    <string name="no_pile_end_reset">Voltar ao início</string>
+
+    <string name="no_conection_title">Sem conexão</string>
+    <string name="no_conection_msg">Não foi possível receber uma resposta de AoDispor.\nDeseja tentar reconectar-se?</string>
+    <string name="no_conection_try_again">Tentar</string>
+</resources>

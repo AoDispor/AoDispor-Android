@@ -3,10 +3,14 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="aoDispor">#00ABC9</color>
+    <color name="black">#000000</color>
+    <color name="aoDispor">#00A8C6</color>
     <color name="aoDispor2">#6BD9E5</color>
     <color name="white">#FFFFFF</color>
     <color name="grey">#B1BCBE</color>
     <color name="aoDisporGreen">#00CE5D</color>
     <color name="red">#e00d3b</color>
+    <color name="highlight">#FFFF00</color>
+    <color name="by_hour">#40C0CB</color>
+    <color name="by_service">#8FBE00</color>
 </resources>

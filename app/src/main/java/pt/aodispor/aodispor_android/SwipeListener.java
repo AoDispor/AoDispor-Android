@@ -25,9 +25,10 @@ public class SwipeListener implements View.OnTouchListener{
     private boolean enableCall;
 
     //TODO this can be removed for simplification since animation is not 100%
-    static final int DISCARD_ANIMATION_MAX_DURATION = 1000;
+    static final int DISCARD_ANIMATION_MAX_DURATION = 850;
     static final int DISCARD_ANIMATION_MIN_DURATION = 200;
     Date cardTouchStart;
+    Date cardLastMove;
     int discardAnimationDuration =0;
 
     /**
@@ -76,6 +77,7 @@ public class SwipeListener implements View.OnTouchListener{
                 //float side1 = (float) Math.sqrt((x-initialX)*(x-initialX) + (y-initialY)*(y-initialY));
                 //float side2 = (float) Math.sqrt(view.getWidth()*view.getWidth() + view.getHeight()*view.getHeight());
                 discard.setRotation(-45);
+                cardLastMove = new Date();
                 //discard.setAlpha((1.7f*side1)/side2);
                 discard.setAlpha(Math.max(
                         3.8f*(x-initialX)*(x-initialX)/(view.getWidth()*view.getWidth()),
@@ -83,13 +85,14 @@ public class SwipeListener implements View.OnTouchListener{
                 break;
             case (MotionEvent.ACTION_UP):
                 if(enableCall){
-                    Intent phoneIntent = new Intent(Intent.ACTION_CALL);
-                    phoneIntent.setData(Uri.parse("tel:9123456789"));//TODO replace with actual professional number
-                    cardFragment.startActivity(phoneIntent);
+                    //Intent phoneIntent = new Intent(Intent.ACTION_CALL);
+                    //phoneIntent.setData(Uri.parse("tel:9123456789"));//TODO replace with actual professional number
+                    //cardFragment.startActivity(phoneIntent);
                     enableCall = false;
                 }
                 viewPager.setSwipeEnabled(true);
                 if(Math.abs(x-initialX) < view.getWidth()/2 && Math.abs(y-initialY) < view.getHeight()/2) {
+                    CardFragment.blockAccess=true;
                     view.animate().translationX(0).translationY(0).rotation(0).setDuration(400).setListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {
@@ -99,6 +102,7 @@ public class SwipeListener implements View.OnTouchListener{
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
+                            CardFragment.blockAccess=false;
                             view.setEnabled(true);
                             discard.setAlpha(0);
                         }
@@ -114,9 +118,12 @@ public class SwipeListener implements View.OnTouchListener{
                         }
                     });
                 }else{
-                    discardAnimationDuration = (int) ((new Date()).getTime() - cardTouchStart.getTime());
+                    long timenow = (new Date()).getTime();
+                    discardAnimationDuration = (int) (timenow - cardTouchStart.getTime());
+                    if(timenow - cardLastMove.getTime()>150 ) discardAnimationDuration = DISCARD_ANIMATION_MAX_DURATION;
                     if(discardAnimationDuration >DISCARD_ANIMATION_MAX_DURATION||discardAnimationDuration<=0) {discardAnimationDuration = DISCARD_ANIMATION_MAX_DURATION;}
                     if(discardAnimationDuration<DISCARD_ANIMATION_MIN_DURATION) {discardAnimationDuration =DISCARD_ANIMATION_MIN_DURATION;}
+                    CardFragment.blockAccess=true;
                     view.animate().rotation((x-initialX)*0.09f).translationX((x-initialX)*2.6f).translationY((y-initialY)*2.6f).setDuration(discardAnimationDuration).setListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {

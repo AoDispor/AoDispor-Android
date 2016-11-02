@@ -2,16 +2,25 @@ package pt.aodispor.aodispor_android;
 
 import android.animation.Animator;
 import android.content.res.Resources;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.io.InputStream;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import pt.aodispor.aodispor_android.API.ApiJSON;
@@ -367,20 +376,52 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     //region CARDS CREATION
 
-    public RelativeLayout createProfessionalCard(String n, String p, String l, String d, String pr){
+    public RelativeLayout createProfessionalCard(String n, String p, String l, String d, String pr, String cur, String type, String av) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
+
+        /*
         TextView name = (TextView) card.findViewById(R.id.name);
         name.setText(Html.fromHtml(n));
+        */
+
         TextView profession = (TextView) card.findViewById(R.id.profession);
         profession.setText(Html.fromHtml(p));
+        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+
         TextView location = (TextView) card.findViewById(R.id.location);
         location.setText(Html.fromHtml(l));
+        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+
         TextView description = (TextView) card.findViewById(R.id.description);
         description.setText(Html.fromHtml(d));
+        description.setMovementMethod(new ScrollingMovementMethod());
+
         TextView price = (TextView) card.findViewById(R.id.price);
+
+        price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         price.setText(Html.fromHtml(pr));
+
+        switch(type) {
+            case "H":
+                price.setText(Html.fromHtml(pr + " " + cur + "/h"));
+                price.setTextColor(getResources().getColor(R.color.by_hour));
+                break;
+            case "S":
+                price.setText(Html.fromHtml(pr + " " + cur));
+                price.setTextColor(getResources().getColor(R.color.by_service));
+                break;
+            case "D":
+                price.setText(Html.fromHtml(pr + " por dia"));
+        }
+
+        ImageView avatar = (ImageView) card.findViewById(R.id.profile_image);
+
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        imageLoader.displayImage(av, avatar);
+
         return card;
     }
+
 
     public RelativeLayout createMessageCard(String title, String message){
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
@@ -391,9 +432,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     private RelativeLayout professionalCard(Professional p)
     {
-        RelativeLayout card = createProfessionalCard(p.getFullName(),p.getTitle(),p.getLocation(),p.getDescription(),p.getRate());
-        //TODO fetch professional image from web
-        //((CircleImageView)card.findViewById(R.id.profile_image)).setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.placeholder));
+        RelativeLayout card = createProfessionalCard(p.getFullName(),p.getTitle(),p.getLocation(),p.getDescription(),p.getRate(),p.getCurrency(),p.getType(),p.getAvatar_url());
         return card;
     }
 
@@ -504,7 +543,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         return currentSet;
     }
 
-    public String getCurrentShownCardProfessionalName() {return ((TextView)cards[0].findViewById(R.id.name)).getText().toString();}
+    //public String getCurrentShownCardProfessionalName() {return ((TextView)cards[0].findViewById(R.id.name)).getText().toString();}
 
     //endregion
 }

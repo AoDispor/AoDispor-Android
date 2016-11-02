@@ -1,6 +1,7 @@
 package pt.aodispor.aodispor_android;
 
 import android.animation.Animator;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -378,7 +379,6 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
     public RelativeLayout createProfessionalCard(String n, String p, String l, String d, String pr, String cur, String type, String av) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
-
         /*
         TextView name = (TextView) card.findViewById(R.id.name);
         name.setText(Html.fromHtml(n));
@@ -418,6 +418,8 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(av, avatar);
+
+        avatar.setOnClickListener(new ImageOnClickListener(n,p,l,d,pr,cur,type,av,this));
 
         return card;
     }
@@ -546,4 +548,5 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     //public String getCurrentShownCardProfessionalName() {return ((TextView)cards[0].findViewById(R.id.name)).getText().toString();}
 
     //endregion
+
 }

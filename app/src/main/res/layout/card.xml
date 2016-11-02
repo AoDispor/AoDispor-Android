@@ -1,5 +1,4 @@
-
-
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,8 +10,7 @@
     android:layout_height="450dp"
     android:layout_width="300dp"
     android:layout_centerInParent="true"
-    android:padding="5dp"
-    android:onClick="openProfessionalProfile">
+    android:padding="5dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -42,7 +40,8 @@
         android:layout_below="@+id/price"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
-        android:layout_height="200dp" />
+        android:layout_height="200dp"
+        android:onClick="openProfessionalProfile"/>
     <!--
         <TextView
             android:layout_width="match_parent"

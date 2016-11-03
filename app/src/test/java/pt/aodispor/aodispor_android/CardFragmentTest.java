@@ -1,7 +1,7 @@
 package pt.aodispor.aodispor_android;
 
 
-import android.app.Activity;
+/*import android.app.Activity;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.widget.Button;
@@ -15,14 +15,14 @@ import pt.aodispor.aodispor_android.API.SearchQueryResult;
 
 import static android.R.attr.fragment;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue; */
 
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-/*public class CardStackUnitTest {
+/* public class CardStackUnitTest {
 
     @Test
     public void shown_cards_order_isCorrect() throws Exception {
@@ -122,6 +122,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;*/
 
+/*
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

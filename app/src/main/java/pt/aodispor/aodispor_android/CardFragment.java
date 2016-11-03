@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import java.util.concurrent.TimeUnit;
 
 import pt.aodispor.aodispor_android.API.ApiJSON;
@@ -393,7 +394,15 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     {
         RelativeLayout card = createProfessionalCard(p.getFullName(),p.getTitle(),p.getLocation(),p.getDescription(),p.getRate());
         //TODO fetch professional image from web
-        //((CircleImageView)card.findViewById(R.id.profile_image)).setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.placeholder));
+        /*
+        try {
+            URL url = new URL("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
+            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            ((ImageView)card.findViewById(R.id.profile_image)).setImageBitmap(bmp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
         return card;
     }
 

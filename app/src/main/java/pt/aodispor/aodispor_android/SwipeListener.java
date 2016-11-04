@@ -1,6 +1,8 @@
 package pt.aodispor.aodispor_android;
 
 import android.animation.Animator;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.MotionEvent;
@@ -8,6 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.Date;
+
+import pt.aodispor.aodispor_android.API.Professional;
 
 /**
  * Class for controlling the motion of the professional cards with the gestures the user makes.
@@ -85,6 +89,39 @@ public class SwipeListener implements View.OnTouchListener{
                 break;
             case (MotionEvent.ACTION_UP):
                 if(enableCall){
+                    final Professional p = cardFragment.getCurrentSet().data.get(0);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(cardFragment.getActivity());
+                    final CharSequence[] items = {"Ligar","Ver Perfil"};
+                    builder.setTitle(p.getFullName())
+                            .setItems(items, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    switch(i){
+                                        case 0:
+                                            Intent phoneIntent = new Intent(Intent.ACTION_CALL);
+                                            phoneIntent.setData(Uri.parse("tel:9123456789"));//TODO replace with actual professional number
+                                            cardFragment.startActivity(phoneIntent);
+                                            break;
+                                        case 1:
+                                            Intent intent = new Intent(cardFragment.getActivity(), ProfessionalProfileActivity.class);
+
+                                            intent.putExtra("name",p.getFullName());
+                                            intent.putExtra("profession",p.getTitle());
+                                            intent.putExtra("location",p.getLocation());
+                                            intent.putExtra("description",p.getDescription());
+                                            intent.putExtra("price",p.getRate());
+                                            intent.putExtra("currency",p.getCurrency());
+                                            intent.putExtra("type",p.getType());
+                                            intent.putExtra("avatar_url",p.getAvatar_url());
+
+                                            cardFragment.startActivity(intent);
+                                            break;
+                                    }
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+
+                    dialog.show();
                     //Intent phoneIntent = new Intent(Intent.ACTION_CALL);
                     //phoneIntent.setData(Uri.parse("tel:9123456789"));//TODO replace with actual professional number
                     //cardFragment.startActivity(phoneIntent);

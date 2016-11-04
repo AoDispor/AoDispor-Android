@@ -39,8 +39,7 @@
         android:layout_below="@+id/price"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
-        android:layout_height="200dp"
-        android:onClick="openProfessionalProfile"/>
+        android:layout_height="200dp" />
     <!--
         <TextView
             android:layout_width="match_parent"

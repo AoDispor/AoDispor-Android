@@ -422,7 +422,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(10)).build();
         imageLoader.displayImage(av, avatar, options);
 
-        avatar.setOnClickListener(new ImageOnClickListener(n,p,l,d,pr,cur,type,av,this));
+        //avatar.setOnClickListener(new ImageOnClickListener(n,p,l,d,pr,cur,type,av,this));
 
         return card;
     }

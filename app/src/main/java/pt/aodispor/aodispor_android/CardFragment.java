@@ -18,7 +18,9 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -417,7 +419,8 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         ImageView avatar = (ImageView) card.findViewById(R.id.profile_image);
 
         ImageLoader imageLoader = ImageLoader.getInstance();
-        imageLoader.displayImage(av, avatar);
+        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(10)).build();
+        imageLoader.displayImage(av, avatar, options);
 
         avatar.setOnClickListener(new ImageOnClickListener(n,p,l,d,pr,cur,type,av,this));
 

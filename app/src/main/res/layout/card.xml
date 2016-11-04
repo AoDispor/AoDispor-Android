@@ -82,19 +82,18 @@
             android:layout_marginLeft="10dp"
             android:scrollbars = "vertical"/>
 
-        <TextView
-            android:text="Descartar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/discard"
-            android:background="@drawable/round_rectangle_red"
-            android:textColor="@color/white"
-            android:textAllCaps="true"
-            android:textSize="24sp"
-            android:alpha="0"
-            android:padding="5dp"
-            android:layout_below="@+id/price"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+    <TextView
+        android:text="Descartar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/discard"
+        android:background="@drawable/round_rectangle_red"
+        android:textColor="@color/white"
+        android:textAllCaps="true"
+        android:textSize="40sp"
+        android:alpha="0"
+        android:padding="10dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
-    </RelativeLayout>
+</RelativeLayout>

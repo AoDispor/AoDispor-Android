@@ -89,7 +89,7 @@ public class SwipeListener implements View.OnTouchListener{
                 break;
             case (MotionEvent.ACTION_UP):
                 if(enableCall){
-                    final Professional p = cardFragment.getCurrentSet().data.get(0);
+                    final Professional p = cardFragment.getProfessionalOnTop();
                     final AlertDialog.Builder builder = new AlertDialog.Builder(cardFragment.getActivity());
                     final CharSequence[] items = {"Ligar","Ver Perfil"};
                     builder.setTitle(p.getFullName())

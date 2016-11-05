@@ -57,6 +57,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     private SearchQueryResult nextSet;
     int currentSetCardIndex;
     private RelativeLayout[] cards;
+    private Professional[] cards_professional_data;
     /**does not allow discard or recover methods to be called before the previous is finished*/
     static boolean blockAccess=false;
 
@@ -168,13 +169,14 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     {
         if(cards!=null) removeCardViews(cards);
         else cards = new RelativeLayout[3];
+        cards_professional_data = new Professional[3];
         switch (prepareNewSearchQuery()){
             case successful://received answer and it has professionals
-                cards[0] = professionalCard(currentSet.data.get(0));
+                putCardOnStack(0,currentSet.data.get(0));
                 if(currentSet.data.size()>1)
                 {
-                    cards[1] = professionalCard(currentSet.data.get(1));
-                    if(currentSet.data.size()>2)   cards[2] = professionalCard(currentSet.data.get(2));
+                    putCardOnStack(1,currentSet.data.get(1));
+                    if(currentSet.data.size()>2)   putCardOnStack(2,currentSet.data.get(2));
                     else                           cards[2] = createMessageCard(getString(R.string.pile_end_title),getString(R.string.pile_end_msg));//TODO missing button
                 }
                 else {
@@ -218,8 +220,9 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         centerFirstCard();
         //rootView.removeAllViews();
         removeCardViews(cards);
-        cards[0] = cards[1];
-        cards[1] = cards[2];
+        swapCardsOnStack(1,0);
+        swapCardsOnStack(2,1);
+
 
         if(cards[1] == null) //already reached end of card pile
         {
@@ -242,7 +245,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
 
         //more than one card on card pile
         if(currentSetCardIndex +2<currentSet.data.size()) {
-            cards[2] = professionalCard(currentSet.data.get(currentSetCardIndex + 2));
+            putCardOnStack(2,currentSet.data.get(currentSetCardIndex + 2));
         }
         else
         {
@@ -254,7 +257,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
                     previousSet = currentSet;
                     currentSet = nextSet;
                     nextSet    = null;
-                    cards[2]   = professionalCard(currentSet.data.get(currentSetCardIndex + 2));
+                    putCardOnStack(2,currentSet.data.get(currentSetCardIndex + 2));
                 }
                 else //content failed to get next page on time
                 {
@@ -295,9 +298,11 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         blockAccess=true;
 
         RelativeLayout[] originalCardsSetup = {cards[0],cards[1],cards[2]};
+        Professional[] originalProfessionals = {cards_professional_data[0],cards_professional_data[1],cards_professional_data[2]};
         int originalIndex = currentSetCardIndex;
-        cards[2] = cards[1];
-        cards[1] = cards[0];
+        swapCardsOnStack(1,2);
+        swapCardsOnStack(0,1);
+
         cards[0].setOnTouchListener(null);
 
         currentSetCardIndex--;
@@ -307,7 +312,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
                 blockAccess=false;
                 return;
             }
-            cards[0] = professionalCard(currentSet.data.get(currentSetCardIndex));
+            putCardOnStack(0,currentSet.data.get(currentSetCardIndex));
              if (currentSetCardIndex < AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD)//load in background if possible
             {
                 nextSet=null;System.gc();//try to keep only 2 sets at maximum
@@ -320,7 +325,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
             nextSet = currentSet;
             currentSet = previousSet;
             previousSet = null;System.gc();// no need to keep 3 sets stored
-            cards[0] = professionalCard(currentSet.data.get(currentSetCardIndex));
+            putCardOnStack(0,currentSet.data.get(currentSetCardIndex));
         }else {
             if (currentSetCardIndex < 0) //needs to get card from previous set immidiatly.
             {
@@ -333,6 +338,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
                         case emptySet:   break;
                         case none: //when reached pile start do not change pile state
                             cards=originalCardsSetup;
+                            cards_professional_data = originalProfessionals;
                             currentSetCardIndex=originalIndex;
                             SwipeListener listener = new SwipeListener(cards[0],((MainActivity)getActivity()).getViewPager(),this);
                             cards[0].setOnTouchListener(listener);
@@ -346,7 +352,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
                 }
                 if(previousSet!=null)//if set was received or was already loaded
                 {
-                    cards[0] = professionalCard(previousSet.data.get(
+                    putCardOnStack(0,previousSet.data.get(
                             previousSet.data.size()+currentSetCardIndex));
                 }
             }
@@ -378,6 +384,28 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     //endregion
 
     //region CARDS CREATION
+
+    /**
+     *
+     * @param stackIndex 0,1 or 2 (the higher the index the lower it is on the stack)
+     * @param professional
+     * @return
+     */
+    public void putCardOnStack(int stackIndex, Professional professional)
+    {
+        if(stackIndex<0||stackIndex>2) return;
+        if (professional==null) return;
+        cards_professional_data[stackIndex]=professional;
+        cards[stackIndex] = professionalCard(cards_professional_data[stackIndex]);
+    }
+
+    public void swapCardsOnStack(int source,int destination)
+    {
+        if(source<0||source>2) return;
+        if(destination<0||destination>2) return;
+        cards_professional_data[destination]=cards_professional_data[source];
+        cards[destination] = cards[source];
+    }
 
     public RelativeLayout createProfessionalCard(String n, String p, String l, String d, String pr, String cur, String type, String av) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
@@ -548,6 +576,11 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     //endregion
 
     //region MISC
+
+    public Professional getProfessionalOnTop()
+    {
+        return cards_professional_data[0];
+    }
 
     /**
      * This should never be accessed from the outside, except for testing purposes! (not your typical getter)

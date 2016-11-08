@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Ao Dispor</string>
+    
+    <!-- Register Card -->
+    <string name="register_location">A sua localização</string>
+    <string name="register_price">O seu preço</string>
+    <string name="register_profession">A sua profissão</string>
+    <string name="register_description">Descreva aqui o que faz&#8230;</string>
 </resources>

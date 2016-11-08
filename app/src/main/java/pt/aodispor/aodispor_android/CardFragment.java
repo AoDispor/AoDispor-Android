@@ -126,8 +126,8 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[position].getLayoutParams());
         params.addRule(RelativeLayout.ALIGN_LEFT,cards[position-1].getId());
         params.addRule(RelativeLayout.ALIGN_TOP,cards[position-1].getId());
-        params.topMargin = dpToPx(5*position);
-        params.leftMargin = dpToPx(5*position);
+        params.topMargin = Utility.dpToPx(5*position);
+        params.leftMargin = Utility.dpToPx(5*position);
         cards[position].setLayoutParams(params);
     }
 
@@ -142,16 +142,6 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         params.topMargin = 0;
         params.leftMargin = 0;
         cards[1].setLayoutParams(params);
-    }
-
-    /**
-     * Auxiliary method to convert density independent pixels to actual pixels on the screen
-     * depending on the systems metrics.
-     * @param dp the number of density independent pixels.
-     * @return the number of actual pixels on the screen.
-     */
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
     public void removeCardViews(RelativeLayout cards[])

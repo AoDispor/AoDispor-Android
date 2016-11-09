@@ -6,4 +6,10 @@
     <string name="register_price">O seu preço</string>
     <string name="register_profession">A sua profissão</string>
     <string name="register_description">Descreva aqui o que faz&#8230;</string>
+    <string name="profile_price_final">O seu preço é final?</string>
+    <string name="profile_price_method">O seu serviço é oferecido como?</string>
+    <string name="profile_price_type_hour">Por hora</string>
+    <string name="profile_price_type_day">Por dia</string>
+    <string name="profile_price_type_service">Por serviço</string>
+
 </resources>

@@ -7,4 +7,5 @@
 
     <!-- Register -->
     <dimen name="register_layout_margin">20dp</dimen>
+    <dimen name="dialog_title">20dp</dimen>
 </resources>

@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
+
 public class ProfileFragment extends Fragment {
     private RelativeLayout professionalCard;
 
@@ -52,6 +54,13 @@ public class ProfileFragment extends Fragment {
         price.setTextColor(grey);
         price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         price.setText(R.string.register_price);
+        price.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PriceDialog dialog = new PriceDialog(getActivity());
+                dialog.show();
+            }
+        });
 
         TextView profession = (TextView) professionalCard.findViewById(R.id.profession);
         profession.setTextColor(grey);

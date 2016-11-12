@@ -6,10 +6,11 @@
     android:id="@+id/card"
     android:orientation="vertical"
     android:background="@drawable/card"
-    android:layout_height="450dp"
-    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     android:layout_centerInParent="true"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:layout_margin="20dp">
 
     <TextView
         android:layout_width="wrap_content"

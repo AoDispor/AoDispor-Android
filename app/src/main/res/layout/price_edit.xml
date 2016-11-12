@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp">
+    android:layout_margin="20dp">
 
     <TextView
         android:text="@string/register_price"
@@ -52,7 +52,7 @@
             android:text="@string/profile_price_type_hour"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button3"
+            android:id="@+id/type1"
             android:layout_weight="1"
             android:background="@drawable/left_option_horizontal"
             android:textAllCaps="false" />
@@ -61,7 +61,7 @@
             android:text="@string/profile_price_type_day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button2"
+            android:id="@+id/type2"
             android:layout_weight="1"
             android:background="@drawable/center_option_horizontal"
             android:textAllCaps="false" />
@@ -70,7 +70,7 @@
             android:text="@string/profile_price_type_service"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button"
+            android:id="@+id/type3"
             android:layout_weight="1"
             android:background="@drawable/right_option_horizontal"
             android:textAllCaps="false" />

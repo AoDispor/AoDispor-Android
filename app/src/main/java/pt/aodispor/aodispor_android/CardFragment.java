@@ -135,10 +135,10 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
      *  This method centers the first card of the stack to the center of this fragment.
      */
     private void centerFirstCard() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[1].getLayoutParams());
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[0].getLayoutParams());
         int px = Utility.dpToPx(20);
         params.setMargins(px,px,px,px);
-        cards[1].setLayoutParams(params);
+        cards[0].setLayoutParams(params);
     }
 
     public void removeCardViews(RelativeLayout cards[]) {
@@ -559,6 +559,11 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
             nextSet = null;
             currentSet = (SearchQueryResult) answer;
         }
+    }
+
+    @Override
+    public void onHttpRequestFailed() {
+
     }
 
     //endregion

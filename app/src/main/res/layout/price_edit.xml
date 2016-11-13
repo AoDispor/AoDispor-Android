@@ -16,7 +16,7 @@
     <EditText
         android:layout_width="match_parent"
         android:inputType="numberDecimal"
-        android:id="@+id/editText"
+        android:id="@+id/price_input"
         android:background="@drawable/line_input"
         android:layout_height="50dp"
         android:textAlignment="center"

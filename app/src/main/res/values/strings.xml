@@ -12,4 +12,10 @@
     <string name="profile_price_type_day">Por dia</string>
     <string name="profile_price_type_service">Por serviço</string>
 
+    <!-- Profile Card -->
+    <string name="profile_price">%1$d €</string>
+
+    <!-- Error Messages -->
+    <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
+
 </resources>

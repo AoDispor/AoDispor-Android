@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -34,6 +35,9 @@ public class ProfessionalProfileActivity extends AppCompatActivity {
         String _location = extras.getString("location");
         location.setText(Html.fromHtml(_location));
         location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+
+        location.setClickable(true);
+        location.setOnClickListener(new LocalizationOnClickListener(this,location));
 
         TextView description = (TextView) findViewById(R.id.description);
         String _description = extras.getString("description");

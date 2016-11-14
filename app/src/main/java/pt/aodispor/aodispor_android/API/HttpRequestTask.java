@@ -6,11 +6,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+
+import pt.aodispor.aodispor_android.AppDefinitions;
 
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
@@ -18,20 +22,22 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private String url;
     private String[] urlVariables;
     boolean useDefaultHeader = true;
+    private OnHttpRequestCompleted postExecute;
+    private boolean timeout = false;
+
     private String getLocalDate()
     {
         Date cDate = new Date();
         return new SimpleDateFormat("yyyyMMdd").format(cDate);
     }
-    private OnHttpRequestCompleted postExecute;
 
-    public HttpRequestTask(Class answerType,OnHttpRequestCompleted postExecute,String url) {
+    public HttpRequestTask(Class answerType, OnHttpRequestCompleted postExecute, String url) {
         this.answerType = answerType;
         this.postExecute = postExecute;
         this.url = url;
         this.urlVariables = new String[]{};
     }
-    public HttpRequestTask(Class answerType,OnHttpRequestCompleted postExecute,String url, String... urlVariables) {
+    public HttpRequestTask(Class answerType, OnHttpRequestCompleted postExecute, String url, String... urlVariables) {
         this.answerType = answerType;
         this.postExecute = postExecute;
         this.url = url;
@@ -43,6 +49,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     {
         this.url = url;
     }
+
     public void setUrlVariables(String... variables)
     {
         this.urlVariables = variables;
@@ -60,22 +67,36 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 headers.set("API-Authorization", token + date);
                 entityReq = new HttpEntity<>(headers);
-            } else entityReq = new HttpEntity<>(null);
-
-            RestTemplate template = new RestTemplate();
-            ApiJSON response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType,urlVariables).getBody();
-            return response;
-
-        } catch (Exception e) {}
-
+            }else {
+                entityReq = new HttpEntity<>(null);
+            }
+            SimpleClientHttpRequestFactory cf = new SimpleClientHttpRequestFactory();
+            cf.setConnectTimeout(AppDefinitions.TIMEOUT);
+            cf.setReadTimeout(AppDefinitions.TIMEOUT);
+            RestTemplate template = new RestTemplate(cf);
+            try {
+                ApiJSON r = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
+                return r;
+            }catch (RestClientException re) {
+                timeout = true;
+                re.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
     protected void onPostExecute(ApiJSON data) {
-        if (data==null) return;
-        if (this.postExecute==null) return;
-        this.postExecute.onHttpRequestCompleted(data);
+        if (postExecute == null)
+            return;
+        if(timeout){
+            postExecute.onHttpRequestFailed();
+        }else {
+            if (data == null)
+                return;
+            postExecute.onHttpRequestCompleted(data);
+        }
     }
-
 }

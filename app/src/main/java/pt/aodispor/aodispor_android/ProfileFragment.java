@@ -98,15 +98,13 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
     }
 
     public void setPrice(int value, boolean f, PriceType type){
-        String text = String.format(getResources().getString(R.string.profile_price), value);
-        priceView.setText(text);
-        priceView.setTextColor(ContextCompat.getColor(getContext(),R.color.aoDispor2));
+        hideViews();
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+        //TODO Send price to api
         update();
     }
 
     public void update(){
-        hideViews();
-        progressBar.setVisibility(ProgressBar.VISIBLE);
         new HttpRequestTask(SearchQueryResult.class, this, "https://api.aodispor.pt/profiles/porto5125").execute();
     }
 

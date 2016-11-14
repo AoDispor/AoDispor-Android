@@ -1,7 +1,6 @@
 package pt.aodispor.aodispor_android.API;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+
+import pt.aodispor.aodispor_android.AppDefinitions;
 
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
@@ -70,8 +71,8 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                 entityReq = new HttpEntity<>(null);
             }
             SimpleClientHttpRequestFactory cf = new SimpleClientHttpRequestFactory();
-            cf.setConnectTimeout(3000);
-            cf.setReadTimeout(3000);
+            cf.setConnectTimeout(AppDefinitions.TIMEOUT);
+            cf.setReadTimeout(AppDefinitions.TIMEOUT);
             RestTemplate template = new RestTemplate(cf);
             try {
                 ApiJSON r = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();

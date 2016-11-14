@@ -26,7 +26,7 @@
     <Switch
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/switch2"
+        android:id="@+id/priceSwitch"
         android:textSize="18sp"
         android:textOn="sim"
         android:textOff="não"

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,10 +27,13 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
     private LinearLayout loadingMessage;
+    private Professional professional;
+    private int rate;
+    private PriceType priceType;
     private TextView priceView, locationView, professionView, descriptionView;
     private ImageView imageView;
 
-    public enum PriceType { ByHour, ByDay, ByMonth }
+    public enum PriceType { ByHour, ByDay, ByService }
 
     /**
      * Factory method to create a new instance of ProfileFragment class. This is needed because of how
@@ -63,7 +65,7 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         createPlaceholderText();
 
         // Create Dialogs
-        priceDialog = new PriceDialog(getActivity(), this);
+        priceDialog = PriceDialog.newInstance();
 
         // Loading Message
         loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
@@ -98,7 +100,7 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         priceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                priceDialog.show();
+                priceDialog.show(getFragmentManager(),"dialog");
             }
         });
 
@@ -113,10 +115,12 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         descriptionView.setText(R.string.register_description);
     }
 
-    public void setPrice(int value, boolean f, PriceType type){
-        startLoading();
-        //TODO Send price to api
-        update();
+    public void setPrice(int value, boolean f, PriceType type) {
+        if(value != rate || type != priceType ) {
+            startLoading();
+            //TODO Send price to api
+            update();
+        }
     }
 
     public void update(){
@@ -131,19 +135,23 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
     @Override
     public void onHttpRequestCompleted(ApiJSON answer) {
         SearchQueryResult result = (SearchQueryResult) answer;
-        Professional p = result.data.get(0);
+        professional = result.data.get(0);
 
         // Price View
-        String priceText = p.getRate();
-        switch (p.getType()){
+        String priceText = professional.getRate();
+        rate = Integer.parseInt(priceText);
+        switch (professional.getType()){
             case "H":
+                priceType = PriceType.ByHour;
                 priceText += "/h";
                 priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.by_hour));
                 break;
             case "S":
+                priceType = PriceType.ByService;
                 priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.by_service));
                 break;
             case "D":
+                priceType = PriceType.ByDay;
                 priceText += "/por dia";
                 priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.aoDispor2));
                 break;
@@ -151,18 +159,18 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         priceView.setText(priceText);
 
         // Location
-        locationView.setText(p.getLocation());
+        locationView.setText(professional.getLocation());
 
         // Profession
-        professionView.setText(p.getTitle());
+        professionView.setText(professional.getTitle());
 
         // Description
-        descriptionView.setText(p.getDescription());
+        descriptionView.setText(professional.getDescription());
 
         // Profile Image
         ImageLoader imageLoader = ImageLoader.getInstance();
         DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
-        imageLoader.displayImage(p.getAvatar_url(), imageView, options);
+        imageLoader.displayImage(professional.getAvatar_url(), imageView, options);
 
         endLoading();
     }
@@ -193,6 +201,14 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         for (int i = 0; i < professionalCard.getChildCount(); i++){
             professionalCard.getChildAt(i).setVisibility(View.VISIBLE);
         }
+    }
+
+    public int getPriceRate(){
+        return rate;
+    }
+
+    public PriceType getPriceType(){
+        return PriceType.values()[priceType.ordinal()];
     }
 
 }

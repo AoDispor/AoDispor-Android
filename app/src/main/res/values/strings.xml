@@ -15,6 +15,9 @@
     <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>
 
+    <!-- Price Dialog -->
+    <string name="dialog_price">%1$d</string>
+
     <!-- Other Messages -->
     <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>

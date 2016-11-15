@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setCurrentItem(1);
     }
 
     /**

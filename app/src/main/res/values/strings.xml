@@ -2,4 +2,22 @@
     <string name="app_name">Ao Dispor</string>
     <string name="zip_dialog">Insira o seu código postal</string>
     <string name="your_location_is_dialog">A sua localização é: </string>
+    
+    <!-- Register Card -->
+    <string name="register_location">A sua localização</string>
+    <string name="register_price">O seu preço</string>
+    <string name="register_profession">A sua profissão</string>
+    <string name="register_description">Descreva aqui o que faz&#8230;</string>
+    <string name="profile_price_final">O seu preço é final?</string>
+    <string name="profile_price_method">O seu serviço é oferecido como?</string>
+    <string name="profile_price_type_hour">Por hora</string>
+    <string name="profile_price_type_day">Por dia</string>
+    <string name="profile_price_type_service">Por serviço</string>
+
+    <!-- Profile Card -->
+    <string name="profile_price">%1$d €</string>
+
+    <!-- Error Messages -->
+    <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
+
 </resources>

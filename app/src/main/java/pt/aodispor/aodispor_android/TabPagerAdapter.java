@@ -30,7 +30,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         Fragment f = null;
         switch (position){
             case 0:
-                f = BlankFragment.newInstance();
+                f = ProfileFragment.newInstance();
                 break;
             case 1:
                 f = CardFragment.newInstance();

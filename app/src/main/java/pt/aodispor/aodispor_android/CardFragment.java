@@ -434,7 +434,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         ImageView avatar = (ImageView) card.findViewById(R.id.profile_image);
 
         ImageLoader imageLoader = ImageLoader.getInstance();
-        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(10)).build();
+        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
         imageLoader.displayImage(av, avatar, options);
 
         //avatar.setOnClickListener(new ImageOnClickListener(n,p,l,d,pr,cur,type,av,this));

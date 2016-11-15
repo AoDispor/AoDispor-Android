@@ -3,16 +3,19 @@ package pt.aodispor.aodispor_android;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import pt.aodispor.aodispor_android.API.ApiJSON;
 import pt.aodispor.aodispor_android.API.HttpRequestTask;
@@ -24,8 +27,9 @@ import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
 public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
-    private TextView priceView;
-    private ProgressBar progressBar;
+    private LinearLayout loadingMessage;
+    private TextView priceView, locationView, professionView, descriptionView;
+    private ImageView imageView;
 
     public enum PriceType { ByHour, ByDay, ByMonth }
 
@@ -48,33 +52,45 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         params.setMargins(p,p,p,p);
         professionalCard.setLayoutParams(params);
 
+        // Get Views
         priceView = (TextView) professionalCard.findViewById(R.id.price);
+        locationView = (TextView) professionalCard.findViewById(R.id.location);
+        professionView = (TextView) professionalCard.findViewById(R.id.profession);
+        descriptionView = (TextView) professionalCard.findViewById(R.id.description);
+        imageView = (ImageView) professionalCard.findViewById(R.id.profile_image);
 
+        // Create Placeholder Text
         createPlaceholderText();
 
-        priceDialog = new PriceDialog(getActivity(),this);
+        // Create Dialogs
+        priceDialog = new PriceDialog(getActivity(), this);
 
-        progressBar = new ProgressBar(getContext());
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(ProgressBar.INVISIBLE);
-        RelativeLayout.LayoutParams progressBarParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
-        professionalCard.addView(progressBar,progressBarParams);
+        // Loading Message
+        loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
 
         rootView.addView(professionalCard);
+
+        startLoading();
+        update();
+
         return rootView;
     }
 
+    /**
+     * Creates a placeholder text in each profile view.
+     */
     private void createPlaceholderText(){
         int grey = ContextCompat.getColor(getActivity(), R.color.grey);
-        TextView location = (TextView) professionalCard.findViewById(R.id.location);
-        location.setTextColor(grey);
-        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        location.setText(R.string.register_location);
 
-        ImageView image = (ImageView) professionalCard.findViewById(R.id.profile_image);
-        image.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));
+        // Location
+        locationView.setTextColor(grey);
+        locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        locationView.setText(R.string.register_location);
 
+        // Profile Image
+        imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));
+
+        // Price
         priceView = (TextView) professionalCard.findViewById(R.id.price);
         priceView.setTextColor(grey);
         priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
@@ -86,20 +102,19 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
             }
         });
 
-        TextView profession = (TextView) professionalCard.findViewById(R.id.profession);
-        profession.setTextColor(grey);
-        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        profession.setText(R.string.register_profession);
+        // Profession
+        professionView.setTextColor(grey);
+        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        professionView.setText(R.string.register_profession);
 
-        TextView description = (TextView) professionalCard.findViewById(R.id.description);
-        description.setTextColor(grey);
-        description.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        description.setText(R.string.register_description);
+        // Description
+        descriptionView.setTextColor(grey);
+        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        descriptionView.setText(R.string.register_description);
     }
 
     public void setPrice(int value, boolean f, PriceType type){
-        hideViews();
-        progressBar.setVisibility(ProgressBar.VISIBLE);
+        startLoading();
         //TODO Send price to api
         update();
     }
@@ -108,13 +123,17 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         new HttpRequestTask(SearchQueryResult.class, this, "https://api.aodispor.pt/profiles/porto5125").execute();
     }
 
+    /**
+     * Started when the HTTP request has finished and succeeded. It then updates the views of the
+     * fragment in order to show profile information.
+     * @param answer the ApiJSON formatted answer.
+     */
     @Override
     public void onHttpRequestCompleted(ApiJSON answer) {
-        showViews();
-        progressBar.setVisibility(ProgressBar.INVISIBLE);
-
         SearchQueryResult result = (SearchQueryResult) answer;
         Professional p = result.data.get(0);
+
+        // Price View
         String priceText = p.getRate();
         switch (p.getType()){
             case "H":
@@ -130,13 +149,38 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
                 break;
         }
         priceView.setText(priceText);
+
+        // Location
+        locationView.setText(p.getLocation());
+
+        // Profession
+        professionView.setText(p.getTitle());
+
+        // Description
+        descriptionView.setText(p.getDescription());
+
+        // Profile Image
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
+        imageLoader.displayImage(p.getAvatar_url(), imageView, options);
+
+        endLoading();
     }
 
     @Override
     public void onHttpRequestFailed() {
-        showViews();
-        progressBar.setVisibility(RelativeLayout.INVISIBLE);
         Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();
+        endLoading();
+    }
+
+    private void startLoading(){
+        hideViews();
+        loadingMessage.setVisibility(LinearLayout.VISIBLE);
+    }
+
+    private void endLoading(){
+        showViews();
+        loadingMessage.setVisibility(LinearLayout.INVISIBLE);
     }
 
     private void hideViews(){

@@ -15,7 +15,8 @@
     <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>
 
-    <!-- Error Messages -->
+    <!-- Other Messages -->
+    <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
 
 </resources>

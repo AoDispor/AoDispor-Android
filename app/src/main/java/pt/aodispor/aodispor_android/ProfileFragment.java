@@ -64,9 +64,6 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         // Create Placeholder Text
         createPlaceholderText();
 
-        // Create Dialogs
-        priceDialog = PriceDialog.newInstance();
-
         // Loading Message
         loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
 
@@ -100,6 +97,8 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         priceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Create Dialogs
+                priceDialog = PriceDialog.newInstance(rate,true,priceType.ordinal());
                 priceDialog.show(getFragmentManager(),"dialog");
             }
         });

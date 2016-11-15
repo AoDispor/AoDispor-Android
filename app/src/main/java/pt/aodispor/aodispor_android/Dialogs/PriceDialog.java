@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,18 +40,20 @@ public class PriceDialog extends DialogFragment {
 
     }
 
-    public static PriceDialog newInstance(){
-        return new PriceDialog();
+    public static PriceDialog newInstance(int r, boolean f, int pt){
+        PriceDialog pd = new PriceDialog();
+
+        Bundle args = new Bundle();
+        args.putInt("rate",r);
+        args.putBoolean("final",f);
+        args.putInt("type",pt);
+
+        pd.setArguments(args);
+        return pd;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
-        // Set Window and Keyboard Settings
-        getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-
         super.onCreate(savedInstanceState);
     }
 
@@ -58,15 +61,23 @@ public class PriceDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.price_edit,container);
 
+        // Set Window and Keyboard Settings
+        getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
         // Set variables
-        rate = profileFragment.getPriceRate();
-        priceType = profileFragment.getPriceType();
+        rate = getArguments().getInt("rate");
+        priceType = ProfileFragment.PriceType.values()[getArguments().getInt("type")];
 
         // Get Views
         priceView = (EditText) root.findViewById(R.id.price_input);
-        priceView.setText(rate);
+        byHour = (Button) root.findViewById(R.id.type1);
+        byDay = (Button) root.findViewById(R.id.type2);
+        byService = (Button) root.findViewById(R.id.type3);
+        priceSwitch = (Switch) root.findViewById(R.id.priceSwitch);
 
-        //priceView.setText(rate,EditText.BufferType.EDITABLE);
+        // Price Edit Text
         InputFilter filter = new InputFilter() {
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned spanned, int i2, int i3) {
@@ -79,10 +90,10 @@ public class PriceDialog extends DialogFragment {
             }
         };
         priceView.setFilters(new InputFilter[] { filter });
-        byHour = (Button) root.findViewById(R.id.type1);
-        byDay = (Button) root.findViewById(R.id.type2);
-        byService = (Button) root.findViewById(R.id.type3);
-        priceSwitch = (Switch) root.findViewById(R.id.priceSwitch);
+        priceView.append(rate+"");
+
+        // Price Final Switch
+        priceSwitch.setChecked(getArguments().getBoolean("final"));
 
         // Buttons
         buttons = new Button[]{ byHour, byDay, byService };

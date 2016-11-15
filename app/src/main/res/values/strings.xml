@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Ao Dispor</string>
+    <string name="zip_dialog">Insira o seu código postal</string>
+    <string name="your_location_is_dialog">A sua localização é: </string>
     
     <!-- Register Card -->
     <string name="register_location">A sua localização</string>

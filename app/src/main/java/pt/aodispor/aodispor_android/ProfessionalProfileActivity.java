@@ -115,4 +115,11 @@ public class ProfessionalProfileActivity extends AppCompatActivity {
             _image.setImageBitmap(image);
         }
     }
+
+    public byte[] convertToBinary(Bitmap image) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream); //not lossless
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
+    }
 }

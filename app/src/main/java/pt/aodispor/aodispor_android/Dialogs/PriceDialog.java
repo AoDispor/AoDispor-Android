@@ -1,19 +1,13 @@
 package pt.aodispor.aodispor_android.Dialogs;
 
-import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +21,9 @@ import pt.aodispor.aodispor_android.ProfileFragment;
 import pt.aodispor.aodispor_android.R;
 
 public class PriceDialog extends DialogFragment {
+    public static final int DIALOG_FRAGMENT = 1;
     private int buttonChosen;
     private Button[] buttons;
-    private ProfileFragment profileFragment;
-    private Button byHour,byDay,byService;
     private EditText priceView;
     private ProfileFragment.PriceType priceType;
     private int rate;
@@ -40,14 +33,13 @@ public class PriceDialog extends DialogFragment {
 
     }
 
-    public static PriceDialog newInstance(int r, boolean f, int pt){
+    public static PriceDialog newInstance(ProfileFragment pf, int r, boolean f, int pt){
         PriceDialog pd = new PriceDialog();
-
         Bundle args = new Bundle();
-        args.putInt("rate",r);
-        args.putBoolean("final",f);
-        args.putInt("type",pt);
-
+        args.putInt("rate", r);
+        args.putBoolean("final", f);
+        args.putInt("type", pt);
+        pd.setTargetFragment(pf, DIALOG_FRAGMENT);
         pd.setArguments(args);
         return pd;
     }
@@ -59,7 +51,7 @@ public class PriceDialog extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.price_edit,container);
+        View root = inflater.inflate(R.layout.price_edit, container);
 
         // Set Window and Keyboard Settings
         getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
@@ -72,9 +64,9 @@ public class PriceDialog extends DialogFragment {
 
         // Get Views
         priceView = (EditText) root.findViewById(R.id.price_input);
-        byHour = (Button) root.findViewById(R.id.type1);
-        byDay = (Button) root.findViewById(R.id.type2);
-        byService = (Button) root.findViewById(R.id.type3);
+        Button byHour = (Button) root.findViewById(R.id.type1);
+        Button byDay = (Button) root.findViewById(R.id.type2);
+        Button byService = (Button) root.findViewById(R.id.type3);
         priceSwitch = (Switch) root.findViewById(R.id.priceSwitch);
 
         // Price Edit Text
@@ -89,36 +81,28 @@ public class PriceDialog extends DialogFragment {
                 return null;
             }
         };
-        priceView.setFilters(new InputFilter[] { filter });
-        priceView.append(rate+"");
+        priceView.setFilters(new InputFilter[]{ filter });
 
-        // Price Final Switch
-        priceSwitch.setChecked(getArguments().getBoolean("final"));
-
-        // Buttons
+        // Radio Buttons
         buttons = new Button[]{ byHour, byDay, byService };
-        buttonChosen = priceType.ordinal();
-        LayerDrawable d = (LayerDrawable) buttons[buttonChosen].getBackground();
-        GradientDrawable s = (GradientDrawable) d.getDrawable(1);
-        s.setColor(ContextCompat.getColor(getContext(),R.color.aoDispor2));
-        for (int i = 0; i < buttons.length; i++) {
-            buttons[i].setOnClickListener(new View.OnClickListener() {
+        for (Button button : buttons) {
+            button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    for (int j = 0; j < buttons.length; j++){
-                        if(buttons[j] == view){
+                    for (int j = 0; j < buttons.length; j++) {
+                        if (buttons[j] == view) {
                             buttonChosen = j;
                         }
                     }
                     priceType = ProfileFragment.PriceType.values()[buttonChosen];
                     LayerDrawable drawable = (LayerDrawable) view.getBackground();
                     GradientDrawable shapeDrawable = (GradientDrawable) drawable.getDrawable(1);
-                    shapeDrawable.setColor(ContextCompat.getColor(getContext(),R.color.aoDispor2));
-                    for (int i = 0; i < buttons.length; i++){
-                        if(i != buttonChosen){
+                    shapeDrawable.setColor(ContextCompat.getColor(getContext(), R.color.aoDispor2));
+                    for (int i = 0; i < buttons.length; i++) {
+                        if (i != buttonChosen) {
                             LayerDrawable d = (LayerDrawable) buttons[i].getBackground();
                             GradientDrawable s = (GradientDrawable) d.getDrawable(1);
-                            s.setColor(ContextCompat.getColor(getContext(),R.color.white));
+                            s.setColor(ContextCompat.getColor(getContext(), R.color.white));
                         }
                     }
                 }
@@ -127,95 +111,58 @@ public class PriceDialog extends DialogFragment {
         getDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                if(priceView.getText().length() != 0){
-                    profileFragment.setPrice(Integer.parseInt(priceView.getText().toString()), priceSwitch.isChecked(), priceType);
+                if (priceView.getText().length() != 0) {
+                    ProfileFragment pf = (ProfileFragment) getTargetFragment();
+                    pf.setPrice(Integer.parseInt(priceView.getText().toString()), priceSwitch.isChecked(), priceType);
                 }
             }
         });
+
+        updateViews();
 
         return root;
     }
 
-
-
-
-
-
-
-    /*
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateViews();
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.price_edit);
+    public void onPause() {
+        super.onPause();
+        ProfileFragment pf = (ProfileFragment) getTargetFragment();
 
-        // Set variables
-        rate = profileFragment.getPriceRate();
-        priceType = profileFragment.getPriceType();
+        int nRate = rate;
+        if(priceView.getText().length() != 0){
+            nRate = Integer.parseInt(priceView.getText().toString());
+        }
+        boolean nFinal = priceSwitch.isChecked();
+        ProfileFragment.PriceType nPriceType = ProfileFragment.PriceType.values()[buttonChosen];
 
-        // Set Window and Keyboard Settings
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        pf.setPrice(nRate,nFinal,nPriceType);
+    }
 
-        // Get Views
-        priceView = (EditText) findViewById(R.id.price_input);
+    private void updateViews() {
+        // Price Edit Text
+        priceView.setText("");
+        priceView.append(rate+"");
 
-        //priceView.setText(rate,EditText.BufferType.EDITABLE);
-        InputFilter filter = new InputFilter() {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned spanned, int i2, int i3) {
-                for (int j = start; j < end; j++) {
-                    if (source.charAt(j) == '.') {
-                        return "";
-                    }
-                }
-                return null;
-            }
-        };
-        priceView.setFilters(new InputFilter[] { filter });
-        byHour = (Button) findViewById(R.id.type1);
-        byDay = (Button) findViewById(R.id.type2);
-        byService = (Button) findViewById(R.id.type3);
-        priceSwitch = (Switch) findViewById(R.id.priceSwitch);
+        // Price Final Switch
+        priceSwitch.setChecked(getArguments().getBoolean("final"));
 
-        // Buttons
-        buttons = new Button[]{ byHour, byDay, byService };
+        // Radio Buttons
         buttonChosen = priceType.ordinal();
+        for (int i = 0; i < buttons.length; i++) {
+            if (i != buttonChosen) {
+                LayerDrawable d = (LayerDrawable) buttons[i].getBackground();
+                GradientDrawable s = (GradientDrawable) d.getDrawable(1);
+                s.setColor(ContextCompat.getColor(getContext(), R.color.white));
+            }
+        }
         LayerDrawable d = (LayerDrawable) buttons[buttonChosen].getBackground();
         GradientDrawable s = (GradientDrawable) d.getDrawable(1);
-        s.setColor(ContextCompat.getColor(getContext(),R.color.aoDispor2));
-        for (int i = 0; i < buttons.length; i++) {
-            buttons[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    for (int j = 0; j < buttons.length; j++){
-                        if(buttons[j] == view){
-                            buttonChosen = j;
-                        }
-                    }
-                    priceType = ProfileFragment.PriceType.values()[buttonChosen];
-                    LayerDrawable drawable = (LayerDrawable) view.getBackground();
-                    GradientDrawable shapeDrawable = (GradientDrawable) drawable.getDrawable(1);
-                    shapeDrawable.setColor(ContextCompat.getColor(getContext(),R.color.aoDispor2));
-                    for (int i = 0; i < buttons.length; i++){
-                        if(i != buttonChosen){
-                            LayerDrawable d = (LayerDrawable) buttons[i].getBackground();
-                            GradientDrawable s = (GradientDrawable) d.getDrawable(1);
-                            s.setColor(ContextCompat.getColor(getContext(),R.color.white));
-                        }
-                    }
-                }
-            });
-        }
-        setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                if(priceView.getText().length() != 0){
-                    profileFragment.setPrice(Integer.parseInt(priceView.getText().toString()), priceSwitch.isChecked(), priceType);
-                }
-            }
-        });
+        s.setColor(ContextCompat.getColor(getContext(), R.color.aoDispor2));
     }
-    */
-
 }

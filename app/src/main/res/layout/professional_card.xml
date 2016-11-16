@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/price"
-        android:textSize="20sp"
+        android:textSize="36sp"
         android:textColor="@android:color/black"
         android:fontFamily="serif"
         android:layout_alignParentRight="true"

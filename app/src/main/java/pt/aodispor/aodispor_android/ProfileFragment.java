@@ -3,6 +3,7 @@ package pt.aodispor.aodispor_android;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,9 +98,10 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         priceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Create Dialogs
-                priceDialog = PriceDialog.newInstance(rate,true,priceType.ordinal());
-                priceDialog.show(getFragmentManager(),"dialog");
+                // Show Price Dialog
+                if(!priceDialog.isAdded()){
+                    priceDialog.show(getFragmentManager(),"dialog");
+                }
             }
         });
 
@@ -114,12 +116,20 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         descriptionView.setText(R.string.register_description);
     }
 
-    public void setPrice(int value, boolean f, PriceType type) {
-        if(value != rate || type != priceType ) {
+    public void setPrice(int value, boolean isFinal, PriceType type) {
+        /*if(value != rate || type != priceType ) {
             startLoading();
             //TODO Send price to api
             update();
-        }
+        }*/
+        Log.v("debug","BEFORE");
+        Log.v("debug",rate+"");
+        Log.v("debug",""+true);
+        Log.v("debug",""+priceType.name());
+        Log.v("debug","AFTER");
+        Log.v("debug",""+value);
+        Log.v("debug",""+isFinal);
+        Log.v("debug",""+type);
     }
 
     public void update(){
@@ -170,6 +180,9 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         ImageLoader imageLoader = ImageLoader.getInstance();
         DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
         imageLoader.displayImage(professional.getAvatar_url(), imageView, options);
+
+        // Create Dialogs
+        priceDialog = PriceDialog.newInstance(this,rate,true,priceType.ordinal());
 
         endLoading();
     }

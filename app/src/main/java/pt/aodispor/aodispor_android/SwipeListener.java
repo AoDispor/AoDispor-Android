@@ -122,26 +122,23 @@ public class SwipeListener implements View.OnTouchListener{
                     AlertDialog dialog = builder.create();
 
                     dialog.show();
-                    //Intent phoneIntent = new Intent(Intent.ACTION_CALL);
-                    //phoneIntent.setData(Uri.parse("tel:9123456789"));//TODO replace with actual professional number
-                    //cardFragment.startActivity(phoneIntent);
                     enableCall = false;
                 }
-                viewPager.setSwipeEnabled(true);
                 if(Math.abs(x-initialX) < view.getWidth()/2 && Math.abs(y-initialY) < view.getHeight()/2) {
-                    CardFragment.blockAccess=true;
+                    CardFragment.blockAccess = true;
                     view.animate().translationX(0).translationY(0).rotation(0).setDuration(400).setListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {
                             view.setEnabled(false);
-                            discardAnimationDuration =0;
+                            discardAnimationDuration = 0;
                         }
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            CardFragment.blockAccess=false;
+                            CardFragment.blockAccess = false;
                             view.setEnabled(true);
                             discard.setAlpha(0);
+                            viewPager.setSwipeEnabled(true);
                         }
 
                         @Override
@@ -169,8 +166,9 @@ public class SwipeListener implements View.OnTouchListener{
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            discardAnimationDuration =0;
+                            discardAnimationDuration = 0;
                             cardFragment.discardTopCard();
+                            viewPager.setSwipeEnabled(true);
                         }
 
                         @Override

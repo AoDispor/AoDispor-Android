@@ -14,6 +14,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -128,8 +132,16 @@ public class CardFragment extends Fragment implements HttpRequest {
         int px = getResources().getDimensionPixelSize(R.dimen.card_margin);
         params.setMargins(px,px,px,px);
         cards[position].setLayoutParams(params);
-        cards[position].animate().translationX(getResources().getDimensionPixelSize(R.dimen.card_offset)*position);
-        cards[position].animate().translationY(getResources().getDimensionPixelSize(R.dimen.card_offset)*position);
+        cards[position].setTranslationX(getResources().getDimensionPixelSize(R.dimen.card_offset)*(position+1));
+        cards[position]
+                .animate()
+                .translationX(getResources().getDimensionPixelSize(R.dimen.card_offset)*position)
+                .setInterpolator(new DecelerateInterpolator());
+        cards[position].setTranslationY(getResources().getDimensionPixelSize(R.dimen.card_offset)*(position+1));
+        cards[position]
+                .animate()
+                .translationY(getResources().getDimensionPixelSize(R.dimen.card_offset)*position)
+                .setInterpolator(new DecelerateInterpolator());
     }
 
     /**

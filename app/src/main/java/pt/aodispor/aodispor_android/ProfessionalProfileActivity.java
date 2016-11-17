@@ -1,29 +1,15 @@
 package pt.aodispor.aodispor_android;
 
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.io.ByteArrayOutputStream;
-
 public class ProfessionalProfileActivity extends AppCompatActivity {
-    private static final int SELECT_PICTURE = 0;
-    private String selectedImagePath;
-    private ImageView _image;
     private ImageLoader imageLoader;
 
     public ProfessionalProfileActivity() {}
@@ -48,9 +34,6 @@ public class ProfessionalProfileActivity extends AppCompatActivity {
         String _location = extras.getString("location");
         location.setText(Html.fromHtml(_location));
         location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-
-        location.setClickable(true);
-        location.setOnClickListener(new LocalizationOnClickListener(this,location));
 
         TextView description = (TextView) findViewById(R.id.description);
         String _description = extras.getString("description");
@@ -83,43 +66,5 @@ public class ProfessionalProfileActivity extends AppCompatActivity {
 
         imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(_avatar, avatar);
-
-        avatar.setClickable(true);
-        _image = avatar;
-        avatar.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                openGallery(SELECT_PICTURE);
-            }
-        });
-
-    }
-    public void openGallery(int req_code) {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.putExtra("crop","true");
-        intent.putExtra("aspectX",1);
-        intent.putExtra("aspectY",1);
-        intent.putExtra("outputX",200);
-        intent.putExtra("outputY",200);
-        intent.putExtra("return-data",true);
-        startActivityForResult(intent, req_code);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
-            Log.d("D", "b4uri");
-            Bundle bundle = data.getExtras();
-            Bitmap image = bundle.getParcelable("data");
-            _image.setImageBitmap(image);
-        }
-    }
-
-    public byte[] convertToBinary(Bitmap image) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, stream); //not lossless
-        byte[] byteArray = stream.toByteArray();
-        return byteArray;
     }
 }

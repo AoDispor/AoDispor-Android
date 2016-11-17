@@ -1,8 +1,12 @@
 package pt.aodispor.aodispor_android;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +20,8 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
+import java.io.ByteArrayOutputStream;
+
 import pt.aodispor.aodispor_android.API.ApiJSON;
 import pt.aodispor.aodispor_android.API.HttpRequestTask;
 import pt.aodispor.aodispor_android.API.HttpRequest;
@@ -24,8 +30,12 @@ import pt.aodispor.aodispor_android.API.SearchQueryResult;
 import pt.aodispor.aodispor_android.Dialogs.DialogCallback;
 import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
 
+import static android.app.Activity.RESULT_OK;
+import static pt.aodispor.aodispor_android.R.id.location;
+
 public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
+    private static final int SELECT_PICTURE = 0;
 
     private final String phoneNumber = "+351 912 488 434";
     private final String password = "123456";
@@ -58,7 +68,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Get Views
         priceView = (TextView) professionalCard.findViewById(R.id.price);
-        locationView = (TextView) professionalCard.findViewById(R.id.location);
+        locationView = (TextView) professionalCard.findViewById(location);
         professionView = (TextView) professionalCard.findViewById(R.id.profession);
         descriptionView = (TextView) professionalCard.findViewById(R.id.description);
         imageView = (ImageView) professionalCard.findViewById(R.id.profile_image);
@@ -67,6 +77,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+
+        locationView.setClickable(true);
+        locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(),locationView));
 
         // Price
         priceView.setOnClickListener(new View.OnClickListener() {
@@ -79,11 +92,17 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             }
         });
 
-        // Edit Text Views
-        //createTextViews();
-
         // Loading Message
         loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
+
+        imageView.setClickable(true);
+        imageView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                openGallery(SELECT_PICTURE);
+            }
+        });
 
         rootView.addView(professionalCard);
 
@@ -267,6 +286,34 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         for (int i = 0; i < professionalCard.getChildCount(); i++){
             professionalCard.getChildAt(i).setVisibility(View.VISIBLE);
         }
+    }
+
+    public void openGallery(int req_code) {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.putExtra("crop","true");
+        intent.putExtra("aspectX",1);
+        intent.putExtra("aspectY",1);
+        intent.putExtra("outputX",200);
+        intent.putExtra("outputY",200);
+        intent.putExtra("return-data",true);
+        startActivityForResult(intent, req_code);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
+            Log.d("D", "b4uri");
+            Bundle bundle = data.getExtras();
+            Bitmap image = bundle.getParcelable("data");
+            imageView.setImageBitmap(image);
+        }
+    }
+
+    public byte[] convertToBinary(Bitmap image) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream); //not lossless
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
     }
 
 }

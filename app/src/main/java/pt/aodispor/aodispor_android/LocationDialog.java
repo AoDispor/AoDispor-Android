@@ -12,10 +12,10 @@ import android.widget.TextView;
  * Created by JOSE PEREIRA on 12-11-2016.
  */
 
-public class LocalizationDialog extends AlertDialog {
+public class LocationDialog extends AlertDialog {
     private TextView _location;
 
-    protected LocalizationDialog(Context context) {
+    protected LocationDialog(Context context) {
         super(context);
     }
 

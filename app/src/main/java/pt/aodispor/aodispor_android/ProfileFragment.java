@@ -3,7 +3,6 @@ package pt.aodispor.aodispor_android;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +18,20 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import pt.aodispor.aodispor_android.API.ApiJSON;
 import pt.aodispor.aodispor_android.API.HttpRequestTask;
-import pt.aodispor.aodispor_android.API.OnHttpRequestCompleted;
+import pt.aodispor.aodispor_android.API.HttpRequest;
 import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
+import pt.aodispor.aodispor_android.Dialogs.DialogCallback;
 import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
 
-public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
+public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
+    private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
+
+    private final String phoneNumber = "+351 912 488 434";
+    private final String password = "123456";
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
     private LinearLayout loadingMessage;
-    private Professional professional;
-    private int rate;
-    private PriceType priceType;
     private TextView priceView, locationView, professionView, descriptionView;
     private ImageView imageView;
 
@@ -62,39 +63,12 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         descriptionView = (TextView) professionalCard.findViewById(R.id.description);
         imageView = (ImageView) professionalCard.findViewById(R.id.profile_image);
 
-        // Create Placeholder Text
-        createPlaceholderText();
-
-        // Loading Message
-        loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
-
-        rootView.addView(professionalCard);
-
-        startLoading();
-        update();
-
-        return rootView;
-    }
-
-    /**
-     * Creates a placeholder text in each profile view.
-     */
-    private void createPlaceholderText(){
-        int grey = ContextCompat.getColor(getActivity(), R.color.grey);
-
-        // Location
-        locationView.setTextColor(grey);
+        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        locationView.setText(R.string.register_location);
-
-        // Profile Image
-        imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));
+        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         // Price
-        priceView = (TextView) professionalCard.findViewById(R.id.price);
-        priceView.setTextColor(grey);
-        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        priceView.setText(R.string.register_price);
         priceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,35 +79,30 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
             }
         });
 
-        // Profession
-        professionView.setTextColor(grey);
-        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        professionView.setText(R.string.register_profession);
+        // Edit Text Views
+        //createTextViews();
 
-        // Description
-        descriptionView.setTextColor(grey);
-        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        descriptionView.setText(R.string.register_description);
+        // Loading Message
+        loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
+
+        rootView.addView(professionalCard);
+
+        startLoading();
+        getProfileInfo();
+
+        return rootView;
     }
 
-    public void setPrice(int value, boolean isFinal, PriceType type) {
-        /*if(value != rate || type != priceType ) {
-            startLoading();
-            //TODO Send price to api
-            update();
-        }*/
-        Log.v("debug","BEFORE");
-        Log.v("debug",rate+"");
-        Log.v("debug",""+true);
-        Log.v("debug",""+priceType.name());
-        Log.v("debug","AFTER");
-        Log.v("debug",""+value);
-        Log.v("debug",""+isFinal);
-        Log.v("debug",""+type);
-    }
-
-    public void update(){
-        new HttpRequestTask(SearchQueryResult.class, this, "https://api.aodispor.pt/profiles/porto5125").execute();
+    /**
+     * Makes a GET HTTP request to get user profile information.
+     */
+    public void getProfileInfo(){
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, "https://api.aodispor.pt/profiles/porto5125"); //TODO change this
+        request.setMethod(HttpRequestTask.GET_REQUEST);
+        /*
+        request.addAPIAuthentication("+351 912 488 434","123456");
+        */
+        request.execute();
     }
 
     /**
@@ -142,55 +111,135 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
      * @param answer the ApiJSON formatted answer.
      */
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer) {
-        SearchQueryResult result = (SearchQueryResult) answer;
-        professional = result.data.get(0);
-
-        // Price View
-        String priceText = professional.getRate();
-        rate = Integer.parseInt(priceText);
-        switch (professional.getType()){
-            case "H":
-                priceType = PriceType.ByHour;
-                priceText += "/h";
-                priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.by_hour));
+    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+        Professional p = new Professional();
+        switch (type) {
+            case HttpRequest.GET_PROFILE:
+                SearchQueryResult getProfile = (SearchQueryResult) answer;
+                p = getProfile.data.get(0);
                 break;
-            case "S":
-                priceType = PriceType.ByService;
-                priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.by_service));
-                break;
-            case "D":
-                priceType = PriceType.ByDay;
-                priceText += "/por dia";
-                priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.aoDispor2));
+            case HttpRequest.UPDATE_PROFILE:
+                p = (Professional) answer;
                 break;
         }
-        priceView.setText(priceText);
-
-        // Location
-        locationView.setText(professional.getLocation());
-
-        // Profession
-        professionView.setText(professional.getTitle());
-
-        // Description
-        descriptionView.setText(professional.getDescription());
-
-        // Profile Image
-        ImageLoader imageLoader = ImageLoader.getInstance();
-        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
-        imageLoader.displayImage(professional.getAvatar_url(), imageView, options);
-
-        // Create Dialogs
-        priceDialog = PriceDialog.newInstance(this,rate,true,priceType.ordinal());
-
+        updateProfileCard(p);
         endLoading();
     }
 
+    /**
+     * Started when the HTTP request is unsuccessful. Shows an error message and ends loading.
+     */
     @Override
     public void onHttpRequestFailed() {
         Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();
         endLoading();
+    }
+
+    /**
+     * Started when the price dialog is dismissed. Then it sends a POST request to store the new
+     * professional data.
+     * @param value Professional rate.
+     * @param isFinal Whether the price is final.
+     * @param type The type of the service.
+     */
+    @Override
+    public void onPriceDialogCallBack(int value, boolean isFinal, PriceType type) {
+        startLoading();
+        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.addAPIAuthentication(phoneNumber, password);
+        Professional p = new Professional();
+        p.rate = value+"";
+        switch (type) {
+            case ByHour:
+                p.type = "H";
+                break;
+            case ByDay:
+                p.type = "D";
+                break;
+            case ByService:
+                p.type = "S";
+                break;
+        }
+        request.setJSONBody(p);
+        request.execute();
+    }
+
+    /*
+     * Updates professional profile views and fills the views which aren't filled yet by the user.
+     */
+    private void updateProfileCard(Professional p){
+        // Placeholder Color
+        int grey = ContextCompat.getColor(getActivity(), R.color.grey);
+
+        // Price View
+        String priceText = p.rate;
+        String type = p.type;
+        String curr = p.currency;
+        int rate;
+        PriceType t = PriceType.ByHour;
+        if(priceText != null && type != null && curr != null ) {
+            rate = Integer.parseInt(priceText);
+            priceText += " " +curr;
+            switch (type){
+                case "H":
+                    t = PriceType.ByHour;
+                    priceText += "/h";
+                    priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.by_hour));
+                    break;
+                case "S":
+                    t = PriceType.ByService;
+                    priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.by_service));
+                    break;
+                case "D":
+                    t = PriceType.ByDay;
+                    priceText += "/por dia";
+                    priceView.setTextColor(ContextCompat.getColor(getContext(), R.color.aoDispor2));
+                    break;
+            }
+            priceView.setText(priceText);
+            priceDialog = PriceDialog.newInstance(this, rate, true, t.ordinal());
+        }else {
+            priceView.setTextColor(grey);
+            priceView.setText(R.string.register_price);
+        }
+
+        // Location
+        String locationText = p.location;
+        if(locationText != null) {
+            locationView.setText(locationText);
+        }else {
+            locationView.setTextColor(grey);
+            locationView.setText(R.string.register_location);
+        }
+
+        // Profession
+        String professionText = p.title;
+        if (professionText != null) {
+            professionView.setText(professionText);
+        } else {
+            professionView.setTextColor(grey);
+            professionView.setText(R.string.register_profession);
+        }
+
+        // Description
+        String descriptionText = p.description;
+        if (descriptionText != null) {
+            descriptionView.setText(descriptionText);
+        } else {
+            descriptionView.setTextColor(grey);
+            descriptionView.setText(R.string.register_description);
+        }
+
+        // Profile Image
+        String imageUrl = p.avatar_url;
+        if(imageUrl != null){
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
+            imageLoader.displayImage(imageUrl, imageView, options);
+        } else {
+            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));
+        }
     }
 
     private void startLoading(){
@@ -213,14 +262,6 @@ public class ProfileFragment extends Fragment implements OnHttpRequestCompleted{
         for (int i = 0; i < professionalCard.getChildCount(); i++){
             professionalCard.getChildAt(i).setVisibility(View.VISIBLE);
         }
-    }
-
-    public int getPriceRate(){
-        return rate;
-    }
-
-    public PriceType getPriceType(){
-        return PriceType.values()[priceType.ordinal()];
     }
 
 }

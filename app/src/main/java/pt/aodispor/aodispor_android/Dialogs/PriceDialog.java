@@ -1,13 +1,10 @@
 package pt.aodispor.aodispor_android.Dialogs;
 
-import android.content.DialogInterface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +17,9 @@ import android.widget.Switch;
 import pt.aodispor.aodispor_android.ProfileFragment;
 import pt.aodispor.aodispor_android.R;
 
+/**
+ * Custom Dialog Fragment for editing price information.
+ */
 public class PriceDialog extends DialogFragment {
     public static final int DIALOG_FRAGMENT = 1;
     private int buttonChosen;
@@ -44,10 +44,6 @@ public class PriceDialog extends DialogFragment {
         return pd;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,20 +64,6 @@ public class PriceDialog extends DialogFragment {
         Button byDay = (Button) root.findViewById(R.id.type2);
         Button byService = (Button) root.findViewById(R.id.type3);
         priceSwitch = (Switch) root.findViewById(R.id.priceSwitch);
-
-        // Price Edit Text
-        InputFilter filter = new InputFilter() {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned spanned, int i2, int i3) {
-                for (int j = start; j < end; j++) {
-                    if (source.charAt(j) == '.') {
-                        return "";
-                    }
-                }
-                return null;
-            }
-        };
-        priceView.setFilters(new InputFilter[]{ filter });
 
         // Radio Buttons
         buttons = new Button[]{ byHour, byDay, byService };
@@ -108,18 +90,7 @@ public class PriceDialog extends DialogFragment {
                 }
             });
         }
-        getDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                if (priceView.getText().length() != 0) {
-                    ProfileFragment pf = (ProfileFragment) getTargetFragment();
-                    pf.setPrice(Integer.parseInt(priceView.getText().toString()), priceSwitch.isChecked(), priceType);
-                }
-            }
-        });
-
         updateViews();
-
         return root;
     }
 
@@ -133,21 +104,19 @@ public class PriceDialog extends DialogFragment {
     public void onPause() {
         super.onPause();
         ProfileFragment pf = (ProfileFragment) getTargetFragment();
-
         int nRate = rate;
-        if(priceView.getText().length() != 0){
+        if (priceView.getText().length() != 0) {
             nRate = Integer.parseInt(priceView.getText().toString());
         }
         boolean nFinal = priceSwitch.isChecked();
         ProfileFragment.PriceType nPriceType = ProfileFragment.PriceType.values()[buttonChosen];
-
-        pf.setPrice(nRate,nFinal,nPriceType);
+        pf.onPriceDialogCallBack(nRate,nFinal,nPriceType);
     }
 
     private void updateViews() {
         // Price Edit Text
         priceView.setText("");
-        priceView.append(rate+"");
+        priceView.append(rate + "");
 
         // Price Final Switch
         priceSwitch.setChecked(getArguments().getBoolean("final"));
@@ -165,4 +134,5 @@ public class PriceDialog extends DialogFragment {
         GradientDrawable s = (GradientDrawable) d.getDrawable(1);
         s.setColor(ContextCompat.getColor(getContext(), R.color.aoDispor2));
     }
+
 }

@@ -1,6 +1,10 @@
 package pt.aodispor.aodispor_android.API;
 
 import android.os.AsyncTask;
+import android.util.Base64;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,71 +21,69 @@ import java.util.Date;
 import pt.aodispor.aodispor_android.AppDefinitions;
 
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
+    public static final int GET_REQUEST = 0;
+    public static final int POST_REQUEST = 1;
+    private static final String token = "4bsHGsYeva6eud8VsLiKEVVQYQEgmfCafwtuNrhuFYFcPjxWnT";
 
     private Class answerType;
     private String url;
     private String[] urlVariables;
-    boolean useDefaultHeader = true;
-    private OnHttpRequestCompleted postExecute;
+    private HttpRequest postExecute;
     private boolean timeout = false;
+    private HttpEntity<?> entityReq;
+    private HttpMethod method;
+    private ApiJSON body;
+    private HttpHeaders httpHeaders;
+    private RestTemplate template;
 
-    private String getLocalDate()
-    {
-        Date cDate = new Date();
-        return new SimpleDateFormat("yyyyMMdd").format(cDate);
+    public HttpRequestTask(Class a, HttpRequest p, String u) {
+        answerType = a;
+        postExecute = p;
+        url = u;
+        urlVariables = new String[]{};
+        method = HttpMethod.GET;
+        httpHeaders = new HttpHeaders();
     }
 
-    public HttpRequestTask(Class answerType, OnHttpRequestCompleted postExecute, String url) {
-        this.answerType = answerType;
-        this.postExecute = postExecute;
-        this.url = url;
-        this.urlVariables = new String[]{};
-    }
-    public HttpRequestTask(Class answerType, OnHttpRequestCompleted postExecute, String url, String... urlVariables) {
-        this.answerType = answerType;
-        this.postExecute = postExecute;
-        this.url = url;
-        this.urlVariables = urlVariables;
-    }
-
-    //these might need to add some form of validation later (could be done outside class)
-    public void setURL(String url)
-    {
-        this.url = url;
-    }
-
-    public void setUrlVariables(String... variables)
-    {
-        this.urlVariables = variables;
+    public HttpRequestTask(Class a, HttpRequest p, String u, String... uv) {
+        answerType = a;
+        postExecute = p;
+        url = u;
+        urlVariables = uv;
+        method = HttpMethod.GET;
+        httpHeaders = new HttpHeaders();
     }
 
     @Override
     protected ApiJSON doInBackground(Void... params) {
         try {
-            HttpEntity<?> entityReq;
-            if(useDefaultHeader) {
-                final String token = "4bsHGsYeva6eud8VsLiKEVVQYQEgmfCafwtuNrhuFYFcPjxWnT";
-                final String date = getLocalDate();
-                HttpHeaders headers = new HttpHeaders();
-                headers.setAccept(Arrays.asList(new MediaType[]{MediaType.APPLICATION_JSON}));
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                headers.set("API-Authorization", token + date);
-                entityReq = new HttpEntity<>(headers);
-            }else {
-                entityReq = new HttpEntity<>(null);
-            }
+            prepareHeaders();
             SimpleClientHttpRequestFactory cf = new SimpleClientHttpRequestFactory();
             cf.setConnectTimeout(AppDefinitions.TIMEOUT);
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
-            RestTemplate template = new RestTemplate(cf);
+            template = new RestTemplate(cf);
             try {
-                ApiJSON r = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
-                return r;
+                ApiJSON response;
+                switch (method) {
+                    case POST:
+                        entityReq = new HttpEntity<>(body,httpHeaders);
+                        String s = template.postForObject(url, entityReq, String.class);
+                        ObjectMapper om = new ObjectMapper();
+                        JsonNode root = om.readTree(s);
+                        response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
+                        break;
+                    default:
+                        entityReq = new HttpEntity<>(httpHeaders);
+                        response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
+                        break;
+                }
+                return response;
             }catch (RestClientException re) {
                 timeout = true;
                 re.printStackTrace();
             }
         } catch (Exception e) {
+            timeout = true;
             e.printStackTrace();
         }
         return null;
@@ -96,7 +98,48 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         }else {
             if (data == null)
                 return;
-            postExecute.onHttpRequestCompleted(data);
+            switch (method) {
+                case POST:
+                    postExecute.onHttpRequestCompleted(data, HttpRequest.UPDATE_PROFILE);
+                    break;
+                default:
+                    postExecute.onHttpRequestCompleted(data, HttpRequest.GET_PROFILE);
+                    break;
+            }
         }
     }
+
+    private String getLocalDate() {
+        Date cDate = new Date();
+        return new SimpleDateFormat("yyyyMMdd").format(cDate);
+    }
+
+    private void prepareHeaders(){
+        final String date = getLocalDate();
+        MediaType[] mediaTypes = { MediaType.APPLICATION_JSON };
+        httpHeaders.setAccept(Arrays.asList(mediaTypes));
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("API-Authorization", token + date);
+    }
+
+    public void setMethod(int m) {
+        switch (m){
+            case POST_REQUEST:
+                method = HttpMethod.POST;
+                break;
+            case GET_REQUEST:
+                method = HttpMethod.GET;
+                break;
+        }
+    }
+
+    public void setJSONBody(ApiJSON b){
+        body = b;
+    }
+
+    public void addAPIAuthentication(String phone, String password){
+        String encode = Base64.encodeToString((phone + ":" + password).getBytes(), Base64.DEFAULT);
+        httpHeaders.set("Authorization", "Basic " + encode);
+    }
+
 }

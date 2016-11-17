@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -124,11 +125,11 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     public void setCardMargin(int position) {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[position].getLayoutParams());
-        int px = Utility.dpToPx(20);
+        int px = getResources().getDimensionPixelSize(R.dimen.card_margin);
         params.setMargins(px,px,px,px);
         cards[position].setLayoutParams(params);
-        cards[position].animate().translationX(10*position);
-        cards[position].animate().translationY(10*position);
+        cards[position].animate().translationX(getResources().getDimensionPixelSize(R.dimen.card_offset)*position);
+        cards[position].animate().translationY(getResources().getDimensionPixelSize(R.dimen.card_offset)*position);
     }
 
     /**
@@ -136,7 +137,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     private void centerFirstCard() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[0].getLayoutParams());
-        int px = Utility.dpToPx(20);
+        int px = getResources().getDimensionPixelSize(R.dimen.card_margin);
         params.setMargins(px,px,px,px);
         cards[0].setLayoutParams(params);
     }

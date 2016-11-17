@@ -97,11 +97,14 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo(){
+        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.addAPIAuthentication(phoneNumber, password);
+        /*
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, "https://api.aodispor.pt/profiles/porto5125"); //TODO change this
         request.setMethod(HttpRequestTask.GET_REQUEST);
-        /*
-        request.addAPIAuthentication("+351 912 488 434","123456");
         */
+        request.addAPIAuthentication("+351 912 488 434","123456");
         request.execute();
     }
 
@@ -166,7 +169,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     /*
-     * Updates professional profile views and fills the views which aren't filled yet by the user.
+     * Updates professional profile views and fills the views which aren't filled yet by the user
+     * with placeholder text
      */
     private void updateProfileCard(Professional p){
         // Placeholder Color
@@ -178,10 +182,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String curr = p.currency;
         int rate;
         PriceType t = PriceType.ByHour;
-        if(priceText != null && type != null && curr != null ) {
+        if (priceText != null && type != null && curr != null ) {
             rate = Integer.parseInt(priceText);
             priceText += " " +curr;
-            switch (type){
+            switch (type) {
                 case "H":
                     t = PriceType.ByHour;
                     priceText += "/h";
@@ -199,14 +203,14 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             }
             priceView.setText(priceText);
             priceDialog = PriceDialog.newInstance(this, rate, true, t.ordinal());
-        }else {
+        } else {
             priceView.setTextColor(grey);
             priceView.setText(R.string.register_price);
         }
 
         // Location
         String locationText = p.location;
-        if(locationText != null) {
+        if (locationText != null) {
             locationView.setText(locationText);
         }else {
             locationView.setTextColor(grey);
@@ -233,9 +237,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Profile Image
         String imageUrl = p.avatar_url;
-        if(imageUrl != null){
+        if (imageUrl != null) {
             ImageLoader imageLoader = ImageLoader.getInstance();
             DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
+            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));
             imageLoader.displayImage(imageUrl, imageView, options);
         } else {
             imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));

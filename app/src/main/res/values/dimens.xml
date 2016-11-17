@@ -5,6 +5,9 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
 
+    <!-- Ao Dispor general dimensions -->
+    <dimen name="card_offset">8dp</dimen>
+    <dimen name="card_margin">20dp</dimen>
     <!-- Register -->
     <dimen name="register_layout_margin">20dp</dimen>
     <dimen name="dialog_title">20dp</dimen>

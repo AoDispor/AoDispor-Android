@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import pt.aodispor.aodispor_android.API.ApiJSON;
 import pt.aodispor.aodispor_android.API.HttpRequestTask;
 import pt.aodispor.aodispor_android.API.Links;
-import pt.aodispor.aodispor_android.API.OnHttpRequestCompleted;
+import pt.aodispor.aodispor_android.API.HttpRequest;
 import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
 
@@ -40,7 +40,7 @@ import pt.aodispor.aodispor_android.API.SearchQueryResult;
  *      This class initializes the stack of cards in an array of RelativeLayout and iterates them.
  *  </p>
  */
-public class CardFragment extends Fragment implements OnHttpRequestCompleted {
+public class CardFragment extends Fragment implements HttpRequest {
 
     /** used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query */
     private enum RequestType{ prevSet, nextSet, newSet}
@@ -434,7 +434,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
         ImageView avatar = (ImageView) card.findViewById(R.id.profile_image);
 
         ImageLoader imageLoader = ImageLoader.getInstance();
-        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(10)).build();
+        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
         imageLoader.displayImage(av, avatar, options);
 
         //avatar.setOnClickListener(new ImageOnClickListener(n,p,l,d,pr,cur,type,av,this));
@@ -451,7 +451,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     }
 
     private RelativeLayout professionalCard(Professional p) {
-        RelativeLayout card = createProfessionalCard(p.getFullName(),p.getTitle(),p.getLocation(),p.getDescription(),p.getRate(),p.getCurrency(),p.getType(),p.getAvatar_url());
+        RelativeLayout card = createProfessionalCard(p.full_name,p.title,p.location,p.description,p.rate,p.currency,p.type,p.avatar_url);
         //TODO fetch professional image from web
         /*
         try {
@@ -550,7 +550,7 @@ public class CardFragment extends Fragment implements OnHttpRequestCompleted {
     }
 
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer) {
+    public void onHttpRequestCompleted(ApiJSON answer, int type) {
         if(requestType == RequestType.nextSet)
             nextSet = (SearchQueryResult) answer;
         else if(requestType == RequestType.prevSet)

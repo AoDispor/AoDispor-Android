@@ -17,7 +17,7 @@ public class AppDefinitions {
     public static Typeface yanoneKaffeesatzThin;
 
     public static final int MILISECONDS_TO_TIMEOUT_ON_QUERY = 5000;//TODO might be used 4 all http request - left 2 decide
-    public static final int TIMEOUT = 3000;
+    public static final int TIMEOUT = 5000;
     /**[CardFragment.java] - nextSet loading
      * will try to load the nextSet
      * when having this number of cards or less left in currentSet

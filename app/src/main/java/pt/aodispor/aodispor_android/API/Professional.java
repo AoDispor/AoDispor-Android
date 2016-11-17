@@ -1,29 +1,22 @@
 package pt.aodispor.aodispor_android.API;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Professional {
-    @JsonProperty("full_name") private String full_name;
-    @JsonProperty("title") private String title;
-    @JsonProperty("description") private String description;
-    @JsonProperty("rate") private String rate;
-    @JsonProperty("currency") private String currency;
-    @JsonProperty("type") private String type;
-    @JsonProperty("string_id") private String string_id;
-    @JsonProperty("location") private String location;
-    @JsonProperty("avatar_url") private String avatar_url;
-    @JsonProperty("phone") private String phone;
-
-    public String getFullName   (){return new String(full_name);}
-    public String getTitle		(){return new String(title);}
-    public String getDescription(){return new String(description);}
-    public String getRate		(){return new String(rate);}
-    public String getCurrency	(){return new String(currency);}
-    public String getType		(){return new String(type);}
-    public String getString_id	(){return new String(string_id);}
-    public String getLocation	(){return new String(location);}
-    public String getAvatar_url	(){return new String(avatar_url);}
-    public String getPhone		(){return new String(phone);}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+public class Professional extends ApiJSON {
+    @JsonProperty("full_name") public String full_name;
+    @JsonProperty("title") public String title;
+    @JsonProperty("description") public String description;
+    @JsonProperty("rate") public String rate;
+    @JsonProperty("currency") public String currency;
+    @JsonProperty("type") public String type;
+    @JsonProperty("string_id") public String string_id;
+    @JsonProperty("location") public String location;
+    @JsonProperty("avatar_url") public String avatar_url;
+    @JsonProperty("phone") public String phone;
 }

@@ -92,7 +92,7 @@ public class SwipeListener implements View.OnTouchListener{
                     final Professional p = cardFragment.getProfessionalOnTop();
                     final AlertDialog.Builder builder = new AlertDialog.Builder(cardFragment.getActivity());
                     final CharSequence[] items = {"Ligar","Ver Perfil"};
-                    builder.setTitle(p.getFullName())
+                    builder.setTitle(p.full_name)
                             .setItems(items, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -105,14 +105,14 @@ public class SwipeListener implements View.OnTouchListener{
                                         case 1:
                                             Intent intent = new Intent(cardFragment.getActivity(), ProfessionalProfileActivity.class);
 
-                                            intent.putExtra("name",p.getFullName());
-                                            intent.putExtra("profession",p.getTitle());
-                                            intent.putExtra("location",p.getLocation());
-                                            intent.putExtra("description",p.getDescription());
-                                            intent.putExtra("price",p.getRate());
-                                            intent.putExtra("currency",p.getCurrency());
-                                            intent.putExtra("type",p.getType());
-                                            intent.putExtra("avatar_url",p.getAvatar_url());
+                                            intent.putExtra("name",p.full_name);
+                                            intent.putExtra("profession",p.title);
+                                            intent.putExtra("location",p.location);
+                                            intent.putExtra("description",p.description);
+                                            intent.putExtra("price",p.rate);
+                                            intent.putExtra("currency",p.currency);
+                                            intent.putExtra("type",p.type);
+                                            intent.putExtra("avatar_url",p.avatar_url);
 
                                             cardFragment.startActivity(intent);
                                             break;

@@ -79,7 +79,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         locationView.setClickable(true);
-        locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(),locationView));
+        locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView));
 
         // Price
         priceView.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +118,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     public void getProfileInfo(){
         HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
         /*
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, "https://api.aodispor.pt/profiles/porto5125"); //TODO change this
@@ -169,9 +170,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         startLoading();
         HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
         Professional p = new Professional();
-        p.rate = value+"";
+        p.rate = value + "";
         switch (type) {
             case ByHour:
                 p.type = "H";
@@ -185,6 +187,21 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         }
         request.setJSONBody(p);
         request.execute();
+    }
+
+    @Override
+    public void onLocationDialogCallBack(String location, boolean isSet) {
+        if(isSet){
+            startLoading();
+            HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+            request.setMethod(HttpRequestTask.POST_REQUEST);
+            request.setType(HttpRequest.UPDATE_PROFILE);
+            request.addAPIAuthentication(phoneNumber, password);
+            Professional p = new Professional();
+            p.location = location;
+            request.setJSONBody(p);
+            request.execute();
+        }
     }
 
     /*

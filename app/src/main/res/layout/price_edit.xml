@@ -20,7 +20,7 @@
 
         <EditText
             android:layout_width="match_parent"
-            android:maxLength="9"
+            android:maxLength="3"
             android:inputType="number"
             android:id="@+id/price_input"
             android:background="@drawable/line_input"

@@ -2,6 +2,7 @@ package pt.aodispor.aodispor_android.API;
 
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private ApiJSON body;
     private HttpHeaders httpHeaders;
     private RestTemplate template;
+    private int type;
 
     public HttpRequestTask(Class a, HttpRequest p, String u) {
         answerType = a;
@@ -98,14 +100,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         }else {
             if (data == null)
                 return;
-            switch (method) {
-                case POST:
-                    postExecute.onHttpRequestCompleted(data, HttpRequest.UPDATE_PROFILE);
-                    break;
-                default:
-                    postExecute.onHttpRequestCompleted(data, HttpRequest.GET_PROFILE);
-                    break;
-            }
+            postExecute.onHttpRequestCompleted(data, type);
         }
     }
 
@@ -122,6 +117,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         httpHeaders.set("API-Authorization", token + date);
     }
 
+    public void setType(int t){
+        type = t;
+    }
+
     public void setMethod(int m) {
         switch (m){
             case POST_REQUEST:
@@ -131,6 +130,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                 method = HttpMethod.GET;
                 break;
         }
+    }
+
+    public int getType(){
+        return type;
     }
 
     public void setJSONBody(ApiJSON b){

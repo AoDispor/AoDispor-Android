@@ -10,4 +10,6 @@ public interface DialogCallback {
 
     void onPriceDialogCallBack(int value, boolean isFinal, ProfileFragment.PriceType type);
 
+    void onLocationDialogCallBack(String location, boolean isSet);
+
 }

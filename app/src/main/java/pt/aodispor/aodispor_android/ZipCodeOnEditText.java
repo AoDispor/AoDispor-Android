@@ -3,30 +3,31 @@ package pt.aodispor.aodispor_android;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.concurrent.TimeUnit;
 
+import pt.aodispor.aodispor_android.API.ApiJSON;
 import pt.aodispor.aodispor_android.API.CPPQueryResult;
+import pt.aodispor.aodispor_android.API.HttpRequest;
 import pt.aodispor.aodispor_android.API.HttpRequestTask;
-import pt.aodispor.aodispor_android.API.SearchQueryResult;
 
-public class ZipCodeOnEditText implements TextWatcher {
+public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
     private TextView _location;
-    private TextView _location_reg;
 
     private EditText _zip1;
     private EditText _zip2;
 
-    public ZipCodeOnEditText(TextView location, TextView location_reg, EditText zip1, EditText zip2) {
+    private boolean lastDigit;
+    private boolean locationSet;
+
+    public ZipCodeOnEditText(TextView location, EditText zip1, EditText zip2) {
         this._location = location;
-        this._location_reg = location_reg;
         this._zip1 = zip1;
         this._zip2 = zip2;
+        this.lastDigit = false;
+        this.locationSet = false;
     }
 
     @Override
@@ -46,29 +47,49 @@ public class ZipCodeOnEditText implements TextWatcher {
         String zip2 = _zip2.getText().toString();
 
         if(zip1.length() == 4 && zip2.length() == 3) {
+            lastDigit = true;
             String url = "https://api.aodispor.pt/location/{cp4}/{cp3}";
 
-            Log.d("FCC1",zip1);
-            Log.d("FCC2",zip2);
+            HttpRequestTask request = new HttpRequestTask(CPPQueryResult.class, this, url, zip1, zip2);
+            request.setType(HttpRequest.GET_LOCATION);
+            request.execute();
 
-            HttpRequestTask request = new HttpRequestTask(CPPQueryResult.class, null, url, zip1, zip2);
-
+            /*
             CPPQueryResult result;
             try {
-                Log.d("CPPQuery","Executing GET REQUEST");
-                Log.d("STRING QUERY", url + zip1 + zip2);
                 result = (CPPQueryResult) request.execute().get(AppDefinitions.MILISECONDS_TO_TIMEOUT_ON_QUERY, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
-                Log.d("L330:EXCP", e.toString());
                 return;
             }
-            if (result!=null && result.data!=null) {
+            if (result != null && result.data != null) {
                 _location.setText(result.data.getLocalidade());
-                _location_reg.setText(result.data.getLocalidade());
+            }
+            */
+        } else {
+            lastDigit = false;
+            locationSet = false;
+        }
+    }
+
+    public boolean isLocationSet(){
+        return locationSet;
+    }
+
+    @Override
+    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+        if(lastDigit) {
+            if(type == HttpRequest.GET_LOCATION){
+                CPPQueryResult result = (CPPQueryResult) answer;
+                if (result != null && result.data != null) {
+                    _location.setText(result.data.getLocalidade());
+                    locationSet = true;
+                }
             }
         }
-        else {
-            Log.d("L","Postal code yet to fill");
-        }
+    }
+
+    @Override
+    public void onHttpRequestFailed() {
+
     }
 }

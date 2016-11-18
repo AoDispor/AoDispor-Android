@@ -7,6 +7,7 @@ package pt.aodispor.aodispor_android.API;
 public interface HttpRequest {
     int GET_PROFILE = 1;
     int UPDATE_PROFILE = 2;
+    int GET_LOCATION = 3;
 
     void onHttpRequestCompleted(ApiJSON answer, int type);
 

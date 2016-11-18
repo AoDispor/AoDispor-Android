@@ -3,17 +3,14 @@ package pt.aodispor.aodispor_android;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.text.TextWatcher;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-/**
- * Created by JOSE PEREIRA on 12-11-2016.
- */
 
 public class LocationDialog extends AlertDialog {
     private TextView _location;
+    private ZipCodeOnEditText listener;
 
     protected LocationDialog(Context context) {
         super(context);
@@ -30,9 +27,9 @@ public class LocationDialog extends AlertDialog {
         EditText zip1 = (EditText) findViewById(R.id.zip1);
         EditText zip2 = (EditText) findViewById(R.id.zip2);
 
-        TextView location = (TextView) findViewById(R.id.localizacao);
+        _location = (TextView) findViewById(R.id.localizacao);
 
-        TextWatcher listener = new ZipCodeOnEditText(location,_location,zip1,zip2);
+        listener = new ZipCodeOnEditText(_location,zip1,zip2);
 
         zip1.addTextChangedListener(listener);
         zip2.addTextChangedListener(listener);
@@ -40,5 +37,13 @@ public class LocationDialog extends AlertDialog {
 
     public void setLocation(TextView location) {
         this._location = location;
+    }
+
+    public boolean isLocationSet(){
+        return listener.isLocationSet();
+    }
+
+    public String getLocation() {
+        return _location.getText().toString();
     }
 }

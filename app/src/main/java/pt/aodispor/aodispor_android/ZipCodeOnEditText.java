@@ -75,6 +75,14 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
         return locationSet;
     }
 
+    public String getCp4(){
+        return _zip1.getText().toString();
+    }
+
+    public String getCp3(){
+        return _zip2.getText().toString();
+    }
+
     @Override
     public void onHttpRequestCompleted(ApiJSON answer, int type) {
         if(lastDigit) {

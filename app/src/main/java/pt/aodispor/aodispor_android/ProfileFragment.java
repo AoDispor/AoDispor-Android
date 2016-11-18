@@ -190,7 +190,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     @Override
-    public void onLocationDialogCallBack(String location, boolean isSet) {
+    public void onLocationDialogCallBack(String location, String cp4, String cp3, boolean isSet) {
         if(isSet){
             startLoading();
             HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
@@ -199,6 +199,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             request.addAPIAuthentication(phoneNumber, password);
             Professional p = new Professional();
             p.location = location;
+            p.cp4 = cp4;
+            p.cp3 = cp3;
             request.setJSONBody(p);
             request.execute();
         }
@@ -211,6 +213,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private void updateProfileCard(Professional p){
         // Placeholder Color
         int grey = ContextCompat.getColor(getActivity(), R.color.grey);
+        int black = ContextCompat.getColor(getActivity(), R.color.black);
 
         // Price View
         String priceText = p.rate;
@@ -248,6 +251,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String locationText = p.location;
         if (locationText != null) {
             locationView.setText(locationText);
+            locationView.setTextColor(black);
         }else {
             locationView.setTextColor(grey);
             locationView.setText(R.string.register_location);
@@ -257,6 +261,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String professionText = p.title;
         if (professionText != null) {
             professionView.setText(professionText);
+            professionView.setTextColor(black);
         } else {
             professionView.setTextColor(grey);
             professionView.setText(R.string.register_profession);
@@ -266,6 +271,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String descriptionText = p.description;
         if (descriptionText != null) {
             descriptionView.setText(descriptionText);
+            descriptionView.setTextColor(black);
         } else {
             descriptionView.setTextColor(grey);
             descriptionView.setText(R.string.register_description);

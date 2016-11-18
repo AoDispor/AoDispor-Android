@@ -43,6 +43,14 @@ public class LocationDialog extends AlertDialog {
         return listener.isLocationSet();
     }
 
+    public String getCp4(){
+        return listener.getCp4();
+    }
+
+    public String getCp3(){
+        return listener.getCp3();
+    }
+
     public String getLocation() {
         return _location.getText().toString();
     }

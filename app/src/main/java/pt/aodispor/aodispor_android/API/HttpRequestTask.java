@@ -95,9 +95,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     protected void onPostExecute(ApiJSON data) {
         if (postExecute == null)
             return;
-        if(timeout){
+        if (timeout) {
             postExecute.onHttpRequestFailed();
-        }else {
+        } else {
             if (data == null)
                 return;
             postExecute.onHttpRequestCompleted(data, type);

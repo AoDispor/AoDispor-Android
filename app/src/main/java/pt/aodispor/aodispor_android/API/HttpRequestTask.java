@@ -24,6 +24,7 @@ import pt.aodispor.aodispor_android.AppDefinitions;
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     public static final int GET_REQUEST = 0;
     public static final int POST_REQUEST = 1;
+    public static final int PUT_REQUEST = 2;
     private static final String token = "4bsHGsYeva6eud8VsLiKEVVQYQEgmfCafwtuNrhuFYFcPjxWnT";
 
     private Class answerType;
@@ -34,6 +35,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private HttpEntity<?> entityReq;
     private HttpMethod method;
     private ApiJSON body;
+    private byte[] bitmapBody;
     private HttpHeaders httpHeaders;
     private RestTemplate template;
     private int type;
@@ -64,14 +66,22 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             cf.setConnectTimeout(AppDefinitions.TIMEOUT);
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
             template = new RestTemplate(cf);
+            ObjectMapper om = new ObjectMapper();
+            String s;
+            JsonNode root;
             try {
                 ApiJSON response;
                 switch (method) {
                     case POST:
                         entityReq = new HttpEntity<>(body,httpHeaders);
-                        String s = template.postForObject(url, entityReq, String.class);
-                        ObjectMapper om = new ObjectMapper();
-                        JsonNode root = om.readTree(s);
+                        s = template.postForObject(url, entityReq, String.class);
+                        root = om.readTree(s);
+                        response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
+                        break;
+                    case PUT:
+                        entityReq = new HttpEntity<>(body,httpHeaders);
+                        s = template.exchange(url, HttpMethod.PUT, entityReq, String.class, urlVariables).getBody();
+                        root = om.readTree(s);
                         response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
                         break;
                     default:
@@ -95,9 +105,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     protected void onPostExecute(ApiJSON data) {
         if (postExecute == null)
             return;
-        if(timeout){
+        if (timeout) {
             postExecute.onHttpRequestFailed();
-        }else {
+        } else {
             if (data == null)
                 return;
             postExecute.onHttpRequestCompleted(data, type);
@@ -129,6 +139,8 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             case GET_REQUEST:
                 method = HttpMethod.GET;
                 break;
+            case PUT_REQUEST:
+                method = HttpMethod.PUT;
         }
     }
 
@@ -138,6 +150,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     public void setJSONBody(ApiJSON b){
         body = b;
+    }
+
+    public void setBitmapBody(byte[] b){
+        bitmapBody = b;
     }
 
     public void addAPIAuthentication(String phone, String password){

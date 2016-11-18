@@ -19,4 +19,6 @@ public class Professional extends ApiJSON {
     @JsonProperty("location") public String location;
     @JsonProperty("avatar_url") public String avatar_url;
     @JsonProperty("phone") public String phone;
+    @JsonProperty("cp4") public String cp4;
+    @JsonProperty("cp3") public String cp3;
 }

@@ -23,7 +23,7 @@ public class LocationOnClickListener implements View.OnClickListener {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                fragment.onLocationDialogCallBack(dialog.getLocation(), dialog.isLocationSet());
+                fragment.onLocationDialogCallBack(dialog.getLocation(), dialog.getCp4(), dialog.getCp3(), dialog.isLocationSet());
             }
         });
         dialog.setLocation(_location);

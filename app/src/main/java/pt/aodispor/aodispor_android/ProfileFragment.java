@@ -21,6 +21,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import pt.aodispor.aodispor_android.API.ApiJSON;
 import pt.aodispor.aodispor_android.API.HttpRequestTask;
@@ -35,6 +36,7 @@ import static pt.aodispor.aodispor_android.R.id.location;
 
 public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
+    private static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
     private static final int SELECT_PICTURE = 0;
 
     private final String phoneNumber = "+351 912 488 434";
@@ -97,7 +99,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         imageView.setClickable(true);
         imageView.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 openGallery(SELECT_PICTURE);
@@ -190,7 +191,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     @Override
-    public void onLocationDialogCallBack(String location, boolean isSet) {
+    public void onLocationDialogCallBack(String location, String cp4, String cp3, boolean isSet) {
         if(isSet){
             startLoading();
             HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
@@ -199,6 +200,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             request.addAPIAuthentication(phoneNumber, password);
             Professional p = new Professional();
             p.location = location;
+            p.cp4 = cp4;
+            p.cp3 = cp3;
             request.setJSONBody(p);
             request.execute();
         }
@@ -209,8 +212,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * with placeholder text
      */
     private void updateProfileCard(Professional p){
-        // Placeholder Color
+        // Colors
         int grey = ContextCompat.getColor(getActivity(), R.color.grey);
+        int black = ContextCompat.getColor(getActivity(), R.color.black);
 
         // Price View
         String priceText = p.rate;
@@ -248,6 +252,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String locationText = p.location;
         if (locationText != null) {
             locationView.setText(locationText);
+            locationView.setTextColor(black);
         }else {
             locationView.setTextColor(grey);
             locationView.setText(R.string.register_location);
@@ -257,6 +262,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String professionText = p.title;
         if (professionText != null) {
             professionView.setText(professionText);
+            professionView.setTextColor(black);
         } else {
             professionView.setTextColor(grey);
             professionView.setText(R.string.register_profession);
@@ -266,6 +272,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String descriptionText = p.description;
         if (descriptionText != null) {
             descriptionView.setText(descriptionText);
+            descriptionView.setTextColor(black);
         } else {
             descriptionView.setTextColor(grey);
             descriptionView.setText(R.string.register_description);
@@ -318,11 +325,25 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        startLoading();
         if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
-            Log.d("D", "b4uri");
             Bundle bundle = data.getExtras();
             Bitmap image = bundle.getParcelable("data");
-            imageView.setImageBitmap(image);
+
+            //TODO PUT image
+            HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_UPLOAD_IMAGE);
+            request.setMethod(HttpRequestTask.PUT_REQUEST);
+            request.setType(HttpRequest.UPDATE_PROFILE);
+            request.addAPIAuthentication(phoneNumber, password);
+
+            int byteNum = image.getByteCount();
+            ByteBuffer buffer = ByteBuffer.allocate(byteNum);
+            image.copyPixelsToBuffer(buffer);
+
+            request.setBitmapBody(buffer.array());
+            request.execute();
+
+            //imageView.setImageBitmap(image);
         }
     }
 

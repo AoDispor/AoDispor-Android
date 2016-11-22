@@ -341,7 +341,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             ByteBuffer buffer = ByteBuffer.allocate(byteNum);
             image.copyPixelsToBuffer(buffer);
 
-            request.setBitmapBody(buffer.array());
+            request.setBitmapBody(convertToBinary(image));
             request.execute();
         }
     }

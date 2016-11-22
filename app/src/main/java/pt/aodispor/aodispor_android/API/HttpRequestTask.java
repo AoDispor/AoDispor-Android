@@ -79,7 +79,8 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                         response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
                         break;
                     case PUT:
-                        entityReq = new HttpEntity<>(body,httpHeaders);
+                        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                        entityReq = new HttpEntity<>(bitmapBody,httpHeaders);
                         s = template.exchange(url, HttpMethod.PUT, entityReq, String.class, urlVariables).getBody();
                         root = om.readTree(s);
                         response = (ApiJSON) om.readValue(root.get("data") + "", answerType);

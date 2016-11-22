@@ -174,7 +174,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
         Professional p = new Professional();
-        p.rate = value + "";
+        if(value > 0){
+            p.rate = value + "";
+        }
         switch (type) {
             case ByHour:
                 p.type = "H";
@@ -325,12 +327,11 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        startLoading();
         if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
+            startLoading();
             Bundle bundle = data.getExtras();
             Bitmap image = bundle.getParcelable("data");
 
-            //TODO PUT image
             HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_UPLOAD_IMAGE);
             request.setMethod(HttpRequestTask.PUT_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
@@ -342,8 +343,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
             request.setBitmapBody(buffer.array());
             request.execute();
-
-            //imageView.setImageBitmap(image);
         }
     }
 

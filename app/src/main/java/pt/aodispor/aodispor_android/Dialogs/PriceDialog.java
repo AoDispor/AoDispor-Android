@@ -5,14 +5,17 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import pt.aodispor.aodispor_android.ProfileFragment;
 import pt.aodispor.aodispor_android.R;
@@ -60,6 +63,16 @@ public class PriceDialog extends DialogFragment {
 
         // Get Views
         priceView = (EditText) root.findViewById(R.id.price_input);
+        priceView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    dismiss();
+                    return true;
+                }
+                return false;
+            }
+        });
         Button byHour = (Button) root.findViewById(R.id.type1);
         Button byDay = (Button) root.findViewById(R.id.type2);
         Button byService = (Button) root.findViewById(R.id.type3);

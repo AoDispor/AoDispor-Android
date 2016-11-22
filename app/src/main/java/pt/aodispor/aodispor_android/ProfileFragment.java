@@ -174,7 +174,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
         Professional p = new Professional();
-        p.rate = value + "";
+        if(value > 0){
+            p.rate = value + "";
+        }
         switch (type) {
             case ByHour:
                 p.type = "H";
@@ -341,8 +343,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
             request.setBitmapBody(buffer.array());
             request.execute();
-
-            //imageView.setImageBitmap(image);
         }
     }
 

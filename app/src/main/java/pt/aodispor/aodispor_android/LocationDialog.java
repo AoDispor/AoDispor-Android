@@ -3,7 +3,9 @@ package pt.aodispor.aodispor_android;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -11,9 +13,11 @@ import android.widget.TextView;
 public class LocationDialog extends AlertDialog {
     private TextView _location;
     private ZipCodeOnEditText listener;
+    private LocationDialog thisDialog;
 
     protected LocationDialog(Context context) {
         super(context);
+        thisDialog = this;
     }
 
     @Override
@@ -25,7 +29,35 @@ public class LocationDialog extends AlertDialog {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
         EditText zip1 = (EditText) findViewById(R.id.zip1);
+        zip1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    if(listener.isLocationSet()){
+                        thisDialog.dismiss();
+                        return false;
+                    }else {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         EditText zip2 = (EditText) findViewById(R.id.zip2);
+        zip2.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    if(listener.isLocationSet()){
+                        thisDialog.dismiss();
+                        return false;
+                    }else {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         _location = (TextView) findViewById(R.id.localizacao);
 

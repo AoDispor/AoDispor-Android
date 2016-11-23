@@ -4,6 +4,7 @@ import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -59,5 +60,5 @@ public class MainActivity extends AppCompatActivity {
         AppDefinitions.yanoneKaffeesatzLight = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Light.otf");
         AppDefinitions.yanoneKaffeesatzRegular = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Regular.otf");
         AppDefinitions.yanoneKaffeesatzThin = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Thin.otf");
-    };
+    }
 }

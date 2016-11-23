@@ -136,8 +136,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     professionEditText.setVisibility(EditText.INVISIBLE);
                     professionView.setVisibility(TextView.VISIBLE);
-                    startLoading();
-                    editProfession();
+                    if(!professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(professionView.getText().toString())) {
+                        startLoading();
+                        editProfession();
+                    }
                     return false;
                 }
                 return false;
@@ -164,8 +166,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                     if(edittingDescription){
                         descriptionEditText.setVisibility(EditText.INVISIBLE);
                         descriptionView.setVisibility(TextView.VISIBLE);
-                        startLoading();
-                        editDescription();
+                        if(!descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(descriptionView.getText().toString())) {
+                            startLoading();
+                            editDescription();
+                        }
                         edittingDescription = false;
                     }
                 }
@@ -296,7 +300,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
         Professional p = new Professional();
-        p.title = professionEditText.getText().toString();
+        p.title = professionEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
         request.setJSONBody(p);
         request.execute();
     }
@@ -307,7 +311,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
         Professional p = new Professional();
-        p.description = descriptionEditText.getText().toString();
+        p.description = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
         request.setJSONBody(p);
         request.execute();
     }
@@ -366,7 +370,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         // Profession
         String professionText = p.title;
         if (professionText != null) {
-            professionView.setText(professionText);
+            professionView.setText(professionText.trim().replaceAll("\\s{2,}", " "));
             professionView.setTextColor(black);
         } else {
             professionView.setTextColor(grey);
@@ -376,7 +380,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         // Description
         String descriptionText = p.description;
         if (descriptionText != null) {
-            descriptionView.setText(descriptionText);
+            descriptionView.setText(descriptionText.trim().replaceAll("\\s{2,}", " "));
             descriptionView.setTextColor(black);
         } else {
             descriptionView.setTextColor(grey);

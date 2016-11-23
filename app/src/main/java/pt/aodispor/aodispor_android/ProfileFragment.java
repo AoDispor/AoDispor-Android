@@ -1,15 +1,19 @@
 package pt.aodispor.aodispor_android;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -28,6 +32,7 @@ import pt.aodispor.aodispor_android.API.HttpRequestTask;
 import pt.aodispor.aodispor_android.API.HttpRequest;
 import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
+import pt.aodispor.aodispor_android.Dialogs.DescriptionDialog;
 import pt.aodispor.aodispor_android.Dialogs.DialogCallback;
 import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
 
@@ -43,9 +48,13 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private final String password = "123456";
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
+    private DescriptionDialog descriptionDialog;
     private LinearLayout loadingMessage;
     private TextView priceView, locationView, professionView, descriptionView;
+    private EditText professionEditText;
     private ImageView imageView;
+    private InputMethodManager manager;
+    private boolean edittingProfession;
 
     public enum PriceType { ByHour, ByDay, ByService }
 
@@ -61,23 +70,27 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         RelativeLayout rootView = new RelativeLayout(getActivity());
-        professionalCard = (RelativeLayout) inflater.inflate(R.layout.professional_card, container, false);
+        professionalCard = (RelativeLayout) inflater.inflate(R.layout.profile_card, container, false);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(professionalCard.getLayoutParams());
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         int p = getResources().getDimensionPixelSize(R.dimen.register_layout_margin);
         params.setMargins(p,p,p,p);
         professionalCard.setLayoutParams(params);
 
+        edittingProfession = false;
+
         // Get Views
         priceView = (TextView) professionalCard.findViewById(R.id.price);
         locationView = (TextView) professionalCard.findViewById(location);
         professionView = (TextView) professionalCard.findViewById(R.id.profession);
+        professionEditText = (EditText) professionalCard.findViewById(R.id.professionEditText);
         descriptionView = (TextView) professionalCard.findViewById(R.id.description);
         imageView = (ImageView) professionalCard.findViewById(R.id.profile_image);
 
         priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        professionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         locationView.setClickable(true);
@@ -89,7 +102,58 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             public void onClick(View view) {
                 // Show Price Dialog
                 if(!priceDialog.isAdded()){
-                    priceDialog.show(getFragmentManager(),"dialog");
+                    priceDialog.show(getFragmentManager(),"price-dialog");
+                }
+            }
+        });
+
+        //Profession
+        manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        professionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                professionView.setVisibility(TextView.INVISIBLE);
+                professionEditText.setVisibility(EditText.VISIBLE);
+                professionEditText.setText("");
+                professionEditText.append(professionView.getText());
+                professionEditText.requestFocus();
+                manager.showSoftInput(professionEditText, InputMethodManager.SHOW_IMPLICIT);
+                edittingProfession = true;
+            }
+        });
+        professionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean focused) {
+                if(!focused){
+                    professionEditText.setVisibility(EditText.INVISIBLE);
+                    professionView.setVisibility(TextView.VISIBLE);
+                }
+            }
+        });
+        professionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    professionEditText.setVisibility(EditText.INVISIBLE);
+                    professionView.setVisibility(TextView.VISIBLE);
+                    startLoading();
+                    editProfession();
+                    return false;
+                } else if (i == EditorInfo.IME_ACTION_PREVIOUS) {
+                    professionEditText.setVisibility(EditText.INVISIBLE);
+                    professionView.setVisibility(TextView.VISIBLE);
+                    return false;
+                }
+                return false;
+            }
+        });
+
+        // Description
+        descriptionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!descriptionDialog.isAdded()){
+                    descriptionDialog.show(getFragmentManager(),"description-dialog");
                 }
             }
         });
@@ -128,6 +192,18 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         request.addAPIAuthentication("+351 912 488 434","123456");
         request.execute();
     }
+
+    public void myOnKeyDown(int keyCode){
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            if(edittingProfession){
+                professionEditText.setText("");
+                professionEditText.setVisibility(EditText.INVISIBLE);
+                edittingProfession = false;
+            }
+        }
+    }
+
+
 
     /**
      * Started when the HTTP request has finished and succeeded. It then updates the views of the
@@ -209,6 +285,17 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         }
     }
 
+    private void editProfession() {
+        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.setType(HttpRequest.UPDATE_PROFILE);
+        request.addAPIAuthentication(phoneNumber, password);
+        Professional p = new Professional();
+        p.title = professionEditText.getText().toString();
+        request.setJSONBody(p);
+        request.execute();
+    }
+
     /*
      * Updates professional profile views and fills the views which aren't filled yet by the user
      * with placeholder text
@@ -279,6 +366,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             descriptionView.setTextColor(grey);
             descriptionView.setText(R.string.register_description);
         }
+        descriptionDialog = DescriptionDialog.newInstance(this);
 
         // Profile Image
         String imageUrl = p.avatar_url;
@@ -299,6 +387,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     private void endLoading(){
         showViews();
+        professionEditText.setVisibility(EditText.INVISIBLE);
         loadingMessage.setVisibility(LinearLayout.INVISIBLE);
     }
 
@@ -353,4 +442,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         return byteArray;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        professionEditText.setVisibility(EditText.INVISIBLE);
+        professionView.setVisibility(TextView.VISIBLE);
+    }
 }

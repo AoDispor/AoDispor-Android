@@ -118,9 +118,26 @@
         android:layout_below="@+id/profession"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
+        android:textSize="20sp"
         android:layout_marginBottom="10dp"
         android:layout_marginRight="15dp"
         android:layout_marginLeft="15dp"
-        android:scrollbars = "vertical"/>
+        android:scrollbars="vertical"/>
+
+    <pt.aodispor.aodispor_android.CustomEditText
+        android:gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/descriptionEditText"
+        android:background="@null"
+        android:textSize="20sp"
+        android:layout_below="@+id/profession"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp"
+        android:scrollbars="vertical"
+        android:inputType="textMultiLine"/>
 
 </RelativeLayout>

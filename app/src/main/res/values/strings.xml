@@ -27,6 +27,10 @@
     <string name="phonerequest_textbox">número de telemóvel</string>
     <string name="phonerequest_button">ENTRAR</string>
 
+    <!-- SMS Code Request -->
+    <string name="smsvalidation_textbox">insira código de validação</string>
+    <string name="smsvalidation_button">VALIDAR</string>
+
     <!-- Other Messages -->
     <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>

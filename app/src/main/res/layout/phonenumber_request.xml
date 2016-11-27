@@ -30,7 +30,6 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_align="@+id/phonebox_country"
             android:layout_alignBaseline="@+id/phonebox_country"
             android:layout_toLeftOf="@+id/phonebox_country"
             android:text="+"

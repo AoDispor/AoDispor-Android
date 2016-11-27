@@ -25,6 +25,8 @@ public abstract class Utility {
         String[] reqCols = new String[] { "_id", "address", "body"};
         ContentResolver cr = ctx.getContentResolver();
         Cursor c = cr.query(inboxURI, reqCols, null, null, null);
+        if (c.getCount() == 0)
+            return null;
         c.moveToFirst();
         while (!c.isLast())
         {

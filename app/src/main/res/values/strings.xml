@@ -23,6 +23,10 @@
     <!-- Description -->
     <string name="edit_description_header">Descreva o que faz</string>
 
+    <!-- Phone Number Request -->
+    <string name="phonerequest_textbox">número de telemóvel</string>
+    <string name="phonerequest_button">ENTRAR</string>
+
     <!-- Other Messages -->
     <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>

@@ -23,4 +23,7 @@ public class AppDefinitions {
      * when having this number of cards or less left in currentSet
      * (should always be higher than 2) */
     public static final int MIN_NUMBER_OFCARDS_2LOAD = 5;
+
+    /**Indicates if the user is registered as a professional*/
+    public static boolean loggedInAsProfessional = false;
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public abstract class Utility {
@@ -19,6 +20,11 @@ public abstract class Utility {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
+    /**
+     * Used to obtain the last message received from a specified sender.
+     * @param ctx Obtained with getApplicationContext()
+     * @param sender Message sender
+     */
     public static String getLastMessageBody(Context ctx, String sender)
     {
         Uri inboxURI = Uri.parse("content://sms/inbox");
@@ -39,5 +45,15 @@ public abstract class Utility {
             c.moveToNext();
         }
         return null;
+    }
+
+    /**
+     * @param ctx Obtained using getApplicationContext()
+     * @return Returns the phone number, empty string if unavailable.
+     */
+    public String getPhoneNumber(Context ctx)
+    {
+        TelephonyManager tMgr = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+        return tMgr.getLine1Number();
     }
 }

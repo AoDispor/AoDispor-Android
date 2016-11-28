@@ -40,20 +40,20 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private RestTemplate template;
     private int type;
 
-    public HttpRequestTask(Class a, HttpRequest p, String u) {
-        answerType = a;
-        postExecute = p;
-        url = u;
+    public HttpRequestTask(Class answer_type, HttpRequest toExecute, String urlArguments) {
+        answerType = answer_type;
+        postExecute = toExecute;
+        this.url = urlArguments;
         urlVariables = new String[]{};
         method = HttpMethod.GET;
         httpHeaders = new HttpHeaders();
     }
 
-    public HttpRequestTask(Class a, HttpRequest p, String u, String... uv) {
-        answerType = a;
-        postExecute = p;
-        url = u;
-        urlVariables = uv;
+    public HttpRequestTask(Class answer_type, HttpRequest toExecute, String url, String... urlArguments) {
+        answerType = answer_type;
+        postExecute = toExecute;
+        this.url = url;
+        urlVariables = urlArguments;
         method = HttpMethod.GET;
         httpHeaders = new HttpHeaders();
     }

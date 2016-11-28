@@ -8,6 +8,7 @@
     <string name="register_price">O seu preço</string>
     <string name="register_profession">A sua profissão</string>
     <string name="register_description">Descreva aqui o que faz&#8230;</string>
+    <string name="register_completion">Inscrição como profissional completa</string>
 
     <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>
@@ -34,5 +35,6 @@
     <!-- Other Messages -->
     <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
+
 
 </resources>

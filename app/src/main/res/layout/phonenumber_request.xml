@@ -44,6 +44,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:hint="351"
+            android:text="351"
             android:inputType="number"
             android:maxLength="3"
             android:textSize="24sp" />

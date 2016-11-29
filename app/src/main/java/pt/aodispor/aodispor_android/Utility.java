@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import pt.aodispor.aodispor_android.API.Professional;
+
 public abstract class Utility {
 
     /**
@@ -55,5 +57,17 @@ public abstract class Utility {
     {
         TelephonyManager tMgr = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         return tMgr.getLine1Number();
+    }
+
+    public static boolean isProfessionalRegistered(Professional info) {
+        //mising name and image
+        if (info.title==null || info.title.equals("")) return false;
+        if (info.currency==null || info.currency.equals("")) return false;
+        if (info.type==null || info.type.equals("")) return false;
+        if (info.phone==null || info.phone.equals("")) return false;
+        if (info.rate==null || info.rate.equals("")) return false;
+        if (info.location==null || info.location.equals("")) return false;
+
+        return true;
     }
 }

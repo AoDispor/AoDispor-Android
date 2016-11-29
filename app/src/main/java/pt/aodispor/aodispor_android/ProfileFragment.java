@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +32,6 @@ import pt.aodispor.aodispor_android.API.HttpRequestTask;
 import pt.aodispor.aodispor_android.API.HttpRequest;
 import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
-import pt.aodispor.aodispor_android.API.VerifyProfessional;
 import pt.aodispor.aodispor_android.Dialogs.DialogCallback;
 import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
 
@@ -233,6 +231,13 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 break;
         }
         updateProfileCard(p);
+
+        if(Utility.isProfessionalRegistered(p)) {
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(getContext(), R.string.register_completion, duration);
+            toast.show();
+        }
+
         endLoading();
     }
 
@@ -276,7 +281,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         }
         request.setJSONBody(p);
         request.execute();
-        notifyProfessionalRegistered();
     }
 
     @Override
@@ -293,7 +297,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             p.cp3 = cp3;
             request.setJSONBody(p);
             request.execute();
-            notifyProfessionalRegistered();
         }
     }
 
@@ -306,7 +309,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         p.title = professionEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
         request.setJSONBody(p);
         request.execute();
-        notifyProfessionalRegistered();
     }
 
     private void editDescription() {
@@ -318,7 +320,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         p.description = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
         request.setJSONBody(p);
         request.execute();
-        notifyProfessionalRegistered();
     }
 
     /*
@@ -475,15 +476,5 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         descriptionEditText.setVisibility(EditText.INVISIBLE);
         descriptionView.setVisibility(TextView.VISIBLE);
-    }
-
-    public void notifyProfessionalRegistered() {
-        Log.d("NOT","notify");
-        if(VerifyProfessional.isRegistered(phoneNumber, password)) {
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(getContext(), R.string.register_completion, duration);
-            Log.d("NOT","b4toastshow");
-            toast.show();
-        }
     }
 }

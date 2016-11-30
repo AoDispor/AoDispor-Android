@@ -43,66 +43,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(1);
-        
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                switch(mLastPage) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_unselected);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_unselected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_unselected);
-                        break;
-                }
-                switch(mViewPager.getCurrentItem()) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_selected);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_selected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_selected);
-                        break;
-                }
-                mLastPage = mViewPager.getCurrentItem();
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                switch(mLastPage) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_unselected);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_unselected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_unselected);
-                        break;
-                }
-                switch(position) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_selected);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_selected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_selected);
-                        break;
-                }
-                mLastPage = mViewPager.getCurrentItem();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
     }
 
     /**
@@ -120,34 +60,5 @@ public class MainActivity extends AppCompatActivity {
         AppDefinitions.yanoneKaffeesatzLight = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Light.otf");
         AppDefinitions.yanoneKaffeesatzRegular = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Regular.otf");
         AppDefinitions.yanoneKaffeesatzThin = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Thin.otf");
-    }
-    
-    @Override
-    protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
-    }
-
-    private void handleIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            CardFragment cardFrag = (CardFragment) getSupportFragmentManager().getFragments().get(1);
-            cardFrag.setSearchQuery(query);
-            cardFrag.setupNewStack();
-        }
-    }
-
-    public void changeFrag(View view) {
-        String viewID = getResources().getResourceEntryName(view.getId());
-        switch(viewID) {
-            case "profile_icon":
-                mViewPager.setCurrentItem(0);
-                break;
-            case "stack_icon":
-                mViewPager.setCurrentItem(1);
-                break;
-            case "fav_icon":
-                mViewPager.setCurrentItem(2);
-                break;
-        }
     }
 }

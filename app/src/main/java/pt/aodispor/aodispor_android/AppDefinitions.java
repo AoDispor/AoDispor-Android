@@ -8,7 +8,6 @@ public class AppDefinitions {
      * and should not therefore be defined as a constant
      */
 
-    /**[CardFragment.java] - http request timeout */
     public static Typeface dancingScriptRegular;
 
     public static Typeface yanoneKaffeesatzBold;
@@ -16,7 +15,8 @@ public class AppDefinitions {
     public static Typeface yanoneKaffeesatzRegular;
     public static Typeface yanoneKaffeesatzThin;
 
-    public static final int MILISECONDS_TO_TIMEOUT_ON_QUERY = 5000;//TODO might be used 4 all http request - left 2 decide
+    /**[CardFragment.java] - http request timeout */
+    //public static final int MILLISECONDS_TO_TIMEOUT_ON_QUERY = 5000;
     public static final int TIMEOUT = 5000;
     /**[CardFragment.java] - nextSet loading
      * will try to load the nextSet
@@ -26,4 +26,13 @@ public class AppDefinitions {
 
     /**Indicates if the user is registered as a professional*/
     public static boolean loggedInAsProfessional = false;
+
+
+    //PERMISSIONS
+    public static final int PERMISSION_NOT_REQUESTED = 20;
+    //public static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    public static final int PERMISSIONS_REQUEST_READ_SMS = 2;
+    public static final int PERMISSIONS_REQUEST_PHONENUMBER = 3;
+    public static final int PERMISSIONS_REQUEST_INTERNET = 4; // Normal Permission
+
 }

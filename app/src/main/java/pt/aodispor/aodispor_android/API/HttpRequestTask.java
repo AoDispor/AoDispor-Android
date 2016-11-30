@@ -32,6 +32,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private String[] urlVariables;
     private HttpRequest postExecute;
     private boolean timeout = false;
+    public boolean getTimeout(){return timeout;}
     private HttpEntity<?> entityReq;
     private HttpMethod method;
     private ApiJSON body;

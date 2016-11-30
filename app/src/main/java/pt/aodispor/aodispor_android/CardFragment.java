@@ -493,11 +493,12 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         SearchQueryResult result;
         try {
-            result = (SearchQueryResult) request.execute().get(AppDefinitions.MILISECONDS_TO_TIMEOUT_ON_QUERY, TimeUnit.MILLISECONDS);
+            result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
         }catch (Exception e) {
             //Log.d("L290:EXCP",e.toString());
             return QueryResult.timeout;
         }
+        if(request.getTimeout()) return QueryResult.timeout;
         if (result != null && result.data != null && result.data.size() > 0) {
             this.currentSet = result;
             return QueryResult.successful;
@@ -550,11 +551,12 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         SearchQueryResult result;
         try {
-            result = (SearchQueryResult) request.execute().get(AppDefinitions.MILISECONDS_TO_TIMEOUT_ON_QUERY, TimeUnit.MILLISECONDS);
+            result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
         }catch (Exception e) {
             Log.d("L330:EXCP",e.toString());
             return QueryResult.timeout;
         }
+        if(request.getTimeout()) return QueryResult.timeout;
         if (result.data != null && result.data.size() > 0) {
             this.currentSet = result;
             return QueryResult.successful;

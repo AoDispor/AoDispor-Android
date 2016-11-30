@@ -31,6 +31,13 @@
     <string name="smsvalidation_textbox">insira código de validação</string>
     <string name="smsvalidation_button">VALIDAR</string>
 
+    <!-- Permissions Messages -->
+    <string name="permisson_accepted">Autorizado</string>
+    <string name="permisson_denied">Não Autorizado</string>
+    <string name="request_permission_phone">AoDispor pretende aceder ao seu cartão para adquirir o seu número telefónico(não confirme se pretender usar um outro número de telemóvel)</string>
+    <string name="request_permission_sms">AoDispor pretende aceder às suas mensagens para adquirir o código de validação</string>
+    <string name="request_permission_internet">AoDispor pretende aceder à internet</string>
+
     <!-- Other Messages -->
     <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -232,6 +231,13 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 break;
         }
         updateProfileCard(p);
+
+        if(Utility.isProfessionalRegistered(p)) {
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(getContext(), R.string.register_completion, duration);
+            toast.show();
+        }
+
         endLoading();
     }
 

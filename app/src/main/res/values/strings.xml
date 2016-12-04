@@ -4,6 +4,7 @@
     <string name="your_location_is_dialog">A sua localização é: </string>
     
     <!-- Register Card -->
+    <string name="register_name">O seu nome</string>
     <string name="register_location">A sua localização</string>
     <string name="register_price">O seu preço</string>
     <string name="register_profession">A sua profissão</string>

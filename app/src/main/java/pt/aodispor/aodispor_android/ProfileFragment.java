@@ -38,6 +38,8 @@ import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.aodispor_android.R.id.location;
+import static pt.aodispor.aodispor_android.R.id.name;
+import static pt.aodispor.aodispor_android.R.id.profession;
 
 public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
@@ -49,8 +51,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
     private LinearLayout loadingMessage;
-    private TextView priceView, locationView, professionView, descriptionView;
-    private EditText professionEditText, descriptionEditText;
+    private TextView priceView, locationView, professionView, descriptionView, nameView;
+    private EditText nameEditText, professionEditText, descriptionEditText;
     private boolean edittingDescription;
     private ImageView imageView;
     private InputMethodManager manager;
@@ -81,6 +83,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         // Get Views
         priceView = (TextView) professionalCard.findViewById(R.id.price);
         locationView = (TextView) professionalCard.findViewById(location);
+        nameView = (TextView) professionalCard.findViewById(R.id.name);
+        nameEditText = (EditText) professionalCard.findViewById(R.id.nameEditText);
         professionView = (TextView) professionalCard.findViewById(R.id.profession);
         professionEditText = (EditText) professionalCard.findViewById(R.id.professionEditText);
         descriptionView = (TextView) professionalCard.findViewById(R.id.description);
@@ -89,6 +93,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        nameEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         professionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
@@ -105,6 +111,44 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 if(!priceDialog.isAdded()){
                     priceDialog.show(getFragmentManager(),"price-dialog");
                 }
+            }
+        });
+
+        // Name
+        manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        nameView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nameView.setVisibility(TextView.INVISIBLE);
+                nameEditText.setVisibility(EditText.VISIBLE);
+                nameEditText.setText("");
+                nameEditText.append(nameView.getText());
+                nameEditText.requestFocus();
+                manager.showSoftInput(nameEditText, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+        nameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean focused) {
+                if(!focused){
+                    nameEditText.setVisibility(EditText.INVISIBLE);
+                    nameView.setVisibility(TextView.VISIBLE);
+                }
+            }
+        });
+        nameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    nameEditText.setVisibility(EditText.INVISIBLE);
+                    nameView.setVisibility(TextView.VISIBLE);
+                    if(!nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(nameView.getText().toString())) {
+                        startLoading();
+                        editName();
+                    }
+                    return false;
+                }
+                return false;
             }
         });
 
@@ -294,6 +338,17 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         }
     }
 
+    private void editName() {
+        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.setType(HttpRequest.UPDATE_PROFILE);
+        request.addAPIAuthentication(phoneNumber, password);
+        Professional p = new Professional();
+        p.full_name = nameEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
+        request.setJSONBody(p);
+        request.execute();
+    }
+
     private void editProfession() {
         HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
@@ -377,6 +432,16 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             professionView.setText(R.string.register_profession);
         }
 
+        // Name
+        String nameText = p.full_name;
+        if (nameText != null) {
+            nameView.setText(nameText.trim().replaceAll("\\s{2,}]"," "));
+            nameView.setTextColor(black);
+        } else {
+            nameView.setTextColor(grey);
+            nameView.setText(R.string.register_name);
+        }
+
         // Description
         String descriptionText = p.description;
         if (descriptionText != null) {
@@ -407,6 +472,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private void endLoading(){
         showViews();
         professionEditText.setVisibility(EditText.INVISIBLE);
+        nameEditText.setVisibility(EditText.INVISIBLE);
         descriptionEditText.setVisibility(EditText.INVISIBLE);
         loadingMessage.setVisibility(LinearLayout.INVISIBLE);
     }
@@ -467,6 +533,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         super.onResume();
         professionEditText.setVisibility(EditText.INVISIBLE);
         professionView.setVisibility(TextView.VISIBLE);
+        nameView.setVisibility(TextView.VISIBLE);
 
         descriptionEditText.setVisibility(EditText.INVISIBLE);
         descriptionView.setVisibility(TextView.VISIBLE);

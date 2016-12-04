@@ -1,23 +1,21 @@
 package pt.aodispor.aodispor_android;
 
+import android.Manifest;
 import android.animation.Animator;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -29,6 +27,7 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import pt.aodispor.aodispor_android.API.ApiJSON;
@@ -46,6 +45,8 @@ import pt.aodispor.aodispor_android.API.SearchQueryResult;
  *  </p>
  */
 public class CardFragment extends Fragment implements HttpRequest {
+
+    public void setSearchQuery(String query) { searchQuery=query; }
 
     /** used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query */
     private enum RequestType{ prevSet, nextSet, newSet}
@@ -69,8 +70,10 @@ public class CardFragment extends Fragment implements HttpRequest {
     private RelativeLayout rootView;
     private LayoutInflater inflater;
     private ViewGroup container;
-
-    String searchQuery="explicador";
+    
+    private String lat = "";
+    private String lon = "";
+    private String searchQuery = "";
 
     /**
      * Default constructor for CardFragment class.
@@ -112,6 +115,22 @@ public class CardFragment extends Fragment implements HttpRequest {
                 restorePreviousCard();
             }
         });
+
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        List<String> l = locationManager.getProviders(true);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            for (String s : l)
+            {
+                Location loc = locationManager.getLastKnownLocation(s);
+                if (loc != null)
+                {
+                    lat = "" + loc.getLatitude();
+                    lon = "" + loc.getLongitude();
+                    break;
+                }
+            }
+        }
 
         setupNewStack();
 
@@ -489,7 +508,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     public QueryResult prepareNewSearchQuery() {//TODO replace test request with the actual request
         requestType = RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,"https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}", searchQuery, "41","-8.1");//arqueologo (1), tecnic (91+9), desporto (10)
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,"https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}", searchQuery, lat,lon);//arqueologo (1), tecnic (91+9), desporto (10)
 
         SearchQueryResult result;
         try {

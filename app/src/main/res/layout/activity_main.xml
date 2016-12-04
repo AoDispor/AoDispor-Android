@@ -17,10 +17,61 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:background="@color/aoDispor"
             app:layout_scrollFlags="enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="fill_parent"
+                    android:layout_height="46dp"
+                    android:orientation="horizontal"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:id="@+id/profile_icon"
+                        android:src="@drawable/profile_unselected"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:clickable="true"
+                        android:onClick="changeFrag"></ImageView>
+                    <ImageView
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:id="@+id/stack_icon"
+                        android:src="@drawable/stack_unselected"
+                        android:layout_centerHorizontal="true"
+                        android:clickable="true"
+                        android:onClick="changeFrag"></ImageView>
+                    <ImageView
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:id="@+id/fav_icon"
+                        android:src="@drawable/fav_unselected"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:clickable="true"
+                        android:onClick="changeFrag"></ImageView>
+                </RelativeLayout>
+
+                <android.support.v7.widget.SearchView
+                    android:layout_height="46dp"
+                    android:layout_width="match_parent"
+                    android:layout_alignParentBottom="true"
+                    android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"
+                    android:id="@+id/searchView"
+                    android:layout_weight="1"></android.support.v7.widget.SearchView>
+
+
+            </LinearLayout>
+            
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

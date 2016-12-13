@@ -10,7 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 public class TabPagerAdapter extends FragmentPagerAdapter {
     /** Number of pages this adapter supports. */
-    private final int NUMBER_OF_PAGES = 3;
+    private final int NUMBER_OF_PAGES = 2;
 
     /**
      * The TabPagerAdapter constructor.
@@ -34,9 +34,6 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
                 break;
             case 1:
                 f = CardFragment.newInstance();
-                break;
-            case 2:
-                f = BlankFragment.newInstance();
                 break;
         }
         return f;
@@ -63,8 +60,6 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
                 return "Perfil";
             case 1:
                 return "Encontrar";
-            case 2:
-                return "Favoritos";
         }
         return null;
     }

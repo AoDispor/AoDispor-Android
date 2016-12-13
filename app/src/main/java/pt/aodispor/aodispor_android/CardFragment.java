@@ -19,6 +19,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -46,7 +47,9 @@ import pt.aodispor.aodispor_android.API.SearchQueryResult;
  */
 public class CardFragment extends Fragment implements HttpRequest {
 
-    public void setSearchQuery(String query) { searchQuery=query; }
+    public void setSearchQuery(String query) {
+        searchQuery=query;
+    }
 
     /** used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query */
     private enum RequestType{ prevSet, nextSet, newSet}

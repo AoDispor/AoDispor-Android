@@ -155,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             CardFragment cardFrag = (CardFragment) getSupportFragmentManager().getFragments().get(0);
+            android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) findViewById(R.id.searchView);
+            searchView.setQuery(query,false);
             cardFrag.setSearchQuery(query);
             cardFrag.setupNewStack();
         }

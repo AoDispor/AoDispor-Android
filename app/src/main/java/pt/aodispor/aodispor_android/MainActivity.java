@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -40,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
 
         installFonts();
 
+        // Set title font
+        TextView titleView = (TextView) findViewById(R.id.app_title);
+        titleView.setTypeface(AppDefinitions.dancingScriptRegular);
+
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
         ImageLoader.getInstance().init(config);
 
@@ -53,29 +58,23 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(1);
 
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 switch(mLastPage) {
                     case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_unselected);
+                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_black_48dp);
                         break;
                     case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_unselected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_unselected);
+                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_black_48dp);
                         break;
                 }
                 switch(mViewPager.getCurrentItem()) {
                     case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_selected);
+                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_white_48dp);
                         break;
                     case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_selected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_selected);
+                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_white_48dp);
                         break;
                 }
                 mLastPage = mViewPager.getCurrentItem();
@@ -85,24 +84,18 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 switch(mLastPage) {
                     case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_unselected);
+                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_black_48dp);
                         break;
                     case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_unselected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_unselected);
+                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_black_48dp);
                         break;
                 }
                 switch(position) {
                     case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.drawable.profile_selected);
+                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_white_48dp);
                         break;
                     case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.drawable.stack_selected);
-                        break;
-                    case 2:
-                        ((ImageView) findViewById(R.id.fav_icon)).setImageResource(R.drawable.fav_selected);
+                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_white_48dp);
                         break;
                 }
                 mLastPage = mViewPager.getCurrentItem();
@@ -110,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrollStateChanged(int state) {
+
             }
         });
 
@@ -117,8 +111,12 @@ public class MainActivity extends AppCompatActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+
             @Override
-            public boolean onQueryTextChange(String query) {return true;}
+            public boolean onQueryTextChange(String query) {
+                return true;
+            }
+
             @Override
             public boolean onQueryTextSubmit(String query) {
                 CardFragment cardFrag = (CardFragment) getSupportFragmentManager().getFragments().get(0);
@@ -139,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void installFonts() {
         AppDefinitions.dancingScriptRegular = Typeface.createFromAsset(getAssets(),"fonts/dancing-script-ot/DancingScript-Regular.otf");
-
         AppDefinitions.yanoneKaffeesatzBold = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Bold.otf");
         AppDefinitions.yanoneKaffeesatzLight = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Light.otf");
         AppDefinitions.yanoneKaffeesatzRegular = Typeface.createFromAsset(getAssets(),"fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Regular.otf");

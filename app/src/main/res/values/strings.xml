@@ -2,7 +2,11 @@
     <string name="app_name">Ao Dispor</string>
     <string name="zip_dialog">Insira o seu código postal</string>
     <string name="your_location_is_dialog">A sua localização é: </string>
-    
+
+    <!-- Navbar -->
+    <string name="profile_icon">Ir para o seu perfil</string>
+    <string name="stack_icon">Ir para a pilha de cartões</string>
+
     <!-- Register Card -->
     <string name="register_name">O seu nome</string>
     <string name="register_location">A sua localização</string>

@@ -24,7 +24,7 @@ public final class Permission {
                     @Override public void onClick(DialogInterface dialog, int which){
                         activity.onRequestPermissionsResult(requestCode,permission ,new int[]{PackageManager.PERMISSION_DENIED});
                     }
-                })
+                }).setCancelable(false)
                 .create()
                 .show();
     }
@@ -60,10 +60,10 @@ public final class Permission {
             Log.d("PERMISSION:","VERSION>=23");
             int hasWriteContactsPermission = activity.checkSelfPermission(permission[0]);
             if (true || hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-                if (true || !activity.shouldShowRequestPermissionRationale(permission[0])) {
+                /*if (true || !activity.shouldShowRequestPermissionRationale(permission[0])) {
                     showMessageOKCancel(activity,permission_dialog_message,permission,requestCode);
                     return;
-                }
+                }*/
                 activity.requestPermissions(permission, requestCode);
                 return;
             }

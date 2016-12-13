@@ -233,9 +233,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         updateProfileCard(p);
 
         if(Utility.isProfessionalRegistered(p)) {
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(getContext(), R.string.register_completion, duration);
-            toast.show();
+            TextView registered = (TextView) professionalCard.findViewById(R.id.registered_note);
+            registered.setVisibility(View.VISIBLE);
         }
 
         endLoading();

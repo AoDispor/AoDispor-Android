@@ -1,71 +1,27 @@
 {
   "project_info": {
-    "project_number": "235284261002",
-    "firebase_url": "https://ao-dispor.firebaseio.com",
-    "project_id": "ao-dispor",
-    "storage_bucket": "ao-dispor.appspot.com"
+    "project_number": "197652095762",
+    "firebase_url": "https://aodispor-debug.firebaseio.com",
+    "project_id": "aodispor-debug",
+    "storage_bucket": "aodispor-debug.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:235284261002:android:a0f925fcd69e0683",
-        "android_client_info": {
-          "package_name": "pt.aodispor.android"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "235284261002-4j439h2p11gblm6dnkksd3iamhg665uo.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "pt.aodispor.android",
-            "certificate_hash": "A46F9BC9E56FAFF48AC418580D803D5C1A11956A"
-          }
-        },
-        {
-          "client_id": "235284261002-g572ds916fapub6hvbpgn1d1rsmr0lg8.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCGg7H7ivZguzI2AAb6QpXmBomI9Azt9vQ"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "235284261002-g572ds916fapub6hvbpgn1d1rsmr0lg8.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:235284261002:android:5e0bbb15b9c5b66f",
+        "mobilesdk_app_id": "1:197652095762:android:5e0bbb15b9c5b66f",
         "android_client_info": {
           "package_name": "pt.aodispor.aodispor_android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "235284261002-g572ds916fapub6hvbpgn1d1rsmr0lg8.apps.googleusercontent.com",
+          "client_id": "197652095762-3inbhmpq7t6ir5dtlq3b2fs1ie2b4uhd.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCGg7H7ivZguzI2AAb6QpXmBomI9Azt9vQ"
+          "current_key": "AIzaSyBurGuhtNYiyDkzIJnVYc_25cqnzD56tjo"
         }
       ],
       "services": {

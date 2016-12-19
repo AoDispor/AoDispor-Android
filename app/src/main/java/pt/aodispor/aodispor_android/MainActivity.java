@@ -3,6 +3,7 @@ package pt.aodispor.aodispor_android;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -19,9 +20,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
+import pt.aodispor.aodispor_android.Notifications.RegistrationIntentService;
 
 
 //import pt.aodispor.aodispor_android.Permissions.Permission;
@@ -40,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
     /**for debug purposes, skips initial login if set to true. should be false in releases*/
     private static final boolean SKIP_LOGIN = false;
 
+    /** Google Play services */
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final String TAG = "MainActivity";
+
     /**
      * This method is called when the main activity is created.
      *
@@ -50,6 +59,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         installFonts();
+
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+       }
 
         if(!SKIP_LOGIN) {
             Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
@@ -151,6 +166,22 @@ public class MainActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 
 }

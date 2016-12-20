@@ -20,7 +20,7 @@ test:
    override:
       - ./gradlew test --info
       - ./gradlew assembleDebug --info
-      - ./gradlew createDevDebugCoverageReport
+      #- ./gradlew createDevDebugCoverageReport
    post:
         # Unit Tests working -> will appear on artifacts and not on tests summary!
         - mkdir -p $CIRCLE_TEST_REPORTS/junit

@@ -1,17 +1,14 @@
-#
-# Build configuration for Circle CI
-#
-
 general:
-   #artifacts:
-   #     - /home/ubuntu/your-app-name/app/build/outputs/apk/
-
+   artifacts:
+        - /home/ubuntu/AoDispor-Android/app/build/outputs/
+         - $CIRLCE_TEST_REPORTS
+         - target
 machine:
     environment:
         ANDROID_HOME: /usr/local/android-sdk-linux
-        android-sdk-license: 8933bad161af4178b1185d1a37fbf41ea5269c55
-        android-sdk-preview-license: 504667f4c0de7af1a06de9f4b1727b84351f2910
-        
+        ##android-sdk-license: 8933bad161af4178b1185d1a37fbf41ea5269c55
+        ##android-sdk-preview-license: 504667f4c0de7af1a06de9f4b1727b84351f2910
+
 dependencies:
     pre:
     - chmod +x gradlew
@@ -20,10 +17,23 @@ dependencies:
         - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
 
 test:
-    post:
-      - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-      - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+   override:
+      - ./gradlew test --info
+      - ./gradlew assembleDebug --info
+     # - ./gradlew createDevDebugCoverageReport
+   post:
+        # Unit Tests working -> will appear on artifacts and not on tests summary!
+        - mkdir -p $CIRCLE_TEST_REPORTS/junit
+        - cp -r ./app/build/reports/tests/debug/* $CIRCLE_TEST_REPORTS/junit
 
-      override:
-        - (./gradlew assemble):
-            timeout: 1000
+        # Lint not working yet
+        #- mkdir -p $CIRCLE_TEST_REPORTS/lint/
+        #- find . -type f -regex ".*lint-results-*.*" -exec cp --parent {} $CIRCLE_TEST_REPORTS/lint/ \;
+
+        # Checkstyle not working yet
+        #- mkdir -p $CIRCLE_TEST_REPORTS/checkstyle/
+        #- find . -type f -regex ".*build/reports/checkstyle/.*" -exec cp --parent {} $CIRCLE_TEST_REPORTS/checkstyle/ \;
+
+        # Coverage not working yet
+        #- mkdir -p $CIRCLE_TEST_REPORTS/coverage/
+        #- cp -r ./app/build/reports/coverage/ $CIRCLE_TEST_REPORTS

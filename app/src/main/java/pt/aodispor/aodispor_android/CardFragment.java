@@ -2,11 +2,13 @@ package pt.aodispor.aodispor_android;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -52,28 +54,29 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     /** used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query */
-    private enum RequestType{ prevSet, nextSet, newSet}
+    @VisibleForTesting protected enum RequestType{ prevSet, nextSet, newSet}
     /**used to know if the query was successful or not. <br><br>emptySet indicates that an answer was received but no results were found*/
-    private enum QueryResult{timeout,emptySet,successful,none}
+    @VisibleForTesting protected enum QueryResult{timeout,emptySet,successful,none}
 
-    private RequestType requestType;
+    @VisibleForTesting protected RequestType requestType;
     /**contains the previous page data*/
-    private SearchQueryResult previousSet;
+    @VisibleForTesting protected SearchQueryResult previousSet;
     /**contains the current page data*/
-    private SearchQueryResult currentSet;
+    @VisibleForTesting protected SearchQueryResult currentSet;
     /**contains the next page data
      * <br>set it to null if it does not have the next page data*/
-    private SearchQueryResult nextSet;
-    int currentSetCardIndex;
-    private RelativeLayout[] cards;
-    private Professional[] cards_professional_data;
+    @VisibleForTesting protected SearchQueryResult nextSet;
+    @VisibleForTesting protected int currentSetCardIndex;
+    @VisibleForTesting protected RelativeLayout[] cards;
+    @VisibleForTesting protected Professional[] cards_professional_data;
     /**does not allow discard or recover methods to be called before the previous is finished*/
     static boolean blockAccess=false;
 
-    private RelativeLayout rootView;
-    private LayoutInflater inflater;
-    private ViewGroup container;
-    
+    @VisibleForTesting protected RelativeLayout rootView;
+    @VisibleForTesting protected LayoutInflater inflater;
+    @VisibleForTesting protected ViewGroup container;
+    @VisibleForTesting protected Activity activity;
+
     private String lat = "";
     private String lon = "";
     private String searchQuery = "";
@@ -107,6 +110,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         inflater = i;
         container = c;
         rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
+        activity = getActivity();
 
         //TODO add button, this might be removed later, for now i need to test the restore ard functionality
         Button button = (Button) rootView.findViewById(R.id.prevCardButton);
@@ -207,8 +211,10 @@ public class CardFragment extends Fragment implements HttpRequest {
                     cards[1] =  createMessageCard(getString(R.string.pile_end_title),getString(R.string.pile_end_msg));//TODO missing button
                 }
 
-                SwipeListener listener = new SwipeListener(cards[0],((MainActivity)getActivity()).getViewPager(),this);
-                cards[0].setOnTouchListener(listener);
+                if(activity instanceof MainActivity) {
+                    SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
+                    cards[0].setOnTouchListener(listener);
+                }
 
                 if(currentSet.data.size()>=2){
                     setCardMargin(2);
@@ -257,8 +263,12 @@ public class CardFragment extends Fragment implements HttpRequest {
             setCardMargin(1);
             rootView.addView(cards[1]);
             rootView.addView(cards[0]);
-            SwipeListener listener = new SwipeListener(cards[0],((MainActivity)getActivity()).getViewPager(),this);
-            cards[0].setOnTouchListener(listener);
+
+            if(activity instanceof  MainActivity) {
+                SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
+                cards[0].setOnTouchListener(listener);
+            }
+
             cards[2] = null;
             blockAccess = false;
             return;
@@ -292,8 +302,11 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView.addView(cards[2]);
         rootView.addView(cards[1]);
         rootView.addView(cards[0]);
-        SwipeListener listener = new SwipeListener(cards[0],((MainActivity)getActivity()).getViewPager(),this);
-        cards[0].setOnTouchListener(listener);
+
+        if(activity instanceof  MainActivity) {
+            SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
+            cards[0].setOnTouchListener(listener);
+        }
 
         if(nextSet == null && currentSetCardIndex + AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD >= currentSet.data.size()) {
             previousSet = null;
@@ -360,8 +373,12 @@ public class CardFragment extends Fragment implements HttpRequest {
                             cards = originalCardsSetup;
                             cards_professional_data = originalProfessionals;
                             currentSetCardIndex = originalIndex;
-                            SwipeListener listener = new SwipeListener(cards[0],((MainActivity)getActivity()).getViewPager(),this);
-                            cards[0].setOnTouchListener(listener);
+
+                            if(activity instanceof  MainActivity) {
+                                SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
+                                cards[0].setOnTouchListener(listener);
+                            }
+
                             blockAccess = false;
                             return;
                         case timeout: //did not receive answer
@@ -384,8 +401,12 @@ public class CardFragment extends Fragment implements HttpRequest {
             rootView.addView(cards[2]);
         rootView.addView(cards[1]);
         rootView.addView(cards[0]);
-        SwipeListener listener = new SwipeListener(cards[0],((MainActivity)getActivity()).getViewPager(),this);
-        cards[0].setOnTouchListener(listener);
+
+        if(activity instanceof MainActivity) {
+            SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
+            cards[0].setOnTouchListener(listener);
+        }
+
         cards[0].setX(800*-1); cards[0].setY(700*-1);
         cards[0].setRotation(40);
         cards[0].animate().rotation(0).translationX(0).translationY(0).setDuration(250).setListener(new Animator.AnimatorListener() {
@@ -429,50 +450,51 @@ public class CardFragment extends Fragment implements HttpRequest {
         cards[destination] = cards[source];
     }
 
-    public RelativeLayout createProfessionalCard(String n, String p, String l, String d, String pr, String cur, String type, String av) {
+    public RelativeLayout createProfessionalCard(//String fullname_text,
+                                                 String profession_text,
+                                                 String location_text,
+                                                 String description_text,
+                                                 String price_value,
+                                                 String currency_type,
+                                                 String payment_type,
+                                                 String avatar_scr) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
-        /*
-        TextView name = (TextView) card.findViewById(R.id.name);
-        name.setText(Html.fromHtml(n));
-        */
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
-        profession.setText(Html.fromHtml(p));
+        profession.setText(Html.fromHtml(profession_text));
         profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView location = (TextView) card.findViewById(R.id.location);
-        location.setText(Html.fromHtml(l));
+        location.setText(Html.fromHtml(location_text));
         location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView description = (TextView) card.findViewById(R.id.description);
-        description.setText(Html.fromHtml(d));
+        description.setText(Html.fromHtml(description_text));
         description.setMovementMethod(new ScrollingMovementMethod());
 
         TextView price = (TextView) card.findViewById(R.id.price);
 
         price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        price.setText(Html.fromHtml(pr));
+        price.setText(Html.fromHtml(price_value));
 
-        switch(type) {
+        switch(payment_type) {
             case "H":
-                price.setText(Html.fromHtml(pr + " " + cur + "/h"));
+                price.setText(Html.fromHtml(price_value + " " + currency_type + "/h"));
                 price.setTextColor(getResources().getColor(R.color.by_hour));
                 break;
             case "S":
-                price.setText(Html.fromHtml(pr + " " + cur));
+                price.setText(Html.fromHtml(price_value + " " + currency_type));
                 price.setTextColor(getResources().getColor(R.color.by_service));
                 break;
             case "D":
-                price.setText(Html.fromHtml(pr + " por dia"));
+                price.setText(Html.fromHtml(price_value + " por dia"));
         }
 
         ImageView avatar = (ImageView) card.findViewById(R.id.profile_image);
 
         ImageLoader imageLoader = ImageLoader.getInstance();
         DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
-        imageLoader.displayImage(av, avatar, options);
-
-        //avatar.setOnClickListener(new ImageOnClickListener(n,p,l,d,pr,cur,type,av,this));
+        imageLoader.displayImage(avatar_scr, avatar, options);
 
         return card;
     }
@@ -485,8 +507,8 @@ public class CardFragment extends Fragment implements HttpRequest {
         return card;
     }
 
-    private RelativeLayout professionalCard(Professional p) {
-        RelativeLayout card = createProfessionalCard(p.full_name,p.title,p.location,p.description,p.rate,p.currency,p.type,p.avatar_url);
+    @VisibleForTesting protected RelativeLayout professionalCard(Professional p) {
+        RelativeLayout card = createProfessionalCard(p.title,p.location,p.description,p.rate,p.currency,p.type,p.avatar_url);
         //TODO fetch professional image from web
         /*
         try {

@@ -35,4 +35,6 @@ public class AppDefinitions {
     public static final int PERMISSIONS_REQUEST_PHONENUMBER = 3;
     public static final int PERMISSIONS_REQUEST_INTERNET = 4; // Normal Permission
 
+    public static int postal_code;
+
 }

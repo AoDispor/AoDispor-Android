@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -34,6 +37,7 @@ import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
 import pt.aodispor.aodispor_android.Dialogs.DialogCallback;
 import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
+import pt.aodispor.aodispor_android.Notifications.RegistrationIntentService;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.aodispor_android.R.id.location;
@@ -53,6 +57,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private boolean edittingDescription;
     private ImageView imageView;
     private InputMethodManager manager;
+
+    /** Google Play services */
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final String TAG = "ProfileFragment";
 
     public enum PriceType { ByHour, ByDay, ByService }
 
@@ -237,6 +245,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             registered.setVisibility(View.VISIBLE);
         }
 
+        if (Utility.isPostalCodeSet(p)) {
+
+        }
+
         endLoading();
     }
 
@@ -286,6 +298,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     public void onLocationDialogCallBack(String location, String cp4, String cp3, boolean isSet) {
         if(isSet){
             startLoading();
+
             HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
             request.setMethod(HttpRequestTask.POST_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
@@ -296,7 +309,31 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             p.cp3 = cp3;
             request.setJSONBody(p);
             request.execute();
+
+            AppDefinitions.postal_code = Integer.parseInt(cp4);
+
+            if (checkPlayServices()) {
+                // Start IntentService to register this application with GCM.
+                Intent intent = new Intent(this.getActivity(), RegistrationIntentService.class);
+                this.getActivity().startService(intent);
+            }
         }
+    }
+
+    public boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this.getActivity());
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this.getActivity(), resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                this.getActivity().finish();
+            }
+            return false;
+        }
+        return true;
     }
 
     private void editProfession() {

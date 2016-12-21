@@ -129,6 +129,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         httpHeaders.set("API-Authorization", token + date);
     }
 
+    /**
+     * Specify type for post execution purposes
+     * @param t
+     */
     public void setType(int t){
         type = t;
     }

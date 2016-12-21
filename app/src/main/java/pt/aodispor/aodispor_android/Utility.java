@@ -70,4 +70,10 @@ public abstract class Utility {
 
         return true;
     }
+
+    public static boolean isPostalCodeSet(Professional p) {
+        if(p.cp4 == null || p.title.equals("")) return false;
+
+        return true;
+    }
 }

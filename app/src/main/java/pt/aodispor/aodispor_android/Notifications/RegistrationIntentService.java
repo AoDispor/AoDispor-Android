@@ -7,18 +7,21 @@ import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+import pt.aodispor.aodispor_android.API.ApiJSON;
+import pt.aodispor.aodispor_android.API.GCMServerInstance;
+import pt.aodispor.aodispor_android.API.HttpRequest;
+import pt.aodispor.aodispor_android.API.HttpRequestTask;
+import pt.aodispor.aodispor_android.API.Professional;
+import pt.aodispor.aodispor_android.AppDefinitions;
 import pt.aodispor.aodispor_android.R;
 
-/**
- * Created by Joao Pereira on 16/11/30.
- */
-
-public class RegistrationIntentService extends IntentService {
+public class RegistrationIntentService extends IntentService implements HttpRequest{
     private static final String TAG = "RegIntentService";
+    private static final String URL = "http://85.139.249.77:57864/store_gcm_token.php";
 
     public RegistrationIntentService() {
         super(TAG);
-        Log.i(TAG,"Constructing object");
+        Log.i(TAG, "Constructing object");
     }
 
     @Override
@@ -37,7 +40,24 @@ public class RegistrationIntentService extends IntentService {
         }
     }
     private void sendRegistrationToServer(String token) {
-        // to do later
+        HttpRequestTask request = new HttpRequestTask(GCMServerInstance.class, this, URL);
+        request.setMethod(HttpRequestTask.POST_REQUEST);
+
+        GCMServerInstance gcm_server_instance = new GCMServerInstance();
+        gcm_server_instance.gcm_token = token;
+        gcm_server_instance.postal_code = AppDefinitions.postal_code;
+
+        request.setJSONBody(gcm_server_instance);
+        request.execute();
     }
 
+    @Override
+    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+
+    }
+
+    @Override
+    public void onHttpRequestFailed() {
+
+    }
 }

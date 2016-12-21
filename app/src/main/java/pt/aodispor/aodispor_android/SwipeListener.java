@@ -7,11 +7,14 @@ import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Date;
 
 import pt.aodispor.aodispor_android.API.Professional;
+
+import static pt.aodispor.aodispor_android.AppDefinitions.DISCARD_ANIMATION_MILLISECONDS;
 
 /**
  * Class for controlling the motion of the professional cards with the gestures the user makes.
@@ -27,13 +30,6 @@ public class SwipeListener implements View.OnTouchListener{
     private TextView discard;
     private float initialX, initialY;
     private boolean enableCall;
-
-    //TODO this can be removed for simplification since animation is not 100%
-    static final int DISCARD_ANIMATION_MAX_DURATION = 850;
-    static final int DISCARD_ANIMATION_MIN_DURATION = 200;
-    Date cardTouchStart;
-    Date cardLastMove;
-    int discardAnimationDuration =0;
 
     /**
      * The constructor of the SwipeListener.
@@ -67,25 +63,22 @@ public class SwipeListener implements View.OnTouchListener{
         final float y = event.getRawY();
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                cardTouchStart = new Date();
                 enableCall = true;
                 initialX = x;
                 initialY = y;
                 viewPager.setSwipeEnabled(false);
+                view.animate().cancel();
+                view.clearAnimation();
                 break;
             case MotionEvent.ACTION_MOVE:
                 enableCall = false;
                 view.setTranslationX(x-initialX);
                 view.setTranslationY(y-initialY);
-                view.setRotation((x-initialX)*0.05f);
-                //float side1 = (float) Math.sqrt((x-initialX)*(x-initialX) + (y-initialY)*(y-initialY));
-                //float side2 = (float) Math.sqrt(view.getWidth()*view.getWidth() + view.getHeight()*view.getHeight());
+                view.setRotation(view.getX()*0.05f);
                 discard.setRotation(-45);
-                cardLastMove = new Date();
-                //discard.setAlpha((1.7f*side1)/side2);
                 discard.setAlpha(Math.max(
-                        3.8f*(x-initialX)*(x-initialX)/(view.getWidth()*view.getWidth()),
-                        3.6f*(y-initialY)*(y-initialY)/(view.getHeight()*view.getHeight()) ));
+                        3.8f*view.getX()*view.getX()/(view.getWidth()*view.getWidth()),
+                        3.6f*view.getY()*view.getY()/(view.getHeight()*view.getHeight()) ));
                 break;
             case (MotionEvent.ACTION_UP):
                 if(enableCall){
@@ -124,18 +117,24 @@ public class SwipeListener implements View.OnTouchListener{
                     dialog.show();
                     enableCall = false;
                 }
-                if(Math.abs(x-initialX) < view.getWidth()/2 && Math.abs(y-initialY) < view.getHeight()/2) {
-                    CardFragment.blockAccess = true;
-                    view.animate().translationX(0).translationY(0).rotation(0).setDuration(400).setListener(new Animator.AnimatorListener() {
+
+                boolean card_is_inside_bounds=Math.abs(view.getX()) < view.getWidth()/2
+                        && Math.abs(view.getY()) < view.getHeight()/2;
+
+                if(card_is_inside_bounds || CardFragment.blockAccess) {
+                    //card was released within bounds or some animation was still playing
+                    view.animate().translationX(0)
+                            .translationY(0)
+                            .rotation(0)
+                            .setDuration(400)
+                            .setListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {
                             view.setEnabled(false);
-                            discardAnimationDuration = 0;
                         }
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            CardFragment.blockAccess = false;
                             view.setEnabled(true);
                             discard.setAlpha(0);
                             viewPager.setSwipeEnabled(true);
@@ -143,7 +142,6 @@ public class SwipeListener implements View.OnTouchListener{
 
                         @Override
                         public void onAnimationCancel(Animator animation) {
-
                         }
 
                         @Override
@@ -151,14 +149,14 @@ public class SwipeListener implements View.OnTouchListener{
 
                         }
                     });
-                }else{
-                    long timenow = (new Date()).getTime();
-                    discardAnimationDuration = (int) (timenow - cardTouchStart.getTime());
-                    if(timenow - cardLastMove.getTime()>150 ) discardAnimationDuration = DISCARD_ANIMATION_MAX_DURATION;
-                    if(discardAnimationDuration >DISCARD_ANIMATION_MAX_DURATION||discardAnimationDuration<=0) {discardAnimationDuration = DISCARD_ANIMATION_MAX_DURATION;}
-                    if(discardAnimationDuration<DISCARD_ANIMATION_MIN_DURATION) {discardAnimationDuration =DISCARD_ANIMATION_MIN_DURATION;}
+                }else //the card must have been released near boarders wile no animation was playing and needs to be discarded
+                {
                     CardFragment.blockAccess=true;
-                    view.animate().rotation((x-initialX)*0.09f).translationX((x-initialX)*2.6f).translationY((y-initialY)*2.6f).setDuration(discardAnimationDuration).setListener(new Animator.AnimatorListener() {
+                    view.animate().rotation((x-initialX)*0.09f)
+                            .translationX((x-initialX)*2.6f)
+                            .translationY((y-initialY)*2.6f)
+                            .setDuration(DISCARD_ANIMATION_MILLISECONDS)
+                            .setListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {
 
@@ -166,14 +164,13 @@ public class SwipeListener implements View.OnTouchListener{
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            discardAnimationDuration = 0;
                             cardFragment.discardTopCard();
                             viewPager.setSwipeEnabled(true);
+                            CardFragment.blockAccess = false;
                         }
 
                         @Override
                         public void onAnimationCancel(Animator animation) {
-
                         }
 
                         @Override

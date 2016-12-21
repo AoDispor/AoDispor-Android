@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -70,36 +71,71 @@ public class CardFragmentTestClass extends CardFragment {
     @Mock
     Links links;
 
-    public void setTestData(ArrayList<Professional> test_dataset)
+    public enum Test{forward,backward,mix};
+
+    public void unblockAccess()
+    {
+        blockAccess=false;
+    }
+
+    public void setTestData(ArrayList<Professional> test_dataset, Test test)
     {
         links = mock(Links.class);
+        when(links.getPrevious()).thenReturn("some prev link");
+        when(links.getNext()).thenReturn("some next link");
 
         currentSet = new SearchQueryResult();
         currentSet.data = new ArrayList<Professional>();
         currentSet.meta = new Meta();
         currentSet.meta.pagination = mock(Pagination.class);
+
+        if(test==Test.backward){
+            previousSet = new SearchQueryResult();
+            previousSet.data = new ArrayList<Professional>();
+            previousSet.data.addAll(test_dataset.subList(0, 64));
+            currentSet.data.addAll(test_dataset.subList(64, 128));
+        }
+        else {
+            nextSet = new SearchQueryResult();
+            nextSet.data = new ArrayList<Professional>();
+            currentSet.data.addAll(test_dataset.subList(0, 64));
+            nextSet.data.addAll(test_dataset.subList(64, 128));
+        }
         when(currentSet.meta.pagination.getLinks()).thenReturn(links);
-        when(links.getNext()).thenReturn("some link");
 
-        nextSet = new SearchQueryResult();
-        nextSet.data = new ArrayList<Professional>();
-        currentSet.data.addAll(test_dataset.subList(0,64));
-        nextSet.data.addAll(test_dataset.subList(64,128));
-
-        /*for(int i = 0; i<64 ; ++i)
-            currentSet.data.add(ProfessionalTestClass.testProfessional("locC"+Integer.toString(i),"titC"+Integer.toString(i)));
-        nextSet = new SearchQueryResult();
-        nextSet.data = new ArrayList<Professional>();
-        for(int i = 0; i<64 ; ++i)
-            nextSet.data.add(ProfessionalTestClass.testProfessional("locN"+Integer.toString(i),"titN"+Integer.toString(i)));*/
         cards = new RelativeLayout[3];
-        cards[0] = professionalCard(currentSet.data.get(0));
-        cards[1] = professionalCard(currentSet.data.get(1));
-        cards[2] = professionalCard(currentSet.data.get(2));
         cards_professional_data = new Professional[3];
-        cards_professional_data[0] = currentSet.data.get(0);
-        cards_professional_data[1] = currentSet.data.get(1);
-        cards_professional_data[2] = currentSet.data.get(2);
+
+        switch (test){
+            case forward:
+                currentSetCardIndex=0;
+                cards[0] = professionalCard(test_dataset.get(0));
+                cards[1] = professionalCard(test_dataset.get(1));
+                cards[2] = professionalCard(test_dataset.get(2));
+                cards_professional_data[0] = test_dataset.get(0);
+                cards_professional_data[1] = test_dataset.get(1);
+                cards_professional_data[2] = test_dataset.get(2);
+                break;
+            case backward:
+                currentSetCardIndex=85-64;
+                cards[0] = professionalCard(test_dataset.get(85));
+                cards[1] = professionalCard(test_dataset.get(86));
+                cards[2] = professionalCard(test_dataset.get(87));
+                cards_professional_data[0] = test_dataset.get(85);
+                cards_professional_data[1] = test_dataset.get(86);
+                cards_professional_data[2] = test_dataset.get(87);
+                break;
+            case mix:
+                currentSetCardIndex=50;
+                cards[0] = professionalCard(test_dataset.get(50));
+                cards[1] = professionalCard(test_dataset.get(51));
+                cards[2] = professionalCard(test_dataset.get(52));
+                cards_professional_data[0] = test_dataset.get(51);
+                cards_professional_data[1] = test_dataset.get(52);
+                cards_professional_data[2] = test_dataset.get(53);
+                break;
+            default: break;
+        }
     }
 
     @Override

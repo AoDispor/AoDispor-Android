@@ -21,15 +21,12 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +36,8 @@ import pt.aodispor.aodispor_android.API.Links;
 import pt.aodispor.aodispor_android.API.HttpRequest;
 import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
+
+import static pt.aodispor.aodispor_android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
 
 /**
  *  Class representing a card stack fragment.
@@ -70,7 +69,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     @VisibleForTesting protected RelativeLayout[] cards;
     @VisibleForTesting protected Professional[] cards_professional_data;
     /**does not allow discard or recover methods to be called before the previous is finished*/
-    static boolean blockAccess=false;
+    @VisibleForTesting protected static boolean blockAccess=false;
 
     @VisibleForTesting protected RelativeLayout rootView;
     @VisibleForTesting protected LayoutInflater inflater;
@@ -81,9 +80,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     private String lon = "";
     private String searchQuery = "";
 
-    /**
-     * Default constructor for CardFragment class.
-     */
+    /** Default constructor for CardFragment class.  */
     public CardFragment() {blockAccess=false;}
 
     /**
@@ -140,8 +137,6 @@ public class CardFragment extends Fragment implements HttpRequest {
         }
 
         setupNewStack();
-
-        //currentSetCardIndex=60;//TODO REMOVE its 4 DEBUG ONLY
 
         return rootView;
     }
@@ -248,7 +243,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      *     Also responsible for requesting the loading of the next page and updating the currentSet and nextSet.
      */
     public void discardTopCard() {
-        blockAccess = true;
+        //blockAccess = true; -> done in SwipeListener
         currentSetCardIndex++;
         removeCardViews(cards);
         swapCardsOnStack(1,0);
@@ -256,7 +251,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         centerFirstCard();
         if(cards[1] == null) {//already reached end of card pile
             rootView.addView(cards[0]);
-            blockAccess = false;
+            //blockAccess = false; -> done in SwipeListener
             return;
         }
         if(cards[2] != null && cards[2].getTag() != null && cards[2].getTag().equals("msg")) {//only one card left on pile card TODO not sure about this line, there may be a prettier way to to it
@@ -270,7 +265,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
 
             cards[2] = null;
-            blockAccess = false;
+            //blockAccess = false; -> done in SwipeListener
             return;
         }
         if(currentSet == null) {
@@ -313,7 +308,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             System.gc();
             prepareNextPage();
         }
-        blockAccess = false;
+        //blockAccess = false; -> done in SwipeListener
     }
 
     /**
@@ -409,7 +404,8 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         cards[0].setX(800*-1); cards[0].setY(700*-1);
         cards[0].setRotation(40);
-        cards[0].animate().rotation(0).translationX(0).translationY(0).setDuration(250).setListener(new Animator.AnimatorListener() {
+        cards[0].animate().rotation(0).translationX(0).translationY(0).
+                setDuration(RESTORE_ANIMATION_MILLISECONDS).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {}
             @Override
@@ -426,8 +422,8 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     //region CARDS CREATION
 
-    /**
-     *
+    /**Because a professional details are separated from the card display use this auxiliary method
+     * to insert new professionals into the card stack
      * @param stackIndex 0,1 or 2 (the higher the index the lower it is on the stack)
      * @param professional
      * @return
@@ -509,16 +505,6 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     @VisibleForTesting protected RelativeLayout professionalCard(Professional p) {
         RelativeLayout card = createProfessionalCard(p.title,p.location,p.description,p.rate,p.currency,p.type,p.avatar_url);
-        //TODO fetch professional image from web
-        /*
-        try {
-            URL url = new URL("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            ((ImageView)card.findViewById(R.id.profile_image)).setImageBitmap(bmp);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
         return card;
     }
 
@@ -531,9 +517,9 @@ public class CardFragment extends Fragment implements HttpRequest {
      * <br>will wait for task to end or timeout (blocking)
      * @return true if received query result on time
      */
-    public QueryResult prepareNewSearchQuery() {//TODO replace test request with the actual request
+    public QueryResult prepareNewSearchQuery() {
         requestType = RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,"https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}", searchQuery, lat,lon);//arqueologo (1), tecnic (91+9), desporto (10)
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,"https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}", searchQuery, lat,lon);
 
         SearchQueryResult result;
         try {
@@ -630,16 +616,6 @@ public class CardFragment extends Fragment implements HttpRequest {
     public Professional getProfessionalOnTop() {
         return cards_professional_data[0];
     }
-
-    /**
-     * This should never be accessed from the outside, except for testing purposes! (not your typical getter)
-     * <br>was made this way to avoid implementing cloning
-     * @return */
-    public SearchQueryResult getCurrentSet() {
-        return currentSet;
-    }
-
-    //public String getCurrentShownCardProfessionalName() {return ((TextView)cards[0].findViewById(R.id.name)).getText().toString();}
 
     //endregion
 

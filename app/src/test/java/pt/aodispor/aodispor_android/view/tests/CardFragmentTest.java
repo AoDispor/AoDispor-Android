@@ -16,6 +16,7 @@ import org.robolectric.shadows.support.v4.SupportFragmentTestUtil;
 //import testrobo.testrobolectric.base.CustomTestRule;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
@@ -39,6 +40,8 @@ public class CardFragmentTest{
     //@Rule
     //public final CustomTestRule mRule = new CustomTestRule(); TODO not used so far
 
+    int iterator;
+
     @Before
     public void initTest() {
     }
@@ -49,20 +52,23 @@ public class CardFragmentTest{
      */
 
     @Test
-    public void testSwipeCardOrder1() throws Exception{
+    public void testSwipeCardOrder1() {
         CardFragmentTestClass fragment = new CardFragmentTestClass();
         SupportFragmentTestUtil.startFragment(fragment, EmptyActivity.class);
 
         ArrayList<Professional> test_data_set = new ArrayList<Professional>(128);
         for(int i = 0; i<128 ; ++i) test_data_set.add(ProfessionalTestClass.testProfessional(""+Integer.toString(i),""+Integer.toString(i)));
-        fragment.setTestData(test_data_set);
+        fragment.setTestData(test_data_set,CardFragmentTestClass.Test.forward);
         //SearchQueryResult cardSet;
         //    cardSet = fragment.getCurrentSet();
 
         ShadowLog.stream = System.out;
+        ShadowLog.i("","\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
         ShadowLog.i("testSwipeCardOrder1","Verify display order of professional cards over a segment of one single set (forward iteration only)");
+
         int i=0;
         for(; i <20 ; ++i) {
+            fragment.unblockAccess();
              String location = Html.fromHtml(test_data_set.get(i).location).toString();
            String title= Html.fromHtml(test_data_set.get(i).title).toString();
             Assert.assertEquals( (location+title) , fragment.getCurrentShownCardProfessionalLocationPlusProfession());
@@ -70,6 +76,7 @@ public class CardFragmentTest{
         }
         ShadowLog.i("testSwipeCardOrder1","Verify display order of professional cards of one entire single set (forward iteration only)");
         for(; i <64 ; ++i) {
+            fragment.unblockAccess();
             String location = Html.fromHtml(test_data_set.get(i).location).toString();
             String title= Html.fromHtml(test_data_set.get(i).title).toString();
             Assert.assertEquals( (location+title) , fragment.getCurrentShownCardProfessionalLocationPlusProfession());
@@ -77,6 +84,7 @@ public class CardFragmentTest{
         }
         ShadowLog.i("testSwipeCardOrder1","Verify display order of professional cards of the next set (forward iteration only)");
         for(; i <85 ; ++i) {
+            fragment.unblockAccess();
             String location = Html.fromHtml(test_data_set.get(i).location).toString();
             String title= Html.fromHtml(test_data_set.get(i).title).toString();
             Assert.assertEquals( (location+title) , fragment.getCurrentShownCardProfessionalLocationPlusProfession());
@@ -84,23 +92,97 @@ public class CardFragmentTest{
         }
     }
 
+    @Test
+    public void testSwipeCardOrder2(){
 
-    /*@Test
-    need some data that is not updated for testing purposes
-    public void testDownloadDataFromApiJSON() {
-        final CardFragment fragment = new CardFragment();
-        SupportFragmentTestUtil.startFragment(fragment, MainActivity.class);
+        CardFragmentTestClass fragment = new CardFragmentTestClass();
+        SupportFragmentTestUtil.startFragment(fragment, EmptyActivity.class);
 
-        ApiJSON data = new SearchQueryResult();
+        ArrayList<Professional> test_data_set = new ArrayList<Professional>(128);
+        for(int i = 0; i<128 ; ++i) test_data_set.add(ProfessionalTestClass.testProfessional(""+Integer.toString(i),""+Integer.toString(i)));
+        fragment.setTestData(test_data_set,CardFragmentTestClass.Test.backward);
+        //SearchQueryResult cardSet;
+        //    cardSet = fragment.getCurrentSet();
 
-        ResponseEntity entity = Mockito.mock(ResponseEntity.class);
-        Mockito.when(entity.getBody()).thenReturn(data);
-        Mockito.when(
-                mRule.getMockRestTemplate().exchange(
-                        any(String.class), any(HttpMethod.class), any(HttpEntity.class), any(Class.class), any(String[].class))
-        ).thenReturn(entity);
+        ShadowLog.stream = System.out;
+        ShadowLog.i("","\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
 
-        //fragment.fetchDataFromJsonApi();
-        //assertEquals(data, fragment.mDownloadedData);
-    }*/
+        int i=85;
+
+        ShadowLog.i("testSwipeCardOrder1","Verify display order of professional cards over a segment of one single set (backward iteration only)");
+        for(; i >64 ; --i) {
+            fragment.unblockAccess();
+            String location = Html.fromHtml(test_data_set.get(i).location).toString();
+            String title= Html.fromHtml(test_data_set.get(i).title).toString();
+            Assert.assertEquals( (location+title) , fragment.getCurrentShownCardProfessionalLocationPlusProfession());
+            fragment.restorePreviousCard();
+        }
+
+        ShadowLog.i("testSwipeCardOrder1","Verify display order of professional cards over previous set (backward iteration only)");
+        for(; i >20 ; --i) {
+            fragment.unblockAccess();
+            String location = Html.fromHtml(test_data_set.get(i).location).toString();
+            String title= Html.fromHtml(test_data_set.get(i).title).toString();
+            Assert.assertEquals( (location+title) , fragment.getCurrentShownCardProfessionalLocationPlusProfession());
+            fragment.restorePreviousCard();
+        }
+    }
+
+    @Test
+    public void testSwipeCardOrder3() {
+
+        CardFragmentTestClass fragment = new CardFragmentTestClass();
+        SupportFragmentTestUtil.startFragment(fragment, EmptyActivity.class);
+
+        ArrayList<Professional> test_data_set = new ArrayList<Professional>(128);
+        for (int i = 0; i < 128; ++i)
+            test_data_set.add(ProfessionalTestClass.testProfessional("" + Integer.toString(i), "" + Integer.toString(i)));
+        fragment.setTestData(test_data_set, CardFragmentTestClass.Test.mix);
+        //SearchQueryResult cardSet;
+        //    cardSet = fragment.getCurrentSet();
+
+        ShadowLog.stream = System.out;
+        ShadowLog.i("", "\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
+
+        iterator=50;
+
+        ShadowLog.i("testSwipeCardOrder1", "forward and backward iterations inside same set");
+        assert1ForwardIteration(fragment,test_data_set);
+        assert1ForwardIteration(fragment,test_data_set);
+        assert1BackwardIteration(fragment,test_data_set);
+        assert1ForwardIteration(fragment,test_data_set);
+        assert1ForwardIteration(fragment,test_data_set);
+        assert1ForwardIteration(fragment,test_data_set);
+        assert1BackwardIteration(fragment,test_data_set);
+        assert1BackwardIteration(fragment,test_data_set);
+
+        ShadowLog.i("testSwipeCardOrder1", "forward and backward iterations alternating sets");
+        //iterator=52
+        for(int i= 0; i<30;++i) assert1ForwardIteration(fragment,test_data_set);
+        for(int i= 0; i<30;++i) assert1BackwardIteration(fragment,test_data_set);
+        for(int i= 0; i<30;++i) assert1ForwardIteration(fragment,test_data_set);
+        for(int i= 0; i<30;++i) assert1BackwardIteration(fragment,test_data_set);
+
+    }
+
+    void assert1BackwardIteration(CardFragmentTestClass fragment, ArrayList<Professional> test_data_set)
+    {
+        iterator--;
+        fragment.restorePreviousCard();
+        fragment.unblockAccess();
+        String location = Html.fromHtml(test_data_set.get(iterator).location).toString();
+        String title= Html.fromHtml(test_data_set.get(iterator).title).toString();
+        Assert.assertEquals( (location+title) , fragment.getCurrentShownCardProfessionalLocationPlusProfession());
+    }
+
+    void assert1ForwardIteration(CardFragmentTestClass fragment, ArrayList<Professional> test_data_set)
+    {
+        iterator++;
+        fragment.discardTopCard();
+        fragment.unblockAccess();
+        String location = Html.fromHtml(test_data_set.get(iterator).location).toString();
+        String title= Html.fromHtml(test_data_set.get(iterator).title).toString();
+        Assert.assertEquals( (location+title) , fragment.getCurrentShownCardProfessionalLocationPlusProfession());
+    }
+
 }

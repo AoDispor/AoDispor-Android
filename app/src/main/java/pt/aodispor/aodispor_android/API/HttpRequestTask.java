@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.common.api.Api;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -67,28 +68,38 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             cf.setConnectTimeout(AppDefinitions.TIMEOUT);
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
             template = new RestTemplate(cf);
-            ObjectMapper om = new ObjectMapper();
-            String s;
-            JsonNode root;
+            //ObjectMapper om = new ObjectMapper();
+            //String s;
+            //JsonNode root;
+            Object answer;//temp before assigning response: may not return ApiJSON
             try {
-                ApiJSON response;
+                ApiJSON response=null;
                 switch (method) {
                     case POST:
                         entityReq = new HttpEntity<>(body,httpHeaders);
-                        s = template.postForObject(url, entityReq, String.class);
-                        root = om.readTree(s);
-                        response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
+                        Log.d("---",url);
+                        answer = template.postForObject(url, entityReq, answerType);
+                        if(ApiJSON.class.isAssignableFrom(answerType))
+                            response = (ApiJSON) answer;
+                        //s = template.postForObject(url, entityReq, String.class);
+                        //root = om.readTree(s);
+                        //response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
                         break;
                     case PUT:
                         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                         entityReq = new HttpEntity<>(bitmapBody,httpHeaders);
-                        s = template.exchange(url, HttpMethod.PUT, entityReq, String.class, urlVariables).getBody();
-                        root = om.readTree(s);
-                        response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
+                        answer = template.exchange(url, HttpMethod.PUT, entityReq, String.class, urlVariables).getBody();
+                        if(ApiJSON.class.isAssignableFrom(answerType))
+                            response = (ApiJSON) answer;
+                        //s = template.exchange(url, HttpMethod.PUT, entityReq, String.class, urlVariables).getBody();
+                        //root = om.readTree(s);
+                        //response = (ApiJSON) om.readValue(root.get("data") + "", answerType);
                         break;
                     default:
                         entityReq = new HttpEntity<>(httpHeaders);
-                        response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
+                        answer = template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
+                        if(ApiJSON.class.isAssignableFrom(answerType))
+                            response = (ApiJSON) answer;
                         break;
                 }
                 return response;

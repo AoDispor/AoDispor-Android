@@ -40,7 +40,7 @@ public class RegistrationIntentService extends IntentService implements HttpRequ
         }
     }
     private void sendRegistrationToServer(String token) {
-        HttpRequestTask request = new HttpRequestTask(GCMServerInstance.class, this, URL);
+        HttpRequestTask request = new HttpRequestTask(String.class, this, URL);
         request.setMethod(HttpRequestTask.POST_REQUEST);
 
         GCMServerInstance gcm_server_instance = new GCMServerInstance();

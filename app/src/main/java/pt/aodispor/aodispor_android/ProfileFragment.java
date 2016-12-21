@@ -207,7 +207,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -235,7 +235,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 p = getProfile.data.get(0);
                 break;
             case HttpRequest.UPDATE_PROFILE:
-                p = (Professional) answer;
+                p = ((SearchQueryResult) answer).data.get(0);//(Professional) answer;
                 break;
         }
         updateProfileCard(p);
@@ -271,7 +271,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     @Override
     public void onPriceDialogCallBack(int value, boolean isFinal, PriceType type) {
         startLoading();
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -299,7 +299,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         if(isSet){
             startLoading();
 
-            HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+            HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
             request.setMethod(HttpRequestTask.POST_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
             request.addAPIAuthentication(phoneNumber, password);
@@ -337,7 +337,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     private void editProfession() {
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -348,7 +348,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     private void editDescription() {
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -483,7 +483,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             Bundle bundle = data.getExtras();
             Bitmap image = bundle.getParcelable("data");
 
-            HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_UPLOAD_IMAGE);
+            HttpRequestTask request = new HttpRequestTask(String.class, this, URL_UPLOAD_IMAGE);
             request.setMethod(HttpRequestTask.PUT_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
             request.addAPIAuthentication(phoneNumber, password);

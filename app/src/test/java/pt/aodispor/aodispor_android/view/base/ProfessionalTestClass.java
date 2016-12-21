@@ -6,7 +6,6 @@ public class ProfessionalTestClass extends Professional {
 
     public static Professional testProfessional(String location, String title)
     {
-        //if (!test_class.getName().contains("Test")) throw new Exception("NOT AUTHORIZED");
         ProfessionalTestClass prof = new ProfessionalTestClass();
         prof.location = location;
         prof.title = title;

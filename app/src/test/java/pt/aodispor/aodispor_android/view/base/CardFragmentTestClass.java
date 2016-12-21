@@ -36,18 +36,16 @@ public class CardFragmentTestClass extends CardFragment {
 
     @Override
     public View onCreateView(LayoutInflater i, ViewGroup c, Bundle savedInstanceState) {
-        currentSetCardIndex=0;
+        currentSetCardIndex = 0;
         inflater = i;
         container = c;
         rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
         activity = null;
 
         Button button = (Button) rootView.findViewById(R.id.prevCardButton);
-        button.setOnClickListener(new View.OnClickListener()
-        {
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 restorePreviousCard();
             }
         });
@@ -64,22 +62,22 @@ public class CardFragmentTestClass extends CardFragment {
 
     public String getCurrentShownCardProfessionalLocationPlusProfession() {
         return
-                ((TextView)cards[0].findViewById(R.id.location)).getText().toString()
-                        +       ((TextView)cards[0].findViewById(R.id.profession)).getText().toString();
+                ((TextView) cards[0].findViewById(R.id.location)).getText().toString()
+                        + ((TextView) cards[0].findViewById(R.id.profession)).getText().toString();
     }
 
     @Mock
     Links links;
 
-    public enum Test{forward,backward,mix};
+    public enum Test {forward, backward, mix}
 
-    public void unblockAccess()
-    {
-        blockAccess=false;
+    ;
+
+    public void unblockAccess() {
+        blockAccess = false;
     }
 
-    public void setTestData(ArrayList<Professional> test_dataset, Test test)
-    {
+    public void setTestData(ArrayList<Professional> test_dataset, Test test) {
         links = mock(Links.class);
         when(links.getPrevious()).thenReturn("some prev link");
         when(links.getNext()).thenReturn("some next link");
@@ -89,13 +87,12 @@ public class CardFragmentTestClass extends CardFragment {
         currentSet.meta = new Meta();
         currentSet.meta.pagination = mock(Pagination.class);
 
-        if(test==Test.backward){
+        if (test == Test.backward) {
             previousSet = new SearchQueryResult();
             previousSet.data = new ArrayList<Professional>();
             previousSet.data.addAll(test_dataset.subList(0, 64));
             currentSet.data.addAll(test_dataset.subList(64, 128));
-        }
-        else {
+        } else {
             nextSet = new SearchQueryResult();
             nextSet.data = new ArrayList<Professional>();
             currentSet.data.addAll(test_dataset.subList(0, 64));
@@ -106,9 +103,9 @@ public class CardFragmentTestClass extends CardFragment {
         cards = new RelativeLayout[3];
         cards_professional_data = new Professional[3];
 
-        switch (test){
+        switch (test) {
             case forward:
-                currentSetCardIndex=0;
+                currentSetCardIndex = 0;
                 cards[0] = professionalCard(test_dataset.get(0));
                 cards[1] = professionalCard(test_dataset.get(1));
                 cards[2] = professionalCard(test_dataset.get(2));
@@ -117,7 +114,7 @@ public class CardFragmentTestClass extends CardFragment {
                 cards_professional_data[2] = test_dataset.get(2);
                 break;
             case backward:
-                currentSetCardIndex=85-64;
+                currentSetCardIndex = 85 - 64;
                 cards[0] = professionalCard(test_dataset.get(85));
                 cards[1] = professionalCard(test_dataset.get(86));
                 cards[2] = professionalCard(test_dataset.get(87));
@@ -126,7 +123,7 @@ public class CardFragmentTestClass extends CardFragment {
                 cards_professional_data[2] = test_dataset.get(87);
                 break;
             case mix:
-                currentSetCardIndex=50;
+                currentSetCardIndex = 50;
                 cards[0] = professionalCard(test_dataset.get(50));
                 cards[1] = professionalCard(test_dataset.get(51));
                 cards[2] = professionalCard(test_dataset.get(52));
@@ -134,7 +131,8 @@ public class CardFragmentTestClass extends CardFragment {
                 cards_professional_data[1] = test_dataset.get(52);
                 cards_professional_data[2] = test_dataset.get(53);
                 break;
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -165,7 +163,7 @@ public class CardFragmentTestClass extends CardFragment {
         price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         price.setText(Html.fromHtml(price_value));
 
-        switch(payment_type) {
+        switch (payment_type) {
             case "H":
                 price.setText(Html.fromHtml(price_value + " " + currency_type + "/h"));
                 price.setTextColor(getResources().getColor(R.color.by_hour));

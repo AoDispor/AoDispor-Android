@@ -95,6 +95,19 @@
         android:gravity="center"
         android:layout_marginRight="15dp"
         android:layout_marginLeft="15dp"
+        android:layout_alignBottom="@+id/nameEditText" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profession"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/name"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp"
         android:layout_alignBottom="@+id/professionEditText" />
 
     <pt.aodispor.aodispor_android.CustomEditText
@@ -154,7 +167,7 @@
         android:scrollbars="vertical"
         android:inputType="textMultiLine"/>
 
-    <TextView
+	<TextView
         android:text="Inscrito"
         android:visibility="invisible"
         android:layout_width="wrap_content"
@@ -168,5 +181,5 @@
         android:alpha="0.66"
         android:layout_above="@+id/profession"
         android:layout_centerHorizontal="true" />
-
+		
 </RelativeLayout>

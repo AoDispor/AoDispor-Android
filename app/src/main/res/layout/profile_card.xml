@@ -167,19 +167,20 @@
         android:scrollbars="vertical"
         android:inputType="textMultiLine"/>
 
-	<TextView
-        android:text="Inscrito"
-        android:visibility="invisible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/registered_note"
-        android:background="@drawable/round_rectangle_black"
-        android:textColor="@color/white"
-        android:textAllCaps="true"
-        android:textSize="17sp"
-        android:padding="10dp"
-        android:alpha="0.66"
-        android:layout_above="@+id/profession"
-        android:layout_centerHorizontal="true" />
-		
+    <TextView
+android:text="Inscrito"
+android:visibility="invisible"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:id="@+id/registered_note"
+android:background="@drawable/round_rectangle_black"
+android:textColor="@color/white"
+android:textAllCaps="true"
+android:textSize="17sp"
+android:padding="10dp"
+android:alpha="0.66"
+        android:layout_above="@+id/name"
+        android:layout_alignLeft="@+id/profile_image"
+        android:layout_alignStart="@+id/profile_image" />
+
 </RelativeLayout>

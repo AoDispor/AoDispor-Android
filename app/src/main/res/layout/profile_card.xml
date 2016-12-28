@@ -87,7 +87,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/profession"
+        android:id="@+id/name"
         android:textSize="20sp"
         android:textColor="@android:color/black"
         android:layout_below="@+id/profile_image"
@@ -100,11 +100,25 @@
     <pt.aodispor.aodispor_android.CustomEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/professionEditText"
+        android:id="@+id/nameEditText"
         android:textSize="20sp"
         android:background="@null"
         android:textColor="@android:color/black"
         android:layout_below="@+id/profile_image"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp"
+        android:inputType="text" />
+
+    <pt.aodispor.aodispor_android.CustomEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/professionEditText"
+        android:textSize="20sp"
+        android:background="@null"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/name"
         android:layout_centerHorizontal="true"
         android:textAlignment="center"
         android:layout_marginRight="15dp"

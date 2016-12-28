@@ -87,23 +87,10 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/name"
-        android:textSize="20sp"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/profile_image"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_alignBottom="@+id/nameEditText" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/profession"
         android:textSize="20sp"
         android:textColor="@android:color/black"
-        android:layout_below="@+id/name"
+        android:layout_below="@+id/profile_image"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:layout_marginRight="15dp"
@@ -113,25 +100,11 @@
     <pt.aodispor.aodispor_android.CustomEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/nameEditText"
-        android:textSize="20sp"
-        android:background="@null"
-        android:textColor="@android:color/black"
-        android:layout_below="@+id/profile_image"
-        android:layout_centerHorizontal="true"
-        android:textAlignment="center"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:inputType="text" />
-
-    <pt.aodispor.aodispor_android.CustomEditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/professionEditText"
         android:textSize="20sp"
         android:background="@null"
         android:textColor="@android:color/black"
-        android:layout_below="@+id/name"
+        android:layout_below="@+id/profile_image"
         android:layout_centerHorizontal="true"
         android:textAlignment="center"
         android:layout_marginRight="15dp"
@@ -166,5 +139,20 @@
         android:layout_marginLeft="15dp"
         android:scrollbars="vertical"
         android:inputType="textMultiLine"/>
+
+    <TextView
+        android:text="Inscrito"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/registered_note"
+        android:background="@drawable/round_rectangle_black"
+        android:textColor="@color/white"
+        android:textAllCaps="true"
+        android:textSize="17sp"
+        android:padding="10dp"
+        android:alpha="0.66"
+        android:layout_above="@+id/profession"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        SearchView searchView = (SearchView) findViewById(R.id.searchView);
+        final SearchView searchView = (SearchView) findViewById(R.id.searchView);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
                 CardFragment cardFrag = (CardFragment) getSupportFragmentManager().getFragments().get(0);
                 cardFrag.setSearchQuery(query);
                 cardFrag.setupNewStack();
+                mViewPager.setCurrentItem(1,true);
+                searchView.clearFocus();
                 return true;
             }
         });
@@ -153,8 +155,12 @@ public class MainActivity extends AppCompatActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             CardFragment cardFrag = (CardFragment) getSupportFragmentManager().getFragments().get(0);
+            android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) findViewById(R.id.searchView);
+            searchView.setQuery(query,false);
             cardFrag.setSearchQuery(query);
             cardFrag.setupNewStack();
+            mViewPager.setCurrentItem(1,true);
+            searchView.clearFocus();
         }
     }
 

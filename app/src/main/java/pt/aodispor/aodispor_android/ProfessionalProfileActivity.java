@@ -18,12 +18,13 @@ public class ProfessionalProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.professional_card);
-        /*
-        TextView name = (TextView) card.findViewById(R.id.name);
-        name.setText(Html.fromHtml(n));
-        */
 
         Bundle extras = getIntent().getExtras();
+
+        TextView name = (TextView) findViewById(R.id.name);
+        String _name = extras.getString("name");
+        name.setText(Html.fromHtml(_name));
+        name.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView profession = (TextView) findViewById(R.id.profession);
         String _profession = extras.getString("profession");

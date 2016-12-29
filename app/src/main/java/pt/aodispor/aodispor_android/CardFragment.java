@@ -307,7 +307,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     public void restorePreviousCard() {
         if(blockAccess)
             return; //don't make anything while animation plays
-        if(currentSetCardIndex <- 2) {
+        if(currentSetCardIndex < -2) {
             Log.d("ERROR 003","Unexpected state");
         }//TODO not expected throw exception or development warning
 

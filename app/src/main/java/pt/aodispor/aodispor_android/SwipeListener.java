@@ -60,6 +60,9 @@ public class SwipeListener implements View.OnTouchListener {
      */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        if (CardFragment.blockAccess)
+            return false;
+
         final float x = event.getRawX();
         final float y = event.getRawY();
         switch (event.getAction() & MotionEvent.ACTION_MASK) {

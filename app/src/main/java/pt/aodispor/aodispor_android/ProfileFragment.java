@@ -21,6 +21,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -35,6 +37,7 @@ import pt.aodispor.aodispor_android.API.Professional;
 import pt.aodispor.aodispor_android.API.SearchQueryResult;
 import pt.aodispor.aodispor_android.Dialogs.DialogCallback;
 import pt.aodispor.aodispor_android.Dialogs.PriceDialog;
+import pt.aodispor.aodispor_android.Notifications.RegistrationIntentService;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.aodispor_android.R.id.location;
@@ -58,6 +61,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private InputMethodManager manager;
 
     public enum PriceType { ByHour, ByDay, ByService }
+
+    /** Google Play services */
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     /**
      * Factory method to create a new instance of ProfileFragment class. This is needed because of how
@@ -244,7 +250,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -272,10 +278,16 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 p = getProfile.data.get(0);
                 break;
             case HttpRequest.UPDATE_PROFILE:
-                p = (Professional) answer;
+                p = ((SearchQueryResult) answer).data.get(0);
                 break;
         }
         updateProfileCard(p);
+
+        if(Utility.isProfessionalRegistered(p)) {
+            TextView registered = (TextView) professionalCard.findViewById(R.id.registered_note);
+            registered.setVisibility(View.VISIBLE);
+        }
+
         endLoading();
     }
 
@@ -298,7 +310,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     @Override
     public void onPriceDialogCallBack(int value, boolean isFinal, PriceType type) {
         startLoading();
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -325,7 +337,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     public void onLocationDialogCallBack(String location, String cp4, String cp3, boolean isSet) {
         if(isSet){
             startLoading();
-            HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+            HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
             request.setMethod(HttpRequestTask.POST_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
             request.addAPIAuthentication(phoneNumber, password);
@@ -335,11 +347,19 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             p.cp3 = cp3;
             request.setJSONBody(p);
             request.execute();
+
+            AppDefinitions.postal_code = Integer.parseInt(cp4);
+
+            if (checkPlayServices()) {
+                // Start IntentService to register this application with GCM.
+                Intent intent = new Intent(this.getActivity(), RegistrationIntentService.class);
+                this.getActivity().startService(intent);
+            }
         }
     }
 
     private void editName() {
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -350,7 +370,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     private void editProfession() {
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -361,7 +381,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     private void editDescription() {
-        HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(phoneNumber, password);
@@ -507,7 +527,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             Bundle bundle = data.getExtras();
             Bitmap image = bundle.getParcelable("data");
 
-            HttpRequestTask request = new HttpRequestTask(Professional.class, this, URL_UPLOAD_IMAGE);
+            HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_UPLOAD_IMAGE);
             request.setMethod(HttpRequestTask.PUT_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
             request.addAPIAuthentication(phoneNumber, password);
@@ -538,4 +558,26 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         descriptionEditText.setVisibility(EditText.INVISIBLE);
         descriptionView.setVisibility(TextView.VISIBLE);
     }
+
+
+    //region GCM messages related auxiliary methods
+
+    public boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this.getActivity());
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this.getActivity(), resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i("ProfileFragment", "This device is not supported.");
+                this.getActivity().finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    //endregion
+
 }

@@ -54,17 +54,6 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
             request.setType(HttpRequest.GET_LOCATION);
             request.execute();
 
-            /*
-            CPPQueryResult result;
-            try {
-                result = (CPPQueryResult) request.execute().get(AppDefinitions.MILISECONDS_TO_TIMEOUT_ON_QUERY, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {
-                return;
-            }
-            if (result != null && result.data != null) {
-                _location.setText(result.data.getLocalidade());
-            }
-            */
         } else {
             lastDigit = false;
             locationSet = false;

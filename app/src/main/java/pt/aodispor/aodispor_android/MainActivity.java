@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -174,6 +176,16 @@ public class MainActivity extends AppCompatActivity {
             case "fav_icon":
                 mViewPager.setCurrentItem(2);
                 break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem() == 1) {
+            CardFragment cardFragment = ((TabPagerAdapter)mViewPager.getAdapter()).getCardFragment();
+            cardFragment.restorePreviousCard();
+        } else {
+            super.onBackPressed();
         }
     }
 }

@@ -11,6 +11,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class TabPagerAdapter extends FragmentPagerAdapter {
     /** Number of pages this adapter supports. */
     private final int NUMBER_OF_PAGES = 2;
+    private ProfileFragment profileFragment;
+    private CardFragment cardFragment;
 
     /**
      * The TabPagerAdapter constructor.
@@ -31,12 +33,22 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         switch (position){
             case 0:
                 f = ProfileFragment.newInstance();
+                profileFragment = (ProfileFragment) f;
                 break;
             case 1:
                 f = CardFragment.newInstance();
+                cardFragment = (CardFragment) f;
                 break;
         }
         return f;
+    }
+
+    public ProfileFragment getProfileFragment() {
+        return profileFragment;
+    }
+
+    public CardFragment getCardFragment() {
+        return cardFragment;
     }
 
     /**

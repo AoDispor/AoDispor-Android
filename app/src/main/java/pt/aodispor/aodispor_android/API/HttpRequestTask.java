@@ -77,7 +77,6 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                 switch (method) {
                     case POST:
                         entityReq = new HttpEntity<>(body,httpHeaders);
-                        Log.d("---",url);
                         answer = template.postForObject(url, entityReq, answerType);
                         if(ApiJSON.class.isAssignableFrom(answerType))
                             response = (ApiJSON) answer;

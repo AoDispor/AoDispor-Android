@@ -60,7 +60,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     /** Google Play services */
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final String TAG = "ProfileFragment";
+    //private static final String TAG = "ProfileFragment";
 
     public enum PriceType { ByHour, ByDay, ByService }
 
@@ -328,7 +328,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 apiAvailability.getErrorDialog(this.getActivity(), resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
                         .show();
             } else {
-                Log.i(TAG, "This device is not supported.");
+                Log.i("ProfileFragment", "This device is not supported.");
                 this.getActivity().finish();
             }
             return false;

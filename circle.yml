@@ -6,6 +6,7 @@ general:
 machine:
     environment:
         ANDROID_HOME: /usr/local/android-sdk-linux
+        _JAVA_OPTIONS: "-Xms512m -Xmx2g"
         ##android-sdk-license: 8933bad161af4178b1185d1a37fbf41ea5269c55
         ##android-sdk-preview-license: 504667f4c0de7af1a06de9f4b1727b84351f2910
 

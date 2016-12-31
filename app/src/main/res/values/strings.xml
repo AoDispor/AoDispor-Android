@@ -13,6 +13,8 @@
     <string name="register_price">O seu preço</string>
     <string name="register_profession">A sua profissão</string>
     <string name="register_description">Descreva aqui o que faz&#8230;</string>
+    <string name="register_completion">Inscrição como profissional completa</string>
+    <string name="profile_registered_note_msg">Inscrito</string>
 
     <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>
@@ -27,6 +29,21 @@
 
     <!-- Description -->
     <string name="edit_description_header">Descreva o que faz</string>
+
+    <!-- Phone Number Request -->
+    <string name="phonerequest_textbox">número de telemóvel</string>
+    <string name="phonerequest_button">ENTRAR</string>
+
+    <!-- SMS Code Request -->
+    <string name="smsvalidation_textbox">insira código de validação</string>
+    <string name="smsvalidation_button">VALIDAR</string>
+
+    <!-- Permissions Messages -->
+    <string name="permisson_accepted">Autorizado</string>
+    <string name="permisson_denied">Não Autorizado</string>
+    <string name="request_permission_phone">AoDispor pretende aceder ao seu cartão para adquirir o seu número telefónico(não confirme se pretender usar um outro número de telemóvel)</string>
+    <string name="request_permission_sms">AoDispor pretende aceder às suas mensagens para adquirir o código de validação</string>
+    <string name="request_permission_internet">AoDispor pretende aceder à internet</string>
 
     <!-- Other Messages -->
     <string name="loading">A atualizar&#8230;</string>

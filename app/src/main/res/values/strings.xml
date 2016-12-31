@@ -14,6 +14,7 @@
     <string name="register_profession">A sua profissão</string>
     <string name="register_description">Descreva aqui o que faz&#8230;</string>
     <string name="register_completion">Inscrição como profissional completa</string>
+    <string name="profile_registered_note_msg">Inscrito</string>
 
     <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>

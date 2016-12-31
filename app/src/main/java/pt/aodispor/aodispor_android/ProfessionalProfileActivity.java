@@ -21,10 +21,10 @@ public class ProfessionalProfileActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
 
-        TextView name = (TextView) findViewById(R.id.name);
-        String _name = extras.getString("name");
-        name.setText(Html.fromHtml(_name));
-        name.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        //TextView name = (TextView) findViewById(R.id.name);
+        //String _name = extras.getString("name");
+        //name.setText(Html.fromHtml(_name));
+        //name.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView profession = (TextView) findViewById(R.id.profession);
         String _profession = extras.getString("profession");

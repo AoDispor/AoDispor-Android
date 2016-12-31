@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,13 +20,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
 import pt.aodispor.aodispor_android.API.ApiJSON;
@@ -41,33 +37,27 @@ import pt.aodispor.aodispor_android.Notifications.RegistrationIntentService;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.aodispor_android.R.id.location;
-import static pt.aodispor.aodispor_android.R.id.name;
-import static pt.aodispor.aodispor_android.R.id.profession;
 
 public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
     private static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
     private static final int SELECT_PICTURE = 0;
-
-    private final String phoneNumber = "+351 912 488 434";
     private final String password = "123456";
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
     private LinearLayout loadingMessage;
     private TextView priceView, locationView, professionView, descriptionView, nameView;
     private EditText nameEditText, professionEditText, descriptionEditText;
-    private boolean edittingDescription;
+    private boolean editingDescription;
     private ImageView imageView;
     private InputMethodManager manager;
 
-    public enum PriceType { ByHour, ByDay, ByService }
-
-    /** Google Play services */
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public enum PriceType {ByHour, ByDay, ByService}
 
     /**
      * Factory method to create a new instance of ProfileFragment class. This is needed because of how
      * a ViewPager handles the creation of a Fragment.
+     *
      * @return the ProfileFragment object created.
      */
     public static ProfileFragment newInstance() {
@@ -81,10 +71,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(professionalCard.getLayoutParams());
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         int p = getResources().getDimensionPixelSize(R.dimen.register_layout_margin);
-        params.setMargins(p,p,p,p);
+        params.setMargins(p, p, p, p);
         professionalCard.setLayoutParams(params);
 
-        edittingDescription = false;
+        editingDescription = false;
 
         // Get Views
         priceView = (TextView) professionalCard.findViewById(R.id.price);
@@ -114,8 +104,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             @Override
             public void onClick(View view) {
                 // Show Price Dialog
-                if(!priceDialog.isAdded()){
-                    priceDialog.show(getFragmentManager(),"price-dialog");
+                if (!priceDialog.isAdded()) {
+                    priceDialog.show(getFragmentManager(), "price-dialog");
                 }
             }
         });
@@ -136,7 +126,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         nameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focused) {
-                if(!focused){
+                if (!focused) {
                     nameEditText.setVisibility(EditText.INVISIBLE);
                     nameView.setVisibility(TextView.VISIBLE);
                 }
@@ -148,7 +138,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     nameEditText.setVisibility(EditText.INVISIBLE);
                     nameView.setVisibility(TextView.VISIBLE);
-                    if(!nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(nameView.getText().toString())) {
+                    if (!nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(nameView.getText().toString())) {
                         startLoading();
                         editName();
                     }
@@ -174,7 +164,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         professionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focused) {
-                if(!focused){
+                if (!focused) {
                     professionEditText.setVisibility(EditText.INVISIBLE);
                     professionView.setVisibility(TextView.VISIBLE);
                 }
@@ -186,7 +176,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     professionEditText.setVisibility(EditText.INVISIBLE);
                     professionView.setVisibility(TextView.VISIBLE);
-                    if(!professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(professionView.getText().toString())) {
+                    if (!professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(professionView.getText().toString())) {
                         startLoading();
                         editProfession();
                     }
@@ -200,7 +190,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         descriptionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                edittingDescription = true;
+                editingDescription = true;
                 descriptionView.setVisibility(TextView.INVISIBLE);
                 descriptionEditText.setVisibility(EditText.VISIBLE);
                 descriptionEditText.setText("");
@@ -212,15 +202,15 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focused) {
-                if(!focused){
-                    if(edittingDescription){
+                if (!focused) {
+                    if (editingDescription) {
                         descriptionEditText.setVisibility(EditText.INVISIBLE);
                         descriptionView.setVisibility(TextView.VISIBLE);
-                        if(!descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(descriptionView.getText().toString())) {
+                        if (!descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(descriptionView.getText().toString())) {
                             startLoading();
                             editDescription();
                         }
-                        edittingDescription = false;
+                        editingDescription = false;
                     }
                 }
             }
@@ -253,13 +243,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(phoneNumber, password);
-        /*
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
-        request.setMethod(HttpRequestTask.GET_REQUEST);
-        request.setType(HttpRequest.GET_PROFILE);
-        request.addAPIAuthentication(phoneNumber,password);
-        */
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
         request.execute();
     }
 
@@ -267,6 +251,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     /**
      * Started when the HTTP request has finished and succeeded. It then updates the views of the
      * fragment in order to show profile information.
+     *
      * @param answer the ApiJSON formatted answer.
      */
     @Override
@@ -283,9 +268,14 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         }
         updateProfileCard(p);
 
-        if(Utility.isProfessionalRegistered(p)) {
+        if (Utility.isProfessionalRegistered(p)) {
             TextView registered = (TextView) professionalCard.findViewById(R.id.registered_note);
-            registered.setVisibility(View.VISIBLE);
+            //registered.setVisibility(View.VISIBLE);
+            /*  TODO WORKAROUND 'FIX'
+                sets registered note visible without using the visibility (solves visibility problem)
+            */
+            registered.setText(R.string.profile_registered_note_msg);
+            registered.setPadding(10,10,10,10);
         }
 
         endLoading();
@@ -303,9 +293,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     /**
      * Started when the price dialog is dismissed. Then it sends a POST request to store the new
      * professional data.
-     * @param value Professional rate.
+     *
+     * @param value   Professional rate.
      * @param isFinal Whether the price is final.
-     * @param type The type of the service.
+     * @param type    The type of the service.
      */
     @Override
     public void onPriceDialogCallBack(int value, boolean isFinal, PriceType type) {
@@ -313,9 +304,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
         Professional p = new Professional();
-        if(value > 0){
+        if (value > 0) {
             p.rate = value + "";
         }
         switch (type) {
@@ -335,12 +326,12 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     @Override
     public void onLocationDialogCallBack(String location, String cp4, String cp3, boolean isSet) {
-        if(isSet){
+        if (isSet) {
             startLoading();
             HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
             request.setMethod(HttpRequestTask.POST_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
-            request.addAPIAuthentication(phoneNumber, password);
+            request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
             Professional p = new Professional();
             p.location = location;
             p.cp4 = cp4;
@@ -350,7 +341,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
             AppDefinitions.postal_code = Integer.parseInt(cp4);
 
-            if (checkPlayServices()) {
+            if (Utility.checkPlayServices(this.getActivity())) {
                 // Start IntentService to register this application with GCM.
                 Intent intent = new Intent(this.getActivity(), RegistrationIntentService.class);
                 this.getActivity().startService(intent);
@@ -362,9 +353,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
         Professional p = new Professional();
-        p.full_name = nameEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
+        p.full_name = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         request.setJSONBody(p);
         request.execute();
     }
@@ -373,9 +364,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
         Professional p = new Professional();
-        p.title = professionEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
+        p.title = professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         request.setJSONBody(p);
         request.execute();
     }
@@ -384,9 +375,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
         Professional p = new Professional();
-        p.description = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}"," ");
+        p.description = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         request.setJSONBody(p);
         request.execute();
     }
@@ -395,7 +386,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Updates professional profile views and fills the views which aren't filled yet by the user
      * with placeholder text
      */
-    private void updateProfileCard(Professional p){
+    private void updateProfileCard(Professional p) {
         // Colors
         int grey = ContextCompat.getColor(getActivity(), R.color.grey);
         int black = ContextCompat.getColor(getActivity(), R.color.black);
@@ -406,9 +397,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String curr = p.currency;
         int rate;
         PriceType t = PriceType.ByHour;
-        if (priceText != null && type != null && curr != null ) {
+        if (priceText != null && type != null && curr != null) {
             rate = Integer.parseInt(priceText);
-            priceText += " " +curr;
+            priceText += " " + curr;
             switch (type) {
                 case "H":
                     t = PriceType.ByHour;
@@ -437,7 +428,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         if (locationText != null) {
             locationView.setText(locationText);
             locationView.setTextColor(black);
-        }else {
+        } else {
             locationView.setTextColor(grey);
             locationView.setText(R.string.register_location);
         }
@@ -455,7 +446,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         // Name
         String nameText = p.full_name;
         if (nameText != null) {
-            nameView.setText(nameText.trim().replaceAll("\\s{2,}]"," "));
+            nameView.setText(nameText.trim().replaceAll("\\s{2,}]", " "));
             nameView.setTextColor(black);
         } else {
             nameView.setTextColor(grey);
@@ -477,19 +468,19 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         if (imageUrl != null) {
             ImageLoader imageLoader = ImageLoader.getInstance();
             DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
-            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));
+            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.image_placeholder));
             imageLoader.displayImage(imageUrl, imageView, options);
         } else {
-            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.image_placeholder));
+            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.image_placeholder));
         }
     }
 
-    private void startLoading(){
+    private void startLoading() {
         hideViews();
         loadingMessage.setVisibility(LinearLayout.VISIBLE);
     }
 
-    private void endLoading(){
+    private void endLoading() {
         showViews();
         professionEditText.setVisibility(EditText.INVISIBLE);
         nameEditText.setVisibility(EditText.INVISIBLE);
@@ -497,26 +488,26 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         loadingMessage.setVisibility(LinearLayout.INVISIBLE);
     }
 
-    private void hideViews(){
-        for (int i = 0; i < professionalCard.getChildCount(); i++){
+    private void hideViews() {
+        for (int i = 0; i < professionalCard.getChildCount(); i++) {
             professionalCard.getChildAt(i).setVisibility(View.INVISIBLE);
         }
     }
 
-    private void showViews(){
-        for (int i = 0; i < professionalCard.getChildCount(); i++){
+    private void showViews() {
+        for (int i = 0; i < professionalCard.getChildCount(); i++) {
             professionalCard.getChildAt(i).setVisibility(View.VISIBLE);
         }
     }
 
     public void openGallery(int req_code) {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.putExtra("crop","true");
-        intent.putExtra("aspectX",1);
-        intent.putExtra("aspectY",1);
-        intent.putExtra("outputX",200);
-        intent.putExtra("outputY",200);
-        intent.putExtra("return-data",true);
+        intent.putExtra("crop", "true");
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("outputX", 200);
+        intent.putExtra("outputY", 200);
+        intent.putExtra("return-data", true);
         startActivityForResult(intent, req_code);
     }
 
@@ -530,23 +521,17 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_UPLOAD_IMAGE);
             request.setMethod(HttpRequestTask.PUT_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
-            request.addAPIAuthentication(phoneNumber, password);
+            request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
 
             int byteNum = image.getByteCount();
             ByteBuffer buffer = ByteBuffer.allocate(byteNum);
             image.copyPixelsToBuffer(buffer);
 
-            request.setBitmapBody(convertToBinary(image));
+            request.setBitmapBody(Utility.convertBitmapToBinary(image));
             request.execute();
         }
     }
 
-    public byte[] convertToBinary(Bitmap image) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, stream); //not lossless
-        byte[] byteArray = stream.toByteArray();
-        return byteArray;
-    }
 
     @Override
     public void onResume() {
@@ -558,26 +543,5 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         descriptionEditText.setVisibility(EditText.INVISIBLE);
         descriptionView.setVisibility(TextView.VISIBLE);
     }
-
-
-    //region GCM messages related auxiliary methods
-
-    public boolean checkPlayServices() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this.getActivity());
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this.getActivity(), resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
-                        .show();
-            } else {
-                Log.i("ProfileFragment", "This device is not supported.");
-                this.getActivity().finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    //endregion
 
 }

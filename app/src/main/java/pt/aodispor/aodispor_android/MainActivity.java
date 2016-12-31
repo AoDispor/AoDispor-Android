@@ -13,6 +13,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,10 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         installFonts();
 
-        if(!AppDefinitions.SKIP_LOGIN) {
+        if (!AppDefinitions.SKIP_LOGIN) {
             Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
-        }
-        else startPagerAndMainContent();
+        } else startPagerAndMainContent();
     }
 
     /**
@@ -197,30 +197,51 @@ public class MainActivity extends AppCompatActivity {
 
     //region LOGIN DIALOGS & HANDLERS
 
-    /** shows phone number request dialog for login */
-    private void loginDialog() {
+    /**
+     * shows phone number request dialog for login
+     */
+    private void loginDialog(final String phoneNumber) {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.phonenumber_request);
-        dialog.setTitle("LOGIN");
+        //dialog.setTitle("LOGIN");
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         Button loginButton = (Button) dialog.findViewById(R.id.button);
+        if(phoneNumber!=null) {
+            EditText phoneEditText = (EditText) dialog.findViewById(R.id.phonebox);
+            phoneEditText.setText(phoneNumber);
+        }
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String aux = ((EditText) dialog.findViewById(R.id.phonebox)).getText().toString();
+                if (!Utility.validPhoneNumber(aux)) {
+                    dialog.dismiss();
+                    loginDialog(phoneNumber);
+                    return;
+                }
+                AppDefinitions.phoneNumber = "+" +
+                        ((EditText) dialog.findViewById(R.id.phonebox_country)).getText().toString() + " " +
+                        aux.substring(0, 3) + " " +
+                        aux.substring(3, 6) + " " +
+                        aux.substring(6, 9);
+                if (AppDefinitions.forceTestPhoneNumber)
+                    AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
                 dialog.dismiss();
-                Permission.requestPermission(MainActivity.this,AppDefinitions.PERMISSIONS_REQUEST_READ_SMS);
+                Permission.requestPermission(MainActivity.this, AppDefinitions.PERMISSIONS_REQUEST_READ_SMS);
             }
         });
 
         dialog.show();
     }
 
-    /** shows validate SMS dialog */
+    /**
+     * shows validate SMS dialog
+     */
     private void validationDialog() {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.sms_validation);
-        dialog.setTitle("LOGIN");
+        //dialog.setTitle("LOGIN");
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         Button loginButton = (Button) dialog.findViewById(R.id.button);
@@ -242,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Permission Granted.
             Toast.makeText(MainActivity.this, getResources().getString(R.string.permisson_accepted), Toast.LENGTH_SHORT).show();
-        } else  if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+        } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
             // Permission Denied
             Toast.makeText(MainActivity.this, getResources().getString(R.string.permisson_denied), Toast.LENGTH_SHORT).show();
         }
@@ -253,7 +274,10 @@ public class MainActivity extends AppCompatActivity {
                 validationDialog();
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
-                loginDialog();
+                String phoneNumber=null;
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    phoneNumber = Utility.getPhoneNumber(getApplicationContext());
+                loginDialog(phoneNumber);
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }

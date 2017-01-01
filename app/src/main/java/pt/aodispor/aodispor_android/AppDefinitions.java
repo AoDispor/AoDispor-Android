@@ -15,16 +15,13 @@ public class AppDefinitions {
 
     /**
      * set true to skip login related dialogs
+     * <br>the phone number used is equal to the test phone number
+     * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
     public static final boolean SKIP_LOGIN = false;
 
-    public static final String testPhoneNumber = "+351 912 488 434";
-
-    /**
-     * set to true so that the phone number used is equal to the test phone number
-     * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
-     */
-    public static final boolean forceTestPhoneNumber = true;
+    public static final String testPhoneNumber = "+351 911 793 861";//"+351 912 488 434";
+    public static final String testPassword = "123456";//"456132"  not workin???//;
 
     //endregion
 
@@ -41,6 +38,10 @@ public class AppDefinitions {
     public static Typeface yanoneKaffeesatzThin;
     //endregion
 
+    /**
+     * phone number that sends password via SMS
+     */
+    public static final String PASSWORD_SMS_PHONE= "+320335320002";
 
     /**
      * Number of milliseconds needed for a timeout to occur in requests
@@ -66,9 +67,14 @@ public class AppDefinitions {
     public static String phoneNumber;
 
     /**
+     * Password used to login. Professional profile editing is blocked without the correct password.
+     * */
+    public static String userPassword;
+
+    /*
      * Indicates if the user is registered as a professional
-     */
     public static boolean loggedInAsProfessional = false;
+    */
 
     /**
      * postal code to be sent to 'tokens' database

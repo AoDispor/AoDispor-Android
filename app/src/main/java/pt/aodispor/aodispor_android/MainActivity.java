@@ -50,7 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (!AppDefinitions.SKIP_LOGIN) {
             Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
-        } else startPagerAndMainContent();
+        } else {
+            AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
+            AppDefinitions.userPassword = AppDefinitions.testPassword;
+            startPagerAndMainContent();
+        }
     }
 
     /**
@@ -227,8 +231,6 @@ public class MainActivity extends AppCompatActivity {
                         aux.substring(0, 3) + " " +
                         aux.substring(3, 6) + " " +
                         aux.substring(6, 9);
-                if (AppDefinitions.forceTestPhoneNumber)
-                    AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
                 dialog.dismiss();
                 Permission.requestPermission(MainActivity.this, AppDefinitions.PERMISSIONS_REQUEST_READ_SMS);
             }
@@ -240,16 +242,21 @@ public class MainActivity extends AppCompatActivity {
     /**
      * shows validate SMS dialog
      */
-    private void validationDialog() {
+    private void validationDialog(String receivec_sms) {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.sms_validation);
         //dialog.setTitle("LOGIN");
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         Button loginButton = (Button) dialog.findViewById(R.id.button);
+        if(receivec_sms!=null) {
+            EditText phoneEditText = (EditText) dialog.findViewById(R.id.password_box);
+            phoneEditText.setText(receivec_sms);
+        }
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                AppDefinitions.userPassword = ((EditText) dialog.findViewById(R.id.password_box)).getText().toString();
                 dialog.dismiss();
                 startPagerAndMainContent();
             }
@@ -273,7 +280,12 @@ public class MainActivity extends AppCompatActivity {
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_READ_SMS:
-                validationDialog();
+                String rec_password=null;
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    try {
+                        rec_password = Utility.getLastMessageBody(getApplicationContext(), AppDefinitions.PASSWORD_SMS_PHONE);
+                    } catch(Exception e){}
+                validationDialog(rec_password);
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
                 String phoneNumber=null;

@@ -18,7 +18,7 @@
         android:layout_gravity="center_horizontal"/>
 
         <EditText
-            android:id="@+id/phonebox_country"
+            android:id="@+id/password_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"

@@ -23,6 +23,14 @@ import android.widget.Toast;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import pt.aodispor.aodispor_android.API.ApiJSON;
+import pt.aodispor.aodispor_android.API.HttpRequest;
+import pt.aodispor.aodispor_android.API.HttpRequestTask;
+import pt.aodispor.aodispor_android.API.Register;
+import pt.aodispor.aodispor_android.API.RegisterResult;
+
+import static pt.aodispor.aodispor_android.AppDefinitions.PASSWORD_SMS_PHONES;
+
 /**
  * This class serves as the main activity for the application which extends AppCompatActivity.
  * <p>
@@ -35,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private MyViewPager mViewPager;
 
     int mLastPage = 0;
+
+    private final String REGISTER_URL = "https://api.aodispor.pt/users/register";
 
     /**
      * This method is called when the main activity is created.
@@ -190,7 +200,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                CardFragment cardFrag = (CardFragment) getSupportFragmentManager().getFragments().get(0);
+                CardFragment cardFrag = null;
+                for(Object frag : getSupportFragmentManager().getFragments())
+                    if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
                 cardFrag.setSearchQuery(query);
                 cardFrag.setupNewStack();
                 mViewPager.setCurrentItem(1, true);
@@ -213,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         Button loginButton = (Button) dialog.findViewById(R.id.button);
-        if(phoneNumber!=null) {
+        if (phoneNumber != null) {
             EditText phoneEditText = (EditText) dialog.findViewById(R.id.phonebox);
             phoneEditText.setText(phoneNumber);
         }
@@ -232,6 +244,13 @@ public class MainActivity extends AppCompatActivity {
                         aux.substring(3, 6) + " " +
                         aux.substring(6, 9);
                 dialog.dismiss();
+
+                HttpRequestTask request_register = new HttpRequestTask(
+                        String.class, null, REGISTER_URL);
+                request_register.setMethod(HttpRequestTask.POST_REQUEST);
+                request_register.setJSONBody(new Register(AppDefinitions.phoneNumber));
+                request_register.execute();
+
                 Permission.requestPermission(MainActivity.this, AppDefinitions.PERMISSIONS_REQUEST_READ_SMS);
             }
         });
@@ -242,16 +261,20 @@ public class MainActivity extends AppCompatActivity {
     /**
      * shows validate SMS dialog
      */
-    private void validationDialog(String receivec_sms) {
+    private void validationDialog(String received_sms) {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.sms_validation);
         //dialog.setTitle("LOGIN");
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         Button loginButton = (Button) dialog.findViewById(R.id.button);
-        if(receivec_sms!=null) {
-            EditText phoneEditText = (EditText) dialog.findViewById(R.id.password_box);
-            phoneEditText.setText(receivec_sms);
+        if (received_sms != null) {
+            Log.e("X2",received_sms);
+            try {
+                EditText phoneEditText = (EditText) dialog.findViewById(R.id.password_box);
+                phoneEditText.setText(Utility.parseSMS(received_sms));
+            } catch (Exception e) {
+            }
         }
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -280,16 +303,20 @@ public class MainActivity extends AppCompatActivity {
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_READ_SMS:
-                String rec_password=null;
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                String rec_password = null;
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) //find token on inbox sms
                     try {
-                        rec_password = Utility.getLastMessageBody(getApplicationContext(), AppDefinitions.PASSWORD_SMS_PHONE);
-                    } catch(Exception e){}
+                        for(int i = 0; i<PASSWORD_SMS_PHONES.length; ++i) {
+                            rec_password = Utility.getLastMessageBody(getApplicationContext(), PASSWORD_SMS_PHONES[i]);
+                            if (rec_password!=null) break;
+                        }
+                    } catch (Exception e) {
+                    }
                 validationDialog(rec_password);
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
-                String phoneNumber=null;
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                String phoneNumber = null;
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     phoneNumber = Utility.getPhoneNumber(getApplicationContext());
                 loginDialog(phoneNumber);
             default:
@@ -303,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (mViewPager.getCurrentItem() == 1) {
-            CardFragment cardFragment = ((TabPagerAdapter)mViewPager.getAdapter()).getCardFragment();
+            CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
             cardFragment.restorePreviousCard();
         } else {
             super.onBackPressed();

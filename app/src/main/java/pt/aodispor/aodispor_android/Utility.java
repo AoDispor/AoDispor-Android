@@ -15,6 +15,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.io.ByteArrayOutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import pt.aodispor.aodispor_android.API.Professional;
 
@@ -132,12 +134,22 @@ public abstract class Utility {
     }
 
 
-    public static boolean validPhoneNumber(String phoneNumber)
-    {
+    public static boolean validPhoneNumber(String phoneNumber) {
         //has 9 digits
-        if(phoneNumber.length() < 9) return false;
+        if (phoneNumber.length() < 9) return false;
         //possibly some other types of validation
         //...
         return true;
     }
+
+    /**
+     * gets password token form received sms
+     */
+    public static String parseSMS(String sms) {
+        Pattern pattern = Pattern.compile("\\d{6}");
+        Matcher matcher = pattern.matcher(sms);
+        matcher.find();
+        return matcher.group();
+    }
+
 }

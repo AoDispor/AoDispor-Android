@@ -52,19 +52,40 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
      */
     private int type;
 
-    public HttpRequestTask(Class a, HttpRequest p, String u) {
-        answerType = a;
-        postExecute = p;
-        url = u;
+    /**
+     * Creates a request task. The request must then be started to with execute.
+     * <br>A GET request is used by default, use setMethod to change this.
+     * <br>The Body is empty by default. Use setJSONBody to define the body.
+     * <br>Verify if addAPIAuthentication is needed
+     * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
+     * @param answer answer type expected, must e deserializable
+     * @param executor the instance that implements the HttpRequest. Only needed to run request on background (can be null).
+     * @param url request destination
+     */
+    public HttpRequestTask(Class answer, HttpRequest executor, String url) {
+        answerType = answer;
+        postExecute = executor;
+        this.url = url;
         urlVariables = new String[]{};
         method = HttpMethod.GET;
         httpHeaders = new HttpHeaders();
     }
 
-    public HttpRequestTask(Class a, HttpRequest p, String u, String... uv) {
-        answerType = a;
-        postExecute = p;
-        url = u;
+    /**
+     * Creates a request task. The request must then be started to with execute.
+     * <br>A GET request is used by default, use setMethod to change this.
+     * <br>The Body is empty by default. Use setJSONBody to define the body.
+     * <br>Verify if addAPIAuthentication is needed
+     * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
+     * @param answer answer type expected, must e deserializable
+     * @param executor the instance that implements the HttpRequest. Only needed to run request on background (can be null).
+     * @param url request destination
+     * @param uv url variables
+     */
+    public HttpRequestTask(Class answer, HttpRequest executor, String url, String... uv) {
+        answerType = answer;
+        postExecute = executor;
+        this.url = url;
         urlVariables = uv;
         method = HttpMethod.GET;
         httpHeaders = new HttpHeaders();
@@ -79,26 +100,27 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
             template = new RestTemplate(cf);
             Object answer;//temp before assigning response: may not return ApiJSON
+            if(answerType==null) answerType = String.class;
             try {
                 ApiJSON response = null;
                 switch (method) {
                     case POST:
                         entityReq = new HttpEntity<>(body, httpHeaders);
                         answer = template.postForObject(url, entityReq, answerType);
-                        if (ApiJSON.class.isAssignableFrom(answerType))
+                        if (answerType!=null&&ApiJSON.class.isAssignableFrom(answerType))
                             response = (ApiJSON) answer;
                         break;
                     case PUT:
                         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                         entityReq = new HttpEntity<>(bitmapBody, httpHeaders);
                         answer = template.exchange(url, HttpMethod.PUT, entityReq, String.class, urlVariables).getBody();
-                        if (ApiJSON.class.isAssignableFrom(answerType))
+                        if (answerType!=null&&ApiJSON.class.isAssignableFrom(answerType))
                             response = (ApiJSON) answer;
                         break;
                     default:
                         entityReq = new HttpEntity<>(httpHeaders);
                         answer = template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
-                        if (ApiJSON.class.isAssignableFrom(answerType))
+                        if (answerType!=null&&ApiJSON.class.isAssignableFrom(answerType))
                             response = (ApiJSON) answer;
                         break;
                 }
@@ -172,6 +194,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         bitmapBody = b;
     }
 
+    /**
+     * Use this method before executing request if it is a Registered used relate operation that needs credentials
+     * */
     public void addAPIAuthentication(String phone, String password) {
         String encode = Base64.encodeToString((phone + ":" + password).getBytes(), Base64.DEFAULT);
         httpHeaders.set("Authorization", "Basic " + encode);

@@ -42,7 +42,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
     private static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
     private static final int SELECT_PICTURE = 0;
-    private final String password = "123456";
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
     private LinearLayout loadingMessage;
@@ -243,7 +242,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         request.execute();
     }
 
@@ -304,7 +303,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         Professional p = new Professional();
         if (value > 0) {
             p.rate = value + "";
@@ -331,7 +330,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
             request.setMethod(HttpRequestTask.POST_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
-            request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
+            request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
             Professional p = new Professional();
             p.location = location;
             p.cp4 = cp4;
@@ -353,7 +352,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         Professional p = new Professional();
         p.full_name = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         request.setJSONBody(p);
@@ -364,7 +363,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         Professional p = new Professional();
         p.title = professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         request.setJSONBody(p);
@@ -375,7 +374,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         Professional p = new Professional();
         p.description = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         request.setJSONBody(p);
@@ -521,7 +520,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_UPLOAD_IMAGE);
             request.setMethod(HttpRequestTask.PUT_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
-            request.addAPIAuthentication(AppDefinitions.phoneNumber, password);
+            request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
 
             int byteNum = image.getByteCount();
             ByteBuffer buffer = ByteBuffer.allocate(byteNum);

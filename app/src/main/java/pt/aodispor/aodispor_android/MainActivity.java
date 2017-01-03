@@ -63,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
         installFonts();
 
+        TextView titleView = (TextView) findViewById(R.id.app_title);
+        titleView.setTypeface(AppDefinitions.dancingScriptRegular);
+
         if (!AppDefinitions.SKIP_LOGIN) {
             Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
         } else {
@@ -128,9 +131,6 @@ public class MainActivity extends AppCompatActivity {
      * <br>Creates pager, loads cardFragment & ProfileFragment ;
      */
     private void startPagerAndMainContent() {
-        TextView titleView = (TextView) findViewById(R.id.app_title);
-        titleView.setTypeface(AppDefinitions.dancingScriptRegular);
-
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
         ImageLoader.getInstance().init(config);
 

@@ -119,9 +119,13 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                         break;
                     default:
                         entityReq = new HttpEntity<>(httpHeaders);
-                        answer = template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
-                        if (answerType!=null&&ApiJSON.class.isAssignableFrom(answerType))
-                            response = (ApiJSON) answer;
+                        Log.v("debug","url: " + url);
+                        Log.v("debug","entityReq: " + entityReq);
+                        Log.v("debug","answerType: " + answerType);
+                        Log.v("debug","urlVariables: " + Arrays.toString(urlVariables));
+                        response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
+                        //if (answerType != null && ApiJSON.class.isAssignableFrom(answerType))
+                            //response = (ApiJSON) answer;
                         break;
                 }
                 return response;

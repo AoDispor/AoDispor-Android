@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -138,7 +139,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     nameEditText.setVisibility(EditText.INVISIBLE);
                     nameView.setVisibility(TextView.VISIBLE);
-                    if (!nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(nameView.getText().toString())) {
+                    String trimmed = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
+                    if (!trimmed.isEmpty() && !trimmed.equals(nameView.getText().toString())) {
                         startLoading();
                         editName();
                     }
@@ -176,7 +178,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     professionEditText.setVisibility(EditText.INVISIBLE);
                     professionView.setVisibility(TextView.VISIBLE);
-                    if (!professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(professionView.getText().toString())) {
+                    String trimmed = professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
+                    if (!trimmed.isEmpty() && !trimmed.equals(professionView.getText().toString())) {
                         startLoading();
                         editProfession();
                     }
@@ -206,7 +209,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                     if (editingDescription) {
                         descriptionEditText.setVisibility(EditText.INVISIBLE);
                         descriptionView.setVisibility(TextView.VISIBLE);
-                        if (!descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ").equals(descriptionView.getText().toString())) {
+                        String trimmed = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
+                        if (!trimmed.isEmpty() && !trimmed.equals(descriptionView.getText().toString())) {
                             startLoading();
                             editDescription();
                         }
@@ -435,6 +439,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Profession
         String professionText = p.title;
+        Log.v("debug", "Profissão: " + p.title);
         if (professionText != null) {
             professionView.setText(professionText.trim().replaceAll("\\s{2,}", " "));
             professionView.setTextColor(black);

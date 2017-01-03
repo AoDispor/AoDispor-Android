@@ -12,12 +12,14 @@ import android.widget.TextView;
 
 public class LocationDialog extends AlertDialog {
     private TextView _location;
+    private String location;
     private ZipCodeOnEditText listener;
     private LocationDialog thisDialog;
 
-    protected LocationDialog(Context context) {
+    protected LocationDialog(Context context, String l) {
         super(context);
         thisDialog = this;
+        location = l;
     }
 
     @Override
@@ -60,6 +62,7 @@ public class LocationDialog extends AlertDialog {
         });
 
         _location = (TextView) findViewById(R.id.localizacao);
+        _location.setText(location);
 
         listener = new ZipCodeOnEditText(_location,zip1,zip2);
 

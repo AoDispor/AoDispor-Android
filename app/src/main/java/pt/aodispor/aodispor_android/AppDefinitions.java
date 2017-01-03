@@ -49,7 +49,7 @@ public class AppDefinitions {
     /**
      * Number of milliseconds needed for a timeout to occur in requests
      */
-    public static final int TIMEOUT = 5000;
+    public static final int TIMEOUT = 20000;
 
     /**
      * [CardFragment.java] - nextSet loading

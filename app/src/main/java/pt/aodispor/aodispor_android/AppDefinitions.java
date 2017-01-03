@@ -18,7 +18,7 @@ public class AppDefinitions {
      * <br>the phone number used is equal to the test phone number
      * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
-    public static final boolean SKIP_LOGIN = false;
+    public static final boolean SKIP_LOGIN = true;
 
     public static final String testPhoneNumber = "+351 911 793 861";//"+351 912 488 434";
     public static final String testPassword = "898745";//"??????"
@@ -49,7 +49,7 @@ public class AppDefinitions {
     /**
      * Number of milliseconds needed for a timeout to occur in requests
      */
-    public static final int TIMEOUT = 5000;
+    public static final int TIMEOUT = 20000;
 
     /**
      * [CardFragment.java] - nextSet loading

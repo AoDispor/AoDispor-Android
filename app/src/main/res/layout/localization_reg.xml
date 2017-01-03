@@ -46,12 +46,32 @@
         android:layout_below="@+id/linearLayout"
         android:text="@string/your_location_is_dialog"
         android:layout_centerHorizontal="true"/>
-    <TextView
-        android:id="@+id/localizacao"
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/your_location"
-        android:text="Vazio"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"/>
+        android:layout_centerHorizontal="true">
+
+        <ProgressBar
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/location_progress_bar"
+            android:layout_weight="1"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/localizacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/your_location"
+            android:text="Vazio"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
 </RelativeLayout>

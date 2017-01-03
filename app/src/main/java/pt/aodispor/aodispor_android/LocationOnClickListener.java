@@ -19,7 +19,7 @@ public class LocationOnClickListener implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        final LocationDialog dialog = new LocationDialog(_activity);
+        final LocationDialog dialog = new LocationDialog(_activity, _location.getText().toString());
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {

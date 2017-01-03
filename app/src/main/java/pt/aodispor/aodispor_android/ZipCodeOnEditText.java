@@ -4,7 +4,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,12 +50,14 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
         String zip2 = _zip2.getText().toString();
 
         if(zip1.length() == 4 && zip2.length() == 3) {
+            _location.setVisibility(TextView.GONE);
+            _location.getRootView().findViewById(R.id.location_progress_bar).setVisibility(ProgressBar.VISIBLE);
             lastDigit = true;
             String url = "https://api.aodispor.pt/location/{cp4}/{cp3}";
-
             HttpRequestTask request = new HttpRequestTask(CPPQueryResult.class, this, url, zip1, zip2);
             request.setType(HttpRequest.GET_LOCATION);
             request.execute();
+            Log.v("debug", "Request sent");
 
         } else {
             lastDigit = false;
@@ -74,11 +79,14 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
 
     @Override
     public void onHttpRequestCompleted(ApiJSON answer, int type) {
+        Log.v("debug", "Request completed");
         if(lastDigit) {
             if(type == HttpRequest.GET_LOCATION){
                 CPPQueryResult result = (CPPQueryResult) answer;
                 if (result != null && result.data != null) {
                     _location.setText(result.data.getLocalidade());
+                    _location.setVisibility(TextView.VISIBLE);
+                    _location.getRootView().findViewById(R.id.location_progress_bar).setVisibility(ProgressBar.GONE);
                     locationSet = true;
                 }
             }

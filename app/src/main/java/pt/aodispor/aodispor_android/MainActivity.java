@@ -100,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            CardFragment cardFrag = (CardFragment) getSupportFragmentManager().getFragments().get(0);
+            CardFragment cardFrag = null;
+            for(Object frag : getSupportFragmentManager().getFragments())
+                if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
             android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) findViewById(R.id.searchView);
             searchView.setQuery(query, false);
             cardFrag.setSearchQuery(query);

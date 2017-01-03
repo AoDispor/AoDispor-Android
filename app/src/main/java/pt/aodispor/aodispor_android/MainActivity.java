@@ -5,7 +5,11 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.ColorFilter;
 import android.graphics.Typeface;
+import android.support.graphics.drawable.VectorDrawableCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,6 +45,7 @@ import static pt.aodispor.aodispor_android.AppDefinitions.PASSWORD_SMS_PHONES;
  */
 public class MainActivity extends AppCompatActivity {
     private MyViewPager mViewPager;
+    private ImageView profileView, stackView;
 
     int mLastPage = 0;
 
@@ -139,47 +144,22 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(1);
 
+        profileView = ((ImageView) findViewById(R.id.profile_icon));
+        stackView = ((ImageView) findViewById(R.id.stack_icon));
+        stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                switch (mLastPage) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_black_48dp);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_black_48dp);
-                        break;
+                if(positionOffset != 0) {
+                    profileView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.white), ContextCompat.getColor(getApplicationContext(), R.color.black), positionOffset));
+                    stackView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.black), ContextCompat.getColor(getApplicationContext(), R.color.white), positionOffset));
                 }
-                switch (mViewPager.getCurrentItem()) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_white_48dp);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_white_48dp);
-                        break;
-                }
-                mLastPage = mViewPager.getCurrentItem();
             }
 
             @Override
             public void onPageSelected(int position) {
-                switch (mLastPage) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_black_48dp);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_black_48dp);
-                        break;
-                }
-                switch (position) {
-                    case 0:
-                        ((ImageView) findViewById(R.id.profile_icon)).setImageResource(R.mipmap.ic_account_circle_white_48dp);
-                        break;
-                    case 1:
-                        ((ImageView) findViewById(R.id.stack_icon)).setImageResource(R.mipmap.ic_library_books_white_48dp);
-                        break;
-                }
-                mLastPage = mViewPager.getCurrentItem();
+
             }
 
             @Override

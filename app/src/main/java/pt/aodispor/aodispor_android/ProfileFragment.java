@@ -66,6 +66,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         RelativeLayout rootView = new RelativeLayout(getActivity());
+        rootView.setBackgroundResource(R.drawable.tabletop1);
         professionalCard = (RelativeLayout) inflater.inflate(R.layout.profile_card, container, false);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(professionalCard.getLayoutParams());
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);

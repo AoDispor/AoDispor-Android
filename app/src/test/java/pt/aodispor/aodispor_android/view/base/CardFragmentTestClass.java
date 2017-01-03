@@ -42,17 +42,6 @@ public class CardFragmentTestClass extends CardFragment {
         rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
         activity = null;
 
-        Button button = (Button) rootView.findViewById(R.id.prevCardButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                restorePreviousCard();
-            }
-        });
-
-        //initializes moqup test data instead of the real deal
-        //setTestData();
-
         return rootView;
     }
 

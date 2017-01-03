@@ -146,15 +146,6 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
         activity = getActivity();
 
-        //TODO add button, this might be removed later, for now i need to test the restore ard functionality
-        Button button = (Button) rootView.findViewById(R.id.prevCardButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                restorePreviousCard();
-            }
-        });
-
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         List<String> l = locationManager.getProviders(true);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {

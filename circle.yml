@@ -25,9 +25,9 @@ test:
         - mkdir -p $CIRCLE_TEST_REPORTS/junit
         - cp -r ./app/build/reports/tests/debug/* $CIRCLE_TEST_REPORTS/junit
 
-        - sudo mkdir -p $CIRCLE_ARTIFACTS/documentation
-        - sudo mkdir -p $CIRCLE_ARTIFACS/lint
+        - mkdir -p $CIRCLE_ARTIFACTS/documentation
+        - mkdir -p $CIRCLE_ARTIFACTS/lint
         
         - cp -r ./app/build/reports/tests/debug/* $CIRCLE_TEST_REPORTS/junit
-        - sudo cp -r ./documentation/* $CIRCLE_ARTIFACTS/documentation
-        - sudo cp -r ./lint/* $CIRCLE_ARTIFACTS/lint
+        - cp -r ./documentation/* $CIRCLE_ARTIFACTS/documentation
+        - cp -r ./lint/* $CIRCLE_ARTIFACTS/lint

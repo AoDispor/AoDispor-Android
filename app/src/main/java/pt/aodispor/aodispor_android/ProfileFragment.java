@@ -425,6 +425,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         } else {
             priceView.setTextColor(grey);
             priceView.setText(R.string.register_price);
+            priceDialog = PriceDialog.newInstance(this, 0, true, PriceType.ByHour.ordinal());
         }
 
         // Location

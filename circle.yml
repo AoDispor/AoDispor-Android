@@ -19,15 +19,18 @@ test:
    override:
       - ./gradlew test --info
       - ./gradlew assembleDebug --info
+      - ./gradlew lint --info
 
    post:
-        # Unit Tests working -> will appear on artifacts and not on tests summary!
+        # Unit Tests
         - mkdir -p $CIRCLE_TEST_REPORTS/junit
         - cp -r ./app/build/reports/tests/debug/* $CIRCLE_TEST_REPORTS/junit
-
-        - mkdir -p $CIRCLE_ARTIFACTS/documentation
-        - mkdir -p $CIRCLE_ARTIFACTS/lint
         
-        - cp -r ./app/build/reports/tests/debug/* $CIRCLE_TEST_REPORTS/junit
+        # Lint
+        - mkdir -p $CIRCLE_TEST_REPORTS/lint/
+        - find . -type f -regex ".*lint-results-*.*" -exec cp --parent {} $CIRCLE_TEST_REPORTS/lint/ \;
+        
+        # Documentation (copy)
+        - mkdir -p $CIRCLE_ARTIFACTS/documentation
         - cp -r ./documentation/* $CIRCLE_ARTIFACTS/documentation
-        - cp -r ./lint/* $CIRCLE_ARTIFACTS/lint
+        

@@ -441,7 +441,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         // Profession
         String professionText = p.title;
         Log.v("debug", "Profissão: " + p.title);
-        if (professionText != null) {
+        if (professionText != null && professionText!="") {
             professionView.setText(professionText.trim().replaceAll("\\s{2,}", " "));
             professionView.setTextColor(black);
         } else {

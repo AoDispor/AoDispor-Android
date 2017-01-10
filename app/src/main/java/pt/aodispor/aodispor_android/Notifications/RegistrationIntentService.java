@@ -16,7 +16,7 @@ import pt.aodispor.aodispor_android.R;
 
 public class RegistrationIntentService extends IntentService implements HttpRequest {
     private static final String TAG = "RegIntentService";
-    private static final String URL = "http://85.139.249.77:57864/store_gcm_token.php";
+    private static final String URL = "http://notificacoes.aodispor.pt/store_gcm_token.php";
 
     public RegistrationIntentService() {
         super(TAG);

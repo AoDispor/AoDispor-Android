@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.TimeZone;
 
 import pt.aodispor.android.AppDefinitions;
 
@@ -23,6 +24,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     public static final int POST_REQUEST = 1;
     public static final int PUT_REQUEST = 2;
     private static final String token = "4bsHGsYeva6eud8VsLiKEVVQYQEgmfCafwtuNrhuFYFcPjxWnT";
+    private static final String serverTimeZone = "UTC";
 
     /**
      * tells the API how to deserialize the response
@@ -152,7 +154,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     private String getLocalDate() {
         Date cDate = new Date();
-        return new SimpleDateFormat("yyyyMMdd").format(cDate);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        dateFormat.setTimeZone(TimeZone.getTimeZone(serverTimeZone));
+        return dateFormat.format(new Date());
     }
 
     private void prepareHeaders() {

@@ -1,0 +1,2 @@
+json_key_file "/Users/lamelas/Google Drive/Ao Dispor/chave-play-store.json" # Path to the json secret file - Follow https://github.com/fastlane/supply#setup to get one
+package_name "aodispor_android" # e.g. com.krausefx.app

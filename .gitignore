@@ -1,3 +1,7 @@
+
+# Created by https://www.gitignore.io/api/android
+
+### Android ###
 # Built application files
 *.apk
 *.ap_
@@ -35,9 +39,16 @@ captures/
 # Intellij
 *.iml
 .idea/workspace.xml
+.idea/tasks.xml
+.idea/libraries
 
 # Keystore files
 *.jks
 
-#Ignore folder mac
-.DS_Store
+# External native build folder generated in Android Studio 2.2 and later
+.externalNativeBuild
+
+### Android Patch ###
+gen-external-apklibs
+
+# End of https://www.gitignore.io/api/android

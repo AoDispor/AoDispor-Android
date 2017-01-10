@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="pt.aodispor.aodispor_android.MainActivity">
+    tools:context="pt.aodispor.android.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -93,7 +93,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <pt.aodispor.aodispor_android.MyViewPager
+    <pt.aodispor.android.MyViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pt.aodispor.aodispor_android.MainActivity"
+    tools:context="pt.aodispor.android.MainActivity"
     android:id="@+id/card"
     android:orientation="vertical"
     android:background="@drawable/card"

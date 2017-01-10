@@ -9,7 +9,7 @@
     android:background="@drawable/card"
     android:orientation="vertical"
     android:padding="0dp"
-    tools:context="pt.aodispor.aodispor_android.ProfessionalProfileActivity">
+    tools:context="pt.aodispor.android.ProfessionalProfileActivity">
 
     <LinearLayout
         android:id="@+id/loadingMessage"

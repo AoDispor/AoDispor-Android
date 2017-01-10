@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="pt.aodispor.aodispor_android">
+    package="pt.aodispor.android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="pt.aodispor.aodispor_android.permission.C2D_MESSAGE" />
 
-    <permission android:name="pt.aodispor.aodispor_android.permission.C2D_MESSAGE"
+    <permission android:name="pt.aodispor.android.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <application
@@ -24,7 +24,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name="pt.aodispor.android.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
@@ -39,7 +39,7 @@ android:windowSoftInputMode="adjustPan"
                 android:resource="@xml/searchable"/>
         </activity>
         <activity
-            android:name=".ProfessionalProfileActivity"
+            android:name="pt.aodispor.android.ProfessionalProfileActivity"
             android:screenOrientation="portrait"
             >
         </activity>
@@ -55,21 +55,21 @@ android:windowSoftInputMode="adjustPan"
         </receiver>
 
         <service
-            android:name="pt.aodispor.aodispor_android.Notifications.MyGcmListenerService"
+            android:name="pt.aodispor.android.Notifications.MyGcmListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name="pt.aodispor.aodispor_android.Notifications.MyInstanceIDListenerService"
+            android:name="pt.aodispor.android.Notifications.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
         <service
-            android:name="pt.aodispor.aodispor_android.Notifications.RegistrationIntentService"
+            android:name="pt.aodispor.android.Notifications.RegistrationIntentService"
             android:exported="false">
         </service>
     </application>

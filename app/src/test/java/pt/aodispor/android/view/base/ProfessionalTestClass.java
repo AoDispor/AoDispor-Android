@@ -1,6 +1,6 @@
 package pt.aodispor.android.view.base;
 
-import pt.aodispor.android.API.Professional;
+import pt.aodispor.android.api.Professional;
 
 public class ProfessionalTestClass extends Professional {
 

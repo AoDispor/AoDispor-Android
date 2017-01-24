@@ -27,14 +27,14 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.nio.ByteBuffer;
 
-import pt.aodispor.android.API.ApiJSON;
-import pt.aodispor.android.API.HttpRequestTask;
-import pt.aodispor.android.API.HttpRequest;
-import pt.aodispor.android.API.Professional;
-import pt.aodispor.android.API.SearchQueryResult;
-import pt.aodispor.android.Dialogs.DialogCallback;
-import pt.aodispor.android.Dialogs.PriceDialog;
-import pt.aodispor.android.Notifications.RegistrationIntentService;
+import pt.aodispor.android.api.ApiJSON;
+import pt.aodispor.android.api.HttpRequestTask;
+import pt.aodispor.android.api.HttpRequest;
+import pt.aodispor.android.api.Professional;
+import pt.aodispor.android.api.SearchQueryResult;
+import pt.aodispor.android.dialogs.DialogCallback;
+import pt.aodispor.android.dialogs.PriceDialog;
+import pt.aodispor.android.notifications.RegistrationIntentService;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.android.R.id.location;

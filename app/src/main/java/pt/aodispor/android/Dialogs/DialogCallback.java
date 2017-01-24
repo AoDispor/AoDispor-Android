@@ -1,9 +1,9 @@
-package pt.aodispor.android.Dialogs;
+package pt.aodispor.android.dialogs;
 
 import pt.aodispor.android.ProfileFragment;
 
 /**
- * Interface for classes that want to implement pt.aodispor.android.Dialogs and want to
+ * Interface for classes that want to implement pt.aodispor.android.dialogs and want to
  * do something when the dialog is dismissed.
  */
 public interface DialogCallback {

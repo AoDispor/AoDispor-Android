@@ -6,8 +6,8 @@ import android.graphics.Typeface;
  * Defines constans and globally used variables
  */
 public class AppDefinitions {
-    /* NOTE related to anything that uses [API SearchQueryResult.java]
-     * Number of results (professionals) per page can be accessed in the API JSON
+    /* NOTE related to anything that uses [api SearchQueryResult.java]
+     * Number of results (professionals) per page can be accessed in the api JSON
      * and should not therefore be defined as a constant
      */
 

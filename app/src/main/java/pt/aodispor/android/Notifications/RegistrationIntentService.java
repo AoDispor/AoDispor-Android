@@ -1,4 +1,4 @@
-package pt.aodispor.android.Notifications;
+package pt.aodispor.android.notifications;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -7,10 +7,10 @@ import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
-import pt.aodispor.android.API.ApiJSON;
-import pt.aodispor.android.API.GCMServerInstance;
-import pt.aodispor.android.API.HttpRequest;
-import pt.aodispor.android.API.HttpRequestTask;
+import pt.aodispor.android.api.ApiJSON;
+import pt.aodispor.android.api.GCMServerInstance;
+import pt.aodispor.android.api.HttpRequest;
+import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 

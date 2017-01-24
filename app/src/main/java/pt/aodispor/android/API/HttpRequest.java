@@ -1,4 +1,4 @@
-package pt.aodispor.android.API;
+package pt.aodispor.android.api;
 
 /**
  * Interface for classes that want to send am HTTP request and want to do something when the

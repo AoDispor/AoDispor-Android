@@ -1,4 +1,4 @@
-package pt.aodispor.android.API;
+package pt.aodispor.android.api;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;

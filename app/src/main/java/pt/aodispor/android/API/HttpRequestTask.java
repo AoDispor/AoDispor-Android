@@ -1,4 +1,4 @@
-package pt.aodispor.android.API;
+package pt.aodispor.android.api;
 
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import pt.aodispor.android.AppDefinitions;
@@ -24,10 +25,11 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     public static final int POST_REQUEST = 1;
     public static final int PUT_REQUEST = 2;
     private static final String token = "4bsHGsYeva6eud8VsLiKEVVQYQEgmfCafwtuNrhuFYFcPjxWnT";
+    //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
     private static final String serverTimeZone = "UTC";
 
     /**
-     * tells the API how to deserialize the response
+     * tells the api how to deserialize the response
      */
     private Class answerType;
     private String url;
@@ -153,8 +155,8 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     }
 
     private String getLocalDate() {
-        Date cDate = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.UK);
+        //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
         dateFormat.setTimeZone(TimeZone.getTimeZone(serverTimeZone));
         return dateFormat.format(new Date());
     }
@@ -164,7 +166,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         MediaType[] mediaTypes = {MediaType.APPLICATION_JSON};
         httpHeaders.setAccept(Arrays.asList(mediaTypes));
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("API-Authorization", token + date);
+        httpHeaders.set("api-Authorization", token + date);
     }
 
     /**

@@ -13,11 +13,11 @@ import org.mockito.Mock;
 
 import java.util.ArrayList;
 
-import pt.aodispor.android.API.Links;
-import pt.aodispor.android.API.Meta;
-import pt.aodispor.android.API.Pagination;
-import pt.aodispor.android.API.Professional;
-import pt.aodispor.android.API.SearchQueryResult;
+import pt.aodispor.android.api.Links;
+import pt.aodispor.android.api.Meta;
+import pt.aodispor.android.api.Pagination;
+import pt.aodispor.android.api.Professional;
+import pt.aodispor.android.api.SearchQueryResult;
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.CardFragment;
 import pt.aodispor.android.R;
@@ -52,8 +52,6 @@ public class CardFragmentTestClass extends CardFragment {
     Links links;
 
     public enum Test {forward, backward, mix}
-
-    ;
 
     public void unblockAccess() {
         blockAccess = false;

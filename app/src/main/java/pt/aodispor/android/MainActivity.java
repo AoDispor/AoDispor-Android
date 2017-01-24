@@ -24,8 +24,8 @@ import android.widget.Toast;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import pt.aodispor.android.API.HttpRequestTask;
-import pt.aodispor.android.API.Register;
+import pt.aodispor.android.api.HttpRequestTask;
+import pt.aodispor.android.api.Register;
 
 import static pt.aodispor.android.AppDefinitions.PASSWORD_SMS_PHONES;
 
@@ -266,7 +266,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        advance(requestCode,permissions,grantResults);
+    }
 
+    /**
+     * Proceeds to next dialog (or ends) the login process.
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    public void advance(int requestCode, String[] permissions, int[] grantResults)
+    {
         //Realizado sempre independentemente do tipo de permissao
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Permission Granted.

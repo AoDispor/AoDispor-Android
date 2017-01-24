@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Ao Dispor</string>
-    <string name="zip_dialog">Insira o seu código postal</string>
-    <string name="your_location_is_dialog">A sua localização é: </string>
 
     <!-- Navbar -->
     <string name="profile_icon">Ir para o seu perfil</string>
@@ -27,12 +25,17 @@
     <string name="profile_price_type_service">Por serviço</string>
     <string name="dialog_price">%1$d</string>
 
-    <!-- Description -->
-    <string name="edit_description_header">Descreva o que faz</string>
+    <!-- Location Dialog -->
+    <string name="zip_dialog">Insira o seu código postal</string>
+    <string name="your_location_is_dialog">A sua localização é: </string>
+    <string name="zip1_hint">0000</string>
+    <string name="zip2_hint">000</string>
 
     <!-- Phone Number Request -->
     <string name="phonerequest_textbox">número de telemóvel</string>
     <string name="phonerequest_button">ENTRAR</string>
+    <string name="phone_hint">000000000</string>
+    <string name="phone_country_code">351</string>
 
     <!-- SMS Code Request -->
     <string name="smsvalidation_textbox">insira código de validação</string>
@@ -54,14 +57,18 @@
     <!-- Other Messages -->
     <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
+    <string name="discard">Descartar</string>string>
 
     <!-- Generic Messages -->
-    <string name="okay">ok</string>
-    <string name="cancel">cancelar</string>
-    <string name="allow">permitir</string>
-    <string name="deny">rejeitar</string>
-    <string name="understood">entendi</string>
-    <string name="next">seguinte</string>
-    <string name="previous">anterior</string>
+    <string name="okay">OK</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
+    <string name="cancel">Cancelar</string>
+    <string name="allow">Permitir</string>
+    <string name="deny">Rejeitar</string>
+    <string name="understood">Entendi</string>
+    <string name="next">Seguinte</string>
+    <string name="previous">Anterior</string>
+    <string name="empty">Vazio</string>
 
 </resources>

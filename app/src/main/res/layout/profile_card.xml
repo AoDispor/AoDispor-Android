@@ -169,8 +169,5 @@
         android:textColor="@color/white"
         android:textSize="17sp"
         android:visibility="invisible" />
-    <!--TODO removed as possibly temporary FIX
-    android:padding="10dp"
-    android:text="@string/profile_registered_note_msg"-->
 
 </RelativeLayout>

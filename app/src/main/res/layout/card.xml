@@ -83,7 +83,7 @@
             android:scrollbars = "vertical"/>
 
     <TextView
-        android:text="Descartar"
+        android:text="@string/discard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/discard"

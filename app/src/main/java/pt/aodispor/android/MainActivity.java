@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             CardFragment cardFrag = null;
-            for(Object frag : getSupportFragmentManager().getFragments())
-                if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
+            for (Object frag : getSupportFragmentManager().getFragments())
+                if (frag instanceof CardFragment) cardFrag = (CardFragment) frag;
             android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) findViewById(R.id.searchView);
             searchView.setQuery(query, false);
             cardFrag.setSearchQuery(query);
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if(positionOffset != 0) {
+                if (positionOffset != 0) {
                     profileView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.white), ContextCompat.getColor(getApplicationContext(), R.color.black), positionOffset));
                     stackView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.black), ContextCompat.getColor(getApplicationContext(), R.color.white), positionOffset));
                 }
@@ -177,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 CardFragment cardFrag = null;
-                for(Object frag : getSupportFragmentManager().getFragments())
-                    if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
+                for (Object frag : getSupportFragmentManager().getFragments())
+                    if (frag instanceof CardFragment) cardFrag = (CardFragment) frag;
                 cardFrag.setSearchQuery(query);
                 cardFrag.setupNewStack();
                 mViewPager.setCurrentItem(1, true);
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(false);
         Button loginButton = (Button) dialog.findViewById(R.id.button);
         if (received_sms != null) {
-            Log.e("X2",received_sms);
+            Log.e("X2", received_sms);
             try {
                 EditText phoneEditText = (EditText) dialog.findViewById(R.id.password_box);
                 phoneEditText.setText(Utility.parseSMS(received_sms));
@@ -266,17 +266,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        advance(requestCode,permissions,grantResults);
+        advance(requestCode, permissions, grantResults);
     }
 
     /**
      * Proceeds to next dialog (or ends) the login process.
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
      */
-    public void advance(int requestCode, String[] permissions, int[] grantResults)
-    {
+    public void advance(int requestCode, String[] permissions, int[] grantResults) {
         //Realizado sempre independentemente do tipo de permissao
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Permission Granted.
@@ -292,9 +292,9 @@ public class MainActivity extends AppCompatActivity {
                 String rec_password = null;
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) //find token on inbox sms
                     try {
-                        for(int i = 0; i<PASSWORD_SMS_PHONES.length; ++i) {
+                        for (int i = 0; i < PASSWORD_SMS_PHONES.length; ++i) {
                             rec_password = Utility.getLastMessageBody(getApplicationContext(), PASSWORD_SMS_PHONES[i]);
-                            if (rec_password!=null) break;
+                            if (rec_password != null) break;
                         }
                     } catch (Exception e) {
                     }
@@ -305,8 +305,10 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     phoneNumber = Utility.getPhoneNumber(getApplicationContext());
                 loginDialog(phoneNumber);
+                break;
             default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                if (android.os.Build.VERSION.SDK_INT >= 23)
+                    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

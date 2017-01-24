@@ -34,8 +34,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/priceSwitch"
             android:textSize="18sp"
-            android:textOn="sim"
-            android:textOff="não"
+            android:textOn="@string/yes"
+            android:textOff="@string/no"
             android:text="@string/profile_price_final"
             android:layout_marginBottom="10dp" />
 

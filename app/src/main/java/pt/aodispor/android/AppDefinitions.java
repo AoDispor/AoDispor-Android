@@ -67,12 +67,12 @@ public class AppDefinitions {
     /**
      * Phone Number used on login
      */
-    public static String phoneNumber;
+    public static String phoneNumber = "";
 
     /**
      * Password used to login. Professional profile editing is blocked without the correct password.
      * */
-    public static String userPassword;
+    public static String userPassword = "";
 
     /*
      * Indicates if the user is registered as a professional
@@ -92,5 +92,6 @@ public class AppDefinitions {
     public static final int PERMISSIONS_REQUEST_READ_SMS = 2;
     public static final int PERMISSIONS_REQUEST_PHONENUMBER = 3;
     public static final int PERMISSIONS_REQUEST_INTERNET = 4;
+    public static final int PERMISSIONS_REQUEST_GPS = 5;
     //endregion
 }

@@ -83,7 +83,7 @@ public class SwipeListener implements View.OnTouchListener {
                         3.6f * view.getY() * view.getY() / (view.getHeight() * view.getHeight())));
                 break;
             case (MotionEvent.ACTION_UP):
-                if (enableCall) {
+                /*if (enableCall) {
                     final Professional p = cardFragment.getProfessionalOnTop();
                     final AlertDialog.Builder builder = new AlertDialog.Builder(cardFragment.getActivity());
                     final CharSequence[] items = {"Ligar", "Ver Perfil"};
@@ -118,7 +118,7 @@ public class SwipeListener implements View.OnTouchListener {
 
                     dialog.show();
                     enableCall = false;
-                }
+                }*/
 
                 boolean card_is_inside_bounds = Math.abs(view.getX()) < view.getWidth() / 2
                         && Math.abs(view.getY()) < view.getHeight() / 2;

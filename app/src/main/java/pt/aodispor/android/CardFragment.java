@@ -4,24 +4,34 @@ import android.Manifest;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
+import com.crashlytics.android.answers.ShareEvent;
+import com.github.karthyks.runtimepermissions.PermissionActivity;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -50,6 +60,10 @@ public class CardFragment extends Fragment implements HttpRequest {
     public void setSearchQuery(String query) {
         searchQuery = query;
     }
+
+    private LocationManager locationManager;
+    public static final int REQUEST_CODE = 111;
+
 
     /**
      * used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query
@@ -145,22 +159,100 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
         activity = getActivity();
 
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        updateLatLon();
+
+        ImageButton returnButton = (ImageButton) rootView.findViewById(R.id.returnButton);
+        returnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                restorePreviousCard();
+            }
+        });
+
+        ImageButton callButton = (ImageButton) rootView.findViewById(R.id.callButton);
+        callButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
+                if(permissionCheck == PackageManager.PERMISSION_DENIED) {
+                    Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
+                    return;
+                }
+
+                callProfessional();
+            }
+        });
+
+        ImageButton smsButton = (ImageButton) rootView.findViewById(R.id.smsButton);
+        smsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Professional p = cards_professional_data[0];
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + p.phone));
+                intent.putExtra("sms_body", getString(R.string.sms_text));
+                Answers.getInstance().logCustom(new CustomEvent("Envio de SMS").putCustomAttribute("string_id", p.string_id));
+                startActivity(intent);
+            }
+        });
+
+        ImageButton shareButton = (ImageButton) rootView.findViewById(R.id.shareButton);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Professional p = cards_professional_data[0];
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.aodispor.pt/"+p.string_id);
+                sendIntent.setType("text/plain");
+                Answers.getInstance().logShare(new ShareEvent().putCustomAttribute("string_id", p.string_id));
+                startActivity(sendIntent);
+            }
+        });
+
+        setupNewStack();
+
+        return rootView;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            switch (resultCode) {
+                case PermissionActivity.PERMISSION_GRANTED:
+                    //Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
+                    setupLocationManager();
+                    setupNewStack();
+                    break;
+                case PermissionActivity.PERMISSION_DENIED:
+                    //Toast.makeText(this, "Denied", Toast.LENGTH_SHORT).show();
+                    break;
+                case PermissionActivity.PERMISSION_PERMANENTLY_DENIED:
+                    //Toast.makeText(this, "Permanently denied", Toast.LENGTH_SHORT).show();
+                    //PermissionUtil.openAppSettings(this.getActivity().);
+                    break;
+                default:
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void setupLocationManager() {
+        //Get coordinates
+        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         List<String> l = locationManager.getProviders(true);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            for (String s : l) {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            for (String s : l)
+            {
                 Location loc = locationManager.getLastKnownLocation(s);
-                if (loc != null) {
+                if (loc != null)
+                {
                     lat = "" + loc.getLatitude();
                     lon = "" + loc.getLongitude();
                     break;
                 }
             }
         }
-
-        setupNewStack();
-
-        return rootView;
     }
 
     //region CARD POSITIONING/DISPLAY UTILITIES
@@ -173,8 +265,12 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     public void setCardMargin(int position) {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[position].getLayoutParams());
-        int px = getResources().getDimensionPixelSize(R.dimen.card_margin);
-        params.setMargins(px, px, px, px);
+        int card_margin_left = getResources().getDimensionPixelSize(R.dimen.card_margin_left);
+        int card_margin_top = getResources().getDimensionPixelSize(R.dimen.card_margin_top);
+        int card_margin_right = getResources().getDimensionPixelSize(R.dimen.card_margin_right);
+        int card_margin_bottom = getResources().getDimensionPixelSize(R.dimen.card_margin_bottom);
+
+        params.setMargins(card_margin_left, card_margin_top, card_margin_right, card_margin_bottom);
         cards[position].setLayoutParams(params);
         cards[position].setTranslationX(getResources().getDimensionPixelSize(R.dimen.card_offset) * (position + 1));
         cards[position]
@@ -193,8 +289,12 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     private void centerFirstCard() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[0].getLayoutParams());
-        int px = getResources().getDimensionPixelSize(R.dimen.card_margin);
-        params.setMargins(px, px, px, px);
+        int card_margin_left = getResources().getDimensionPixelSize(R.dimen.card_margin_left);
+        int card_margin_top = getResources().getDimensionPixelSize(R.dimen.card_margin_top);
+        int card_margin_right = getResources().getDimensionPixelSize(R.dimen.card_margin_right);
+        int card_margin_bottom = getResources().getDimensionPixelSize(R.dimen.card_margin_bottom);
+
+        params.setMargins(card_margin_left, card_margin_top, card_margin_right, card_margin_bottom);
         cards[0].setLayoutParams(params);
     }
 
@@ -342,8 +442,10 @@ public class CardFragment extends Fragment implements HttpRequest {
      * <also> reponsable for requesting the loading of the previous page and updating the currentSet and nextSet
      */
     public void restorePreviousCard() {
-        if (blockAccess)
+        if (blockAccess) {
             return; //don't make anything while animation plays
+        }
+
         if (currentSetCardIndex < -2) {
             Log.d("ERROR 003", "Unexpected state");
         }//TODO not expected throw exception or development warning
@@ -369,8 +471,9 @@ public class CardFragment extends Fragment implements HttpRequest {
             if (currentSetCardIndex < AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD) {//load in background if possible
                 nextSet = null;
                 System.gc();//try to keep only 2 sets at maximum
-                if (previousSet == null)
+                if (previousSet == null) {
                     preparePreviousPage();
+                }
             }
         } else if (currentSetCardIndex == -3) {//transfer previousSet to currentSet if more than 2 cards already taken from it
             currentSetCardIndex = previousSet.data.size() - 3;
@@ -380,7 +483,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             System.gc();// no need to keep 3 sets stored
             putCardOnStack(0, currentSet.data.get(currentSetCardIndex));
         } else {
-            if (currentSetCardIndex < 0) {//needs to get card from previous set immidiatly.
+            if (currentSetCardIndex < 0) {//needs to get card from previous set immediately.
                 nextSet = null;
                 System.gc();
                 if (previousSet == null) {//if previous set was not yet loaded
@@ -420,6 +523,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         if (cards[2] != null)
             rootView.addView(cards[2]);
         rootView.addView(cards[1]);
+        setCardMargin(0);
         rootView.addView(cards[0]);
 
         if (activity instanceof MainActivity) {
@@ -501,10 +605,9 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         TextView description = (TextView) card.findViewById(R.id.description);
         description.setText(Html.fromHtml(description_text));
-        description.setMovementMethod(new ScrollingMovementMethod());
+        //description.setMovementMethod(new ScrollingMovementMethod());
 
         TextView price = (TextView) card.findViewById(R.id.price);
-
         price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         price.setText(Html.fromHtml(price_value));
 
@@ -606,7 +709,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     /**
-     * try to load previous page immidiatly! will wait for task to end or timeout (blocking)
+     * try to load previous page immediately! will wait for task to end or timeout (blocking)
      */
     public QueryResult preparePreviousPageI() {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null)
@@ -618,7 +721,6 @@ public class CardFragment extends Fragment implements HttpRequest {
         String link = links.getPrevious();
         if (link == null)
             return QueryResult.none;
-        ;
         Log.d("LOAD PREV IMMIDIATE", "STARTED");
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, link);
 
@@ -634,6 +736,21 @@ public class CardFragment extends Fragment implements HttpRequest {
             return QueryResult.successful;
         }
         return QueryResult.emptySet;
+    }
+
+    public void updateLatLon() {
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        List<String> l = locationManager.getProviders(true);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            for (String s : l) {
+                Location loc = locationManager.getLastKnownLocation(s);
+                if (loc != null) {
+                    lat = "" + loc.getLatitude();
+                    lon = "" + loc.getLongitude();
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -661,6 +778,34 @@ public class CardFragment extends Fragment implements HttpRequest {
         return cards_professional_data[0];
     }
 
+    //endregion
+
+    //region CARD ACTIONS
+
+    void callProfessional() {
+        Professional p = cards_professional_data[0];
+        Answers.getInstance().logCustom(new CustomEvent("Telefonema").putCustomAttribute("string_id", p.string_id));
+        startActivity(new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", p.phone, null)));
+    }
+
+    //endregion
+
+    //region PERMISSIONS
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //Realizado dependendo do tipo de permissao
+        switch (requestCode) {
+            case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    callProfessional();
+                }
+
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
     //endregion
 
 }

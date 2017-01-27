@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
@@ -57,16 +58,25 @@ public class MainActivity extends AppCompatActivity {
 
         installFonts();
 
+        startPagerAndMainContent();
+
         TextView titleView = (TextView) findViewById(R.id.app_title);
         titleView.setTypeface(AppDefinitions.dancingScriptRegular);
+        titleView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SearchView searchView = (SearchView) findViewById(R.id.searchView);
+                searchView.setQuery("", false);
+                searchView.clearFocus();
 
-        if (!AppDefinitions.SKIP_LOGIN) {
-            Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
-        } else {
-            AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
-            AppDefinitions.userPassword = AppDefinitions.testPassword;
-            startPagerAndMainContent();
-        }
+                CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
+                cardFragment.setSearchQuery("");
+                cardFragment.setupNewStack();
+                //FIXME isto precisa de ter uma maneira para limpar a string pesquisada
+            }
+        });
+
+        Permission.requestPermission(MainActivity.this, AppDefinitions.PERMISSIONS_REQUEST_GPS);
     }
 
     /**
@@ -97,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             CardFragment cardFrag = null;
             for(Object frag : getSupportFragmentManager().getFragments())
                 if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
-            android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) findViewById(R.id.searchView);
+            SearchView searchView = (SearchView) findViewById(R.id.searchView);
             searchView.setQuery(query, false);
             cardFrag.setSearchQuery(query);
             cardFrag.setupNewStack();
@@ -138,10 +148,18 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(1); //TODO Mostrar o perfil se a pessoa se tiver registado
 
         profileView = ((ImageView) findViewById(R.id.profile_icon));
         stackView = ((ImageView) findViewById(R.id.stack_icon));
+
+        if(AppDefinitions.phoneNumber == "" || AppDefinitions.userPassword == "") {
+            profileView.setVisibility(View.INVISIBLE);
+            stackView.setVisibility(View.INVISIBLE);
+            mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador estiver loggado
+            mViewPager.setEnabled(false);
+        }
+
         stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
         profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -167,8 +185,7 @@ public class MainActivity extends AppCompatActivity {
         final SearchView searchView = (SearchView) findViewById(R.id.searchView);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
-
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String query) {
                 return true;
@@ -189,112 +206,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //region LOGIN DIALOGS & HANDLERS
-
-    /**
-     * shows phone number request dialog for login
-     */
-    private void loginDialog(final String phoneNumber) {
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.phonenumber_request);
-        //dialog.setTitle("LOGIN");
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        Button loginButton = (Button) dialog.findViewById(R.id.button);
-        if (phoneNumber != null) {
-            EditText phoneEditText = (EditText) dialog.findViewById(R.id.phonebox);
-            phoneEditText.setText(phoneNumber);
-        }
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String aux = ((EditText) dialog.findViewById(R.id.phonebox)).getText().toString();
-                if (!Utility.validPhoneNumber(aux)) {
-                    dialog.dismiss();
-                    loginDialog(phoneNumber);
-                    return;
-                }
-                AppDefinitions.phoneNumber = "+" +
-                        ((EditText) dialog.findViewById(R.id.phonebox_country)).getText().toString() + " " +
-                        aux.substring(0, 3) + " " +
-                        aux.substring(3, 6) + " " +
-                        aux.substring(6, 9);
-                dialog.dismiss();
-
-                HttpRequestTask request_register = new HttpRequestTask(
-                        String.class, null, REGISTER_URL);
-                request_register.setMethod(HttpRequestTask.POST_REQUEST);
-                request_register.setJSONBody(new Register(AppDefinitions.phoneNumber));
-                request_register.execute();
-
-                Permission.requestPermission(MainActivity.this, AppDefinitions.PERMISSIONS_REQUEST_READ_SMS);
-            }
-        });
-
-        dialog.show();
-    }
-
-    /**
-     * shows validate SMS dialog
-     */
-    private void validationDialog(String received_sms) {
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.sms_validation);
-        //dialog.setTitle("LOGIN");
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        Button loginButton = (Button) dialog.findViewById(R.id.button);
-        if (received_sms != null) {
-            Log.e("X2",received_sms);
-            try {
-                EditText phoneEditText = (EditText) dialog.findViewById(R.id.password_box);
-                phoneEditText.setText(Utility.parseSMS(received_sms));
-            } catch (Exception e) {
-            }
-        }
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AppDefinitions.userPassword = ((EditText) dialog.findViewById(R.id.password_box)).getText().toString();
-                dialog.dismiss();
-                startPagerAndMainContent();
-            }
-        });
-
-        dialog.show();
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         //Realizado sempre independentemente do tipo de permissao
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        /*if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Permission Granted.
             Toast.makeText(MainActivity.this, getResources().getString(R.string.permisson_accepted), Toast.LENGTH_SHORT).show();
         } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
             // Permission Denied
             Toast.makeText(MainActivity.this, getResources().getString(R.string.permisson_denied), Toast.LENGTH_SHORT).show();
-        }
+        }*/
+
+
 
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
-            case AppDefinitions.PERMISSIONS_REQUEST_READ_SMS:
-                String rec_password = null;
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) //find token on inbox sms
-                    try {
-                        for(int i = 0; i<PASSWORD_SMS_PHONES.length; ++i) {
-                            rec_password = Utility.getLastMessageBody(getApplicationContext(), PASSWORD_SMS_PHONES[i]);
-                            if (rec_password!=null) break;
-                        }
-                    } catch (Exception e) {
-                    }
-                validationDialog(rec_password);
+            case AppDefinitions.PERMISSIONS_REQUEST_GPS:
+                CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
+                cardFragment.updateLatLon();
+                cardFragment.prepareNewSearchQuery();
                 break;
-            case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
-                String phoneNumber = null;
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    phoneNumber = Utility.getPhoneNumber(getApplicationContext());
-                loginDialog(phoneNumber);
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -312,5 +244,4 @@ public class MainActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
-
 }

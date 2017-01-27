@@ -39,8 +39,8 @@
         android:layout_below="@+id/price"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
-        android:layout_width="175dp"
-        android:layout_height="175dp" />
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size" />
     <!--
         <TextView
             android:layout_width="match_parent"
@@ -56,7 +56,7 @@
             android:textAlignment="center" />
        -->
 
-        <TextView
+    <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/profession"

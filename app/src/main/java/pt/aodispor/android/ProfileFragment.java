@@ -244,6 +244,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
+        if(AppDefinitions.SKIP_LOGIN == true) {
+            return;
+        }
+
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);

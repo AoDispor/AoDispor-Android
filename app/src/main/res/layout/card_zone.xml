@@ -1,7 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/tabletop2">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="@dimen/button_bar_bottom"
+        android:paddingTop="@dimen/button_bar_top">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+        <ImageButton
+            app:srcCompat="@drawable/ic_action_playback_prev"
+            android:id="@+id/returnButton"
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+            android:contentDescription="@string/back"
+            android:background="@drawable/circle"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="false"
+            android:padding="10dp" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+        <ImageButton
+            app:srcCompat="@drawable/ic_local_phone"
+            android:id="@+id/callButton"
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+            android:contentDescription="@string/call"
+            android:background="@drawable/circle"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="false"
+            android:padding="10dp" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+        <ImageButton
+            app:srcCompat="@drawable/ic_textsms"
+            android:id="@+id/smsButton"
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+            android:background="@drawable/circle"
+            android:contentDescription="@string/send_sms"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="false"
+            android:padding="10dp" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+        <ImageButton
+            app:srcCompat="@drawable/ic_share"
+            android:id="@+id/shareButton"
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+            android:background="@drawable/circle"
+            android:contentDescription="@string/share"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="false"
+            android:padding="10dp" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+    </LinearLayout>
 
 </RelativeLayout>

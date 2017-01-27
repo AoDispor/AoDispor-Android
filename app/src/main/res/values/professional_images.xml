@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="professional_images">
+        <item>@drawable/profissional1</item>
+        <item>@drawable/profissional2</item>
+        <item>@drawable/profissional3</item>
+        <item>@drawable/profissional4</item>
+    </array>
+</resources>

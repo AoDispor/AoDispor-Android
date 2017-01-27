@@ -49,4 +49,30 @@
     <string name="loading">A atualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
 
+    <string name="search_bar_hint">De quem precisa hoje?</string>
+    <string name="permission_request_location">Para lhe mostrarmos profissionais perto de si precisamos de aceder à sua localização.</string>
+
+    <!-- Floating Action Menu -->
+    <string name="share">Partilhar</string>
+    <string name="send_sms">Enviar SMS</string>
+    <string name="call">Telefonar</string>
+    <string name="back">Voltar</string>
+
+    <!-- Onboarding -->
+    <string name="new_user">Novo utilizador</string>
+    <string name="returning_user">Já tenho uma password</string>
+    <string name="validate">Validar</string>
+    <string name="send_another">Enviar de novo</string>
+    <string name="phone_number">Número de telefone</string>
+    <string name="validation_code">Código de validação</string>
+    <string name="welcome_text">Bem-vindo ao\n Ao Dispor.</string>
+    <string name="ask_phone"> Para o podermos inscrever precisamos de lhe enviar uma SMS.</string>
+    <string name="skip">Não me inscrever agora</string>
+    <string name="next">Continuar</string>
+    <string name="insert_validation_code">Insira o código de 6 digitos presente na SMS que recebeu.</string>
+    <string name="sms_text">Vi o seu perfil no AoDispor.pt e gostaria de contratar os seus serviços. Podemos falar?</string>
+    <string name="request_permission_gps">AoDispor precisa usar o seu GPS para encontrar os profissionais mais perto de si.</string>
+    <string name="http_error">Ocorreu um erro.</string>
+    <string name="password_incomplete">O seu código de validação não está completo.</string>
+
 </resources>

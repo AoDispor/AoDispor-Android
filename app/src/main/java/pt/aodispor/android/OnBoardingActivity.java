@@ -25,16 +25,16 @@ import java.util.Date;
 import java.util.Objects;
 
 import io.fabric.sdk.android.Fabric;
-import pt.aodispor.android.API.ApiJSON;
-import pt.aodispor.android.API.HttpRequest;
-import pt.aodispor.android.API.HttpRequestTask;
-import pt.aodispor.android.API.Professional;
-import pt.aodispor.android.API.Register;
-import pt.aodispor.android.API.SearchQueryResult;
+import pt.aodispor.android.api.ApiJSON;
+import pt.aodispor.android.api.HttpRequest;
+import pt.aodispor.android.api.HttpRequestTask;
+import pt.aodispor.android.api.Professional;
+import pt.aodispor.android.api.Register;
+import pt.aodispor.android.api.SearchQueryResult;
 
 import static pt.aodispor.android.AppDefinitions.PASSWORD_SMS_PHONES;
 
-public class OnBoardingActivity extends AppCompatActivity implements HttpRequest {
+public class OnBoardingActivity extends AppCompatActivity implements HttpRequest, Advanceable {
     private static final String REGISTER_URL = "https://api.aodispor.pt/users/register";
     private static final String MYSELF_URL = "https://api.aodispor.pt/users/me";
 
@@ -88,7 +88,6 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         final View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppDefinitions.SKIP_LOGIN = true;
                 showMainActivity();
             }
         };
@@ -217,50 +216,19 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        //Realizado sempre independentemente do tipo de permissao
-        /*if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permission Granted.
-            Toast.makeText(this, getResources().getString(R.string.permisson_accepted), Toast.LENGTH_SHORT).show();
-        } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-            // Permission Denied
-            Toast.makeText(this, getResources().getString(R.string.permisson_denied), Toast.LENGTH_SHORT).show();
-        }*/
+        advance(requestCode, permissions, grantResults);
+    }
 
+    /**
+     * Proceeds to next dialog (or ends) the login process.
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    public void advance(int requestCode, String[] permissions, int[] grantResults) {
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
-            case AppDefinitions.PERMISSIONS_REQUEST_READ_SMS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { //find token on inbox sms
-                    String[] last_message = null;
-                    try {
-                        for (int i = 0; i < PASSWORD_SMS_PHONES.length; ++i) {
-                            String[] message = Utility.getLastMessage(getApplicationContext(), PASSWORD_SMS_PHONES[i]);
-
-                            if (last_message == null) {
-                                last_message = message;
-                            }
-
-                            if (message == null) {
-                                continue;
-                            }
-
-                            Date message_date = new Date(message[1]);
-                            Date last_message_date = new Date(last_message[1]);
-
-                            if (message_date.before(last_message_date)) {
-                                last_message = message;
-                            }
-                        }
-                    } catch (Exception e) {
-                    }
-                    if (last_message != null) {
-                        String password = last_message[0].replaceAll("\\D+","");
-                        AppDefinitions.userPassword = password;
-                        final EditText validation_code = (EditText) findViewById(R.id.validation_code);
-                        validation_code.setText(password);
-                        break;
-                    }
-                }
-                break;
             case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
                 String phoneNumber = null;
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {

@@ -30,6 +30,8 @@ import pt.aodispor.android.api.Register;
 
 import static pt.aodispor.android.AppDefinitions.PASSWORD_SMS_PHONES;
 
+import pt.aodispor.android.Advanceable;
+
 /**
  * This class serves as the main activity for the application which extends AppCompatActivity.
  * <p>
@@ -38,7 +40,7 @@ import static pt.aodispor.android.AppDefinitions.PASSWORD_SMS_PHONES;
  * the page switching for the tabbed pages.
  * </p>
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Advanceable {
     private MyViewPager mViewPager;
     private ImageView profileView, stackView;
 
@@ -219,38 +221,12 @@ public class MainActivity extends AppCompatActivity {
      * @param grantResults
      */
     public void advance(int requestCode, String[] permissions, int[] grantResults) {
-        //Realizado sempre independentemente do tipo de permissao
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permission Granted.
-            Toast.makeText(MainActivity.this, getResources().getString(R.string.permisson_accepted), Toast.LENGTH_SHORT).show();
-        } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-            // Permission Denied
-            Toast.makeText(MainActivity.this, getResources().getString(R.string.permisson_denied), Toast.LENGTH_SHORT).show();
-        }
-
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
-            case AppDefinitions.PERMISSIONS_REQUEST_READ_SMS:
-                String rec_password = null;
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) //find token on inbox sms
-                    try {
-                        for (int i = 0; i < PASSWORD_SMS_PHONES.length; ++i) {
-                            rec_password = Utility.getLastMessageBody(getApplicationContext(), PASSWORD_SMS_PHONES[i]);
-                            if (rec_password != null) break;
-                        }
-                    } catch (Exception e) {
-                    }
-                validationDialog(rec_password);
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
                 CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
                 cardFragment.updateLatLon();
                 cardFragment.prepareNewSearchQuery();
-                break;
-            case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
-                String phoneNumber = null;
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    phoneNumber = Utility.getPhoneNumber(getApplicationContext());
-                loginDialog(phoneNumber);
                 break;
             default:
                 if (android.os.Build.VERSION.SDK_INT >= 23)

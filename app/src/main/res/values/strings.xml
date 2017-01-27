@@ -90,7 +90,6 @@
     <string name="welcome_text">Bem-vindo ao\n Ao Dispor.</string>
     <string name="ask_phone"> Para o podermos inscrever precisamos de lhe enviar uma SMS.</string>
     <string name="skip">Não me inscrever agora</string>
-    <string name="next">Continuar</string>
     <string name="insert_validation_code">Insira o código de 6 digitos presente na SMS que recebeu.</string>
     <string name="sms_text">Vi o seu perfil no AoDispor.pt e gostaria de contratar os seus serviços. Podemos falar?</string>
     <string name="request_permission_gps">AoDispor precisa usar o seu GPS para encontrar os profissionais mais perto de si.</string>

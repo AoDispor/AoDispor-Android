@@ -30,7 +30,8 @@ public final class Permission {
                 .setNegativeButton(R.string.deny, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        activity.advance(requestCode, permission, new int[]{PackageManager.PERMISSION_DENIED});
+                        Advanceable advanceable = (Advanceable) activity;
+                        advanceable.advance(requestCode, permission, new int[]{PackageManager.PERMISSION_DENIED});
                     }
                 }).setCancelable(false)
                 .create()

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
-public class Register extends ApiJSON{
+public class Register extends ApiJSON {
         @JsonProperty("telephone") public String telephone;
 
         public  Register(String phone){

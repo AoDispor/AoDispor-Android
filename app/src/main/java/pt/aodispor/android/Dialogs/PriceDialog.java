@@ -1,4 +1,4 @@
-package pt.aodispor.android.Dialogs;
+package pt.aodispor.android.dialogs;
 
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;

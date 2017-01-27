@@ -69,21 +69,6 @@
         android:layout_marginTop="10dp"
         tools:ignore="ContentDescription" />
 
-    <!--TextView
-        android:id="@+id/name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="serif"
-        android:textAlignment="center"
-        android:textColor="@color/aoDispor"
-        android:textSize="24sp"
-        android:textStyle="normal|bold"
-        android:layout_below="@+id/profession"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" /-->
-
     <TextView
         android:id="@+id/profession"
         android:layout_width="match_parent"

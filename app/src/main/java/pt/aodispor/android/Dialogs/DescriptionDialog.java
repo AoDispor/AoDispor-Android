@@ -1,4 +1,4 @@
-package pt.aodispor.android.Dialogs;
+package pt.aodispor.android.dialogs;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;

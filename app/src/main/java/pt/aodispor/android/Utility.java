@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pt.aodispor.android.API.Professional;
+import pt.aodispor.android.api.Professional;
 
 /**
  * Contains many methods which implement a more generic functionality
@@ -94,15 +94,13 @@ public abstract class Utility {
         if (info.type == null || info.type.equals("")) return false;
         if (info.phone == null || info.phone.equals("")) return false;
         if (info.rate == null || info.rate.equals("")) return false;
-        if (info.location == null || info.location.equals("")) return false;
+        return !(info.location == null || info.location.equals(""));
 
-        return true;
     }
 
     public static boolean isPostalCodeSet(Professional p) {
-        if (p.cp4 == null || p.title.equals("")) return false;
+        return !(p.cp4 == null || p.title.equals(""));
 
-        return true;
     }
 
 

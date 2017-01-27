@@ -7,10 +7,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import pt.aodispor.android.API.ApiJSON;
-import pt.aodispor.android.API.CPPQueryResult;
-import pt.aodispor.android.API.HttpRequest;
-import pt.aodispor.android.API.HttpRequestTask;
+import pt.aodispor.android.api.ApiJSON;
+import pt.aodispor.android.api.CPPQueryResult;
+import pt.aodispor.android.api.HttpRequest;
+import pt.aodispor.android.api.HttpRequestTask;
 
 public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
     private TextView _location;

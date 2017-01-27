@@ -1,3 +1,3 @@
-package pt.aodispor.android.API;
+package pt.aodispor.android.api;
 
 public abstract class ApiJSON {}

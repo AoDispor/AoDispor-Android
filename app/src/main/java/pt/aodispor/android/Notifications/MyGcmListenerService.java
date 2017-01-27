@@ -1,4 +1,4 @@
-package pt.aodispor.android.Notifications;
+package pt.aodispor.android.notifications;
 
 import com.google.android.gms.gcm.GcmListenerService;
 

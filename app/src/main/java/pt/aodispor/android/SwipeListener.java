@@ -9,7 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import pt.aodispor.android.API.Professional;
+import pt.aodispor.android.api.Professional;
 
 import static pt.aodispor.android.AppDefinitions.DISCARD_ANIMATION_MILLISECONDS;
 

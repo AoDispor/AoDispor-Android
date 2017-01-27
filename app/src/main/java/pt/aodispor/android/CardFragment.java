@@ -39,12 +39,12 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import pt.aodispor.android.API.ApiJSON;
-import pt.aodispor.android.API.HttpRequestTask;
-import pt.aodispor.android.API.Links;
-import pt.aodispor.android.API.HttpRequest;
-import pt.aodispor.android.API.Professional;
-import pt.aodispor.android.API.SearchQueryResult;
+import pt.aodispor.android.api.ApiJSON;
+import pt.aodispor.android.api.HttpRequestTask;
+import pt.aodispor.android.api.Links;
+import pt.aodispor.android.api.HttpRequest;
+import pt.aodispor.android.api.Professional;
+import pt.aodispor.android.api.SearchQueryResult;
 
 import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
 
@@ -649,7 +649,7 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     //endregion
 
-    //region API RELATED
+    //region api RELATED
 
     /**
      * send a new search query

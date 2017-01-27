@@ -2,6 +2,7 @@ package pt.aodispor.android;
 
 import android.Manifest;
 import android.app.Activity;
+import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -10,13 +11,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
+import java.lang.annotation.Target;
+
 public final class Permission {
 
     private static void showMessageOKCancel(final Activity activity, String message,
                                             final String[] permission, final int requestCode) {
         new AlertDialog.Builder(activity)
                 .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.allow, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (android.os.Build.VERSION.SDK_INT >= 23)
@@ -24,12 +27,10 @@ public final class Permission {
                         else ActivityCompat.requestPermissions(activity, permission, requestCode);
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.deny, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            activity.onRequestPermissionsResult(requestCode, permission, new int[]{PackageManager.PERMISSION_DENIED});
-                        }
+                        activity.advance(requestCode, permission, new int[]{PackageManager.PERMISSION_DENIED});
                     }
                 }).setCancelable(false)
                 .create()
@@ -48,15 +49,26 @@ public final class Permission {
         final String[] permission;
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_READ_SMS:
-                permission_dialog_message = activity.getResources().getString(R.string.request_permission_sms);
+                permission_dialog_message = activity.getResources().getString(
+                        android.os.Build.VERSION.SDK_INT >= 23 ?
+                                R.string.request_permission_sms_version_plus23 :
+                                R.string.request_permission_sms
+                );
                 permission = new String[]{Manifest.permission.READ_SMS};
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_INTERNET:
-                permission_dialog_message = activity.getResources().getString(R.string.request_permission_internet);
+                permission_dialog_message = activity.getResources().getString(
+                        android.os.Build.VERSION.SDK_INT >= 23 ?
+                                R.string.request_permission_internet_version_plus23 : R.string.request_permission_internet
+                );
                 permission = new String[]{Manifest.permission.INTERNET};
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
-                permission_dialog_message = activity.getResources().getString(R.string.request_permission_phone);
+                permission_dialog_message = activity.getResources().getString(
+                        android.os.Build.VERSION.SDK_INT >= 23 ?
+                                R.string.request_permission_phone_version_plus23 :
+                                R.string.request_permission_phone
+                );
                 permission = new String[]{Manifest.permission.READ_PHONE_STATE};
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
@@ -72,10 +84,21 @@ public final class Permission {
             Log.d("PERMISSION:", "VERSION>=23");
             int hasWriteContactsPermission = activity.checkSelfPermission(permission[0]);
             if (true || hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-                activity.requestPermissions(permission, requestCode);
+
+                new AlertDialog.Builder(activity)
+                        .setMessage(permission_dialog_message)
+                        .setPositiveButton(R.string.understood, new DialogInterface.OnClickListener() {
+                            @Override
+                            @TargetApi(Build.VERSION_CODES.M)
+                            public void onClick(DialogInterface dialog, int which) {
+                                activity.requestPermissions(permission, requestCode);
+                            }
+                        }).setCancelable(false)
+                        .create()
+                        .show();
+
                 return;
             }
-
         } else {
             Log.d("PERMISSION:", "VERSION<23");
             int hasWriteContactsPermission = ContextCompat.checkSelfPermission(activity,

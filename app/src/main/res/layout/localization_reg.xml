@@ -12,7 +12,7 @@
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"/>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
 
         <EditText
             android:id="@+id/zip1"
-            android:hint="0000"
+            android:hint="@string/zip1_hint"
             android:maxLength="4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
         <EditText
             android:id="@+id/zip2"
             android:hint="000"
-            android:maxLength="3"
+            android:maxLength="@string/zip2_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="number" />
@@ -66,9 +66,7 @@
             android:id="@+id/localizacao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/your_location"
-            android:text="Vazio"
-            android:layout_centerHorizontal="true"
+            android:text="@string/empty"
             android:layout_marginBottom="20dp"
             android:layout_weight="1" />
 

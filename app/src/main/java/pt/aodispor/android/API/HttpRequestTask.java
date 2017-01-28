@@ -101,29 +101,26 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
             template = new RestTemplate(cf);
             Object answer;//temp before assigning response: may not return ApiJSON
-            if(answerType==null) answerType = String.class;
+            if(answerType == null)
+                answerType = String.class;
             try {
                 ApiJSON response = null;
                 switch (method) {
                     case POST:
                         entityReq = new HttpEntity<>(body, httpHeaders);
                         answer = template.postForObject(url, entityReq, answerType);
-                        if (answerType!=null&&ApiJSON.class.isAssignableFrom(answerType))
+                        if (ApiJSON.class.isAssignableFrom(answerType))
                             response = (ApiJSON) answer;
                         break;
                     case PUT:
                         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                         entityReq = new HttpEntity<>(bitmapBody, httpHeaders);
-                        answer = template.exchange(url, HttpMethod.PUT, entityReq, String.class, urlVariables).getBody();
-                        if (answerType!=null&&ApiJSON.class.isAssignableFrom(answerType))
+                        answer = template.exchange(url, HttpMethod.PUT, entityReq, answerType, urlVariables).getBody();
+                        if (ApiJSON.class.isAssignableFrom(answerType))
                             response = (ApiJSON) answer;
                         break;
                     default:
                         entityReq = new HttpEntity<>(httpHeaders);
-                        Log.v("debug","url: " + url);
-                        Log.v("debug","entityReq: " + entityReq);
-                        Log.v("debug","answerType: " + answerType);
-                        Log.v("debug","urlVariables: " + Arrays.toString(urlVariables));
                         response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
                         //if (answerType != null && ApiJSON.class.isAssignableFrom(answerType))
                             //response = (ApiJSON) answer;

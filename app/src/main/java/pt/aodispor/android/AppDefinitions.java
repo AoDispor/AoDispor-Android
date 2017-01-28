@@ -18,10 +18,10 @@ public class AppDefinitions {
      * <br>the phone number used is equal to the test phone number
      * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
-    public static final boolean SKIP_LOGIN = false;
+    public static final boolean SKIP_LOGIN = true;
 
-    public static final String testPhoneNumber = "+351 911 793 861";//"+351 912 488 434";
-    public static final String testPassword = "898745";//"??????"
+    public static final String testPhoneNumber = "+351912488434";
+    public static final String testPassword = "123456";//"??????"
 
     //endregion
 

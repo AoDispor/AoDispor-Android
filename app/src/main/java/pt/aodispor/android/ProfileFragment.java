@@ -7,14 +7,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,7 +37,6 @@ import pt.aodispor.android.notifications.RegistrationIntentService;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.android.R.id.location;
-import static pt.aodispor.android.R.id.start;
 
 public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
@@ -54,7 +51,11 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private ImageView imageView;
     private InputMethodManager manager;
 
-    public enum PriceType {ByHour, ByDay, ByService}
+    public enum PriceType {
+        ByHour,
+        ByDay,
+        ByService
+    }
 
     /**
      * Factory method to create a new instance of ProfileFragment class. This is needed because of how
@@ -76,29 +77,15 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         int p = getResources().getDimensionPixelSize(R.dimen.register_layout_margin);
         params.setMargins(p, p, p, p);
         professionalCard.setLayoutParams(params);
-
         editingDescription = false;
 
         // Get Views
-        priceView = (TextView) professionalCard.findViewById(R.id.price);
-        locationView = (TextView) professionalCard.findViewById(location);
-        nameView = (TextView) professionalCard.findViewById(R.id.name);
-        nameEditText = (EditText) professionalCard.findViewById(R.id.nameEditText);
-        professionView = (TextView) professionalCard.findViewById(R.id.profession);
-        professionEditText = (EditText) professionalCard.findViewById(R.id.professionEditText);
-        descriptionView = (TextView) professionalCard.findViewById(R.id.description);
-        descriptionEditText = (EditText) professionalCard.findViewById(R.id.descriptionEditText);
-        imageView = (ImageView) professionalCard.findViewById(R.id.profile_image);
+        getViews();
 
-        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        nameEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        professionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        descriptionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        // Set Fonts
+        setFonts();
 
+        // Location
         locationView.setClickable(true);
         locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView));
 
@@ -239,8 +226,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         startLoading();
         getProfileInfo();
 
-
-
         return rootView;
     }
 
@@ -248,7 +233,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
-        /*
+        /* //TODO UNCOMMENT
         if(AppDefinitions.SKIP_LOGIN == true) {
             return;
         }
@@ -449,8 +434,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Profession
         String professionText = p.title;
-        Log.v("debug", "Profissão: " + p.title);
-        if (professionText != null && professionText!="") {
+        if (professionText != null) {
             professionView.setText(professionText.trim().replaceAll("\\s{2,}", " "));
             professionView.setTextColor(black);
         } else {
@@ -480,13 +464,11 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Profile Image
         String imageUrl = p.avatar_url;
+        imageView.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.image_placeholder));
         if (imageUrl != null) {
             ImageLoader imageLoader = ImageLoader.getInstance();
             DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
-            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.image_placeholder));
             imageLoader.displayImage(imageUrl, imageView, options);
-        } else {
-            imageView.setBackgroundDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.image_placeholder));
         }
     }
 
@@ -526,25 +508,46 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         startActivityForResult(intent, req_code);
     }
 
+    private void getViews() {
+        priceView = (TextView) professionalCard.findViewById(R.id.price);
+        locationView = (TextView) professionalCard.findViewById(location);
+        nameView = (TextView) professionalCard.findViewById(R.id.name);
+        nameEditText = (EditText) professionalCard.findViewById(R.id.nameEditText);
+        professionView = (TextView) professionalCard.findViewById(R.id.profession);
+        professionEditText = (EditText) professionalCard.findViewById(R.id.professionEditText);
+        descriptionView = (TextView) professionalCard.findViewById(R.id.description);
+        descriptionEditText = (EditText) professionalCard.findViewById(R.id.descriptionEditText);
+        imageView = (ImageView) professionalCard.findViewById(R.id.profile_image);
+    }
+
+    private void setFonts() {
+        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        nameEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        professionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        descriptionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
             startLoading();
-
             Bundle bundle = data.getExtras();
             Bitmap image = bundle.getParcelable("data");
-
-            HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_UPLOAD_IMAGE);
-            request.setMethod(HttpRequestTask.PUT_REQUEST);
-            request.setType(HttpRequest.UPDATE_PROFILE);
-            request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-
-            int byteNum = image.getByteCount();
-            ByteBuffer buffer = ByteBuffer.allocate(byteNum);
-            image.copyPixelsToBuffer(buffer);
-
-            request.setBitmapBody(Utility.convertBitmapToBinary(image));
-            request.execute();
+            if(image != null) {
+                int byteNum = image.getByteCount();
+                ByteBuffer buffer = ByteBuffer.allocate(byteNum);
+                image.copyPixelsToBuffer(buffer);
+                HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_UPLOAD_IMAGE);
+                request.setMethod(HttpRequestTask.PUT_REQUEST);
+                request.setType(HttpRequest.UPDATE_PROFILE);
+                request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+                request.setBitmapBody(Utility.convertBitmapToBinary(image));
+                request.execute();
+            }
         }
     }
 

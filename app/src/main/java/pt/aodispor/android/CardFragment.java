@@ -174,7 +174,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             @Override
             public void onClick(View view) {
                 int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
-                if(permissionCheck == PackageManager.PERMISSION_DENIED) {
+                if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                     Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
                     return;
                 }
@@ -202,7 +202,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 Professional p = cards_professional_data[0];
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.aodispor.pt/"+p.string_id);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.aodispor.pt/" + p.string_id);
                 sendIntent.setType("text/plain");
                 Answers.getInstance().logShare(new ShareEvent().putCustomAttribute("string_id", p.string_id));
                 startActivity(sendIntent);
@@ -240,13 +240,10 @@ public class CardFragment extends Fragment implements HttpRequest {
         //Get coordinates
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         List<String> l = locationManager.getProviders(true);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-        {
-            for (String s : l)
-            {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            for (String s : l) {
                 Location loc = locationManager.getLastKnownLocation(s);
-                if (loc != null)
-                {
+                if (loc != null) {
                     lat = "" + loc.getLatitude();
                     lon = "" + loc.getLongitude();
                     break;
@@ -312,6 +309,9 @@ public class CardFragment extends Fragment implements HttpRequest {
      * to be called when doing a new search
      */
     public void setupNewStack() {
+        currentSetCardIndex = 0;
+        nextSet = null;
+        previousSet = null;
         if (cards != null)
             removeCardViews(cards);
         else
@@ -328,6 +328,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                         cards[2] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                 } else {
                     cards[1] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                    cards[2] = null;
                 }
 
                 if (activity instanceof MainActivity) {
@@ -348,12 +349,18 @@ public class CardFragment extends Fragment implements HttpRequest {
             case emptySet: //received answer but there aren't any professionals
                 cards[0] = createMessageCard(getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
                         (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>");
+                cards[1] = null;
+                cards[2] = null;
                 break;
             case timeout: //did not receive answer
                 cards[0] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
+                cards[1] = null;
+                cards[2] = null;
                 break;
             default:
                 cards[0] = createMessageCard("ERROR 001", "");//TODO replace with xml defined strings
+                cards[1] = null;
+                cards[2] = null;
                 break;
         }
         centerFirstCard();
@@ -759,10 +766,10 @@ public class CardFragment extends Fragment implements HttpRequest {
             nextSet = (SearchQueryResult) answer;
         else if (requestType == RequestType.prevSet)
             previousSet = (SearchQueryResult) answer;
-        else if (requestType == RequestType.newSet) { //not used right now
-            nextSet = null;
-            currentSet = (SearchQueryResult) answer;
-        }
+        //else if (requestType == RequestType.newSet) { //not used right now
+        //    nextSet = null;
+        //    currentSet = (SearchQueryResult) answer;
+        //}
     }
 
     @Override

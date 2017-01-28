@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,6 +39,7 @@ import pt.aodispor.android.notifications.RegistrationIntentService;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.android.R.id.location;
+import static pt.aodispor.android.R.id.start;
 
 public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
@@ -237,6 +239,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         startLoading();
         getProfileInfo();
 
+
+
         return rootView;
     }
 
@@ -244,14 +248,15 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
+        /*
         if(AppDefinitions.SKIP_LOGIN == true) {
             return;
         }
-
+        */
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        request.addAPIAuthentication(AppDefinitions.testPhoneNumber, AppDefinitions.testPassword);
         request.execute();
     }
 
@@ -487,7 +492,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     private void startLoading() {
         hideViews();
-        loadingMessage.setVisibility(LinearLayout.VISIBLE);
+        loadingMessage.setVisibility(View.VISIBLE);
     }
 
     private void endLoading() {
@@ -525,6 +530,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
             startLoading();
+
             Bundle bundle = data.getExtras();
             Bitmap image = bundle.getParcelable("data");
 
@@ -540,18 +546,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             request.setBitmapBody(Utility.convertBitmapToBinary(image));
             request.execute();
         }
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        professionEditText.setVisibility(EditText.INVISIBLE);
-        professionView.setVisibility(TextView.VISIBLE);
-        nameView.setVisibility(TextView.VISIBLE);
-
-        descriptionEditText.setVisibility(EditText.INVISIBLE);
-        descriptionView.setVisibility(TextView.VISIBLE);
     }
 
 }

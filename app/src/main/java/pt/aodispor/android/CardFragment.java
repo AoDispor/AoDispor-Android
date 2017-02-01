@@ -777,7 +777,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     @Override
-    public void onHttpRequestFailed() {
+    public void onHttpRequestFailed(ApiJSON errorData) {
 
     }
 

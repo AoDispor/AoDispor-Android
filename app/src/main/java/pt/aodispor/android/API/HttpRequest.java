@@ -11,5 +11,5 @@ public interface HttpRequest {
 
     void onHttpRequestCompleted(ApiJSON answer, int type);
 
-    void onHttpRequestFailed();
+    void onHttpRequestFailed(ApiJSON errorData);
 }

@@ -4,14 +4,20 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,6 +41,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private String url;
     private String[] urlVariables;
     private boolean timeout = false;
+    private boolean error = false;
     private HttpEntity<?> entityReq;
     private HttpMethod method;
     private ApiJSON body;
@@ -59,9 +66,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
      * <br>The Body is empty by default. Use setJSONBody to define the body.
      * <br>Verify if addAPIAuthentication is needed
      * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
-     * @param answer answer type expected, must e deserializable
+     *
+     * @param answer   answer type expected, must e deserializable
      * @param executor the instance that implements the HttpRequest. Only needed to run request on background (can be null).
-     * @param url request destination
+     * @param url      request destination
      */
     public HttpRequestTask(Class answer, HttpRequest executor, String url) {
         answerType = answer;
@@ -78,10 +86,11 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
      * <br>The Body is empty by default. Use setJSONBody to define the body.
      * <br>Verify if addAPIAuthentication is needed
      * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
-     * @param answer answer type expected, must e deserializable
+     *
+     * @param answer   answer type expected, must e deserializable
      * @param executor the instance that implements the HttpRequest. Only needed to run request on background (can be null).
-     * @param url request destination
-     * @param uv url variables
+     * @param url      request destination
+     * @param uv       url variables
      */
     public HttpRequestTask(Class answer, HttpRequest executor, String url, String... uv) {
         answerType = answer;
@@ -94,13 +103,13 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     @Override
     protected ApiJSON doInBackground(Void... params) {
+        Object answer;//temp before assigning response: may not return ApiJSON
         try {
             prepareHeaders();
             SimpleClientHttpRequestFactory cf = new SimpleClientHttpRequestFactory();
             cf.setConnectTimeout(AppDefinitions.TIMEOUT);
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
             template = new RestTemplate(cf);
-            Object answer;//temp before assigning response: may not return ApiJSON
             if(answerType == null)
                 answerType = String.class;
             try {
@@ -127,14 +136,20 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                         break;
                 }
                 return response;
+            } catch (HttpStatusCodeException e) {
+                error = true;
+
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(e.getResponseBodyAsString(), Error.class);
             } catch (RestClientException re) {
-                timeout = true;
+                error = true;
                 re.printStackTrace();
             }
         } catch (Exception e) {
-            timeout = true;
+            error = true;
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -142,8 +157,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     protected void onPostExecute(ApiJSON data) {
         if (postExecute == null)
             return;
-        if (timeout) {
-            postExecute.onHttpRequestFailed();
+        if (timeout || error) {
+            if (data == null)
+                return;
+            postExecute.onHttpRequestFailed(data);
         } else {
             if (data == null)
                 return;
@@ -200,7 +217,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     /**
      * Use this method before executing request if it is a Registered used relate operation that needs credentials
-     * */
+     */
     public void addAPIAuthentication(String phone, String password) {
         String encode = Base64.encodeToString((phone + ":" + password).getBytes(), Base64.DEFAULT);
         httpHeaders.set("Authorization", "Basic " + encode);

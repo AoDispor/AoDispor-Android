@@ -11,7 +11,8 @@ import com.crashlytics.android.answers.Answers;
 
 import io.fabric.sdk.android.Fabric;
 
-public class SplitActivity extends AppCompatActivity {
+public class SplitActivity extends Activity
+{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,5 +40,7 @@ public class SplitActivity extends AppCompatActivity {
         Intent newActivity = new Intent(SplitActivity.this, activityClass);
         newActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(newActivity);
+
+        finish();
     }
 }

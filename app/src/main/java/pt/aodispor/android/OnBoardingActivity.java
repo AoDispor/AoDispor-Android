@@ -78,13 +78,6 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         final Button sendAnother = (Button) findViewById(R.id.send_another_button);
         final Button skipButton3 = (Button) findViewById(R.id.skip_button3);
 
-        final Window window = this.getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.setStatusBarColor(this.getResources().getColor(R.color.aoDispor));
-        }
-
         final View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {

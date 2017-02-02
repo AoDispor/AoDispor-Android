@@ -30,15 +30,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"/>
+            android:text="@string/dash"/>
         <EditText
             android:id="@+id/zip2"
-            android:hint="000"
-            android:maxLength="@string/zip2_hint"
+            android:hint="@string/zip2_hint"
+            android:maxLength="3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="number" />
     </LinearLayout>
+
     <TextView
         android:id="@+id/your_location"
         android:layout_width="wrap_content"
@@ -63,7 +64,7 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/localizacao"
+            android:id="@+id/locationName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/empty"

@@ -31,9 +31,9 @@ import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
-import pt.aodispor.android.dialogs.DialogCallback;
-import pt.aodispor.android.dialogs.PriceDialog;
+import pt.aodispor.android.dialogs.*;
 import pt.aodispor.android.notifications.RegistrationIntentService;
+import pt.aodispor.android.dialogs.LocationDialog;
 
 import static android.app.Activity.RESULT_OK;
 import static pt.aodispor.android.R.id.location;
@@ -87,7 +87,14 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Location
         locationView.setClickable(true);
-        locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView));
+        //locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView));
+        locationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LocationDialog dialog = new LocationDialog();
+                dialog.show(getFragmentManager(), "location");
+            }
+        });
 
         // Price
         priceView.setOnClickListener(new View.OnClickListener() {

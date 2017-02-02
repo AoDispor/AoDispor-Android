@@ -25,11 +25,9 @@ public class LocationDialog extends AlertDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.localization_reg);
-
+        setContentView(R.layout.localization_reg);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-
         EditText zip1 = (EditText) findViewById(R.id.zip1);
         zip1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -61,7 +59,7 @@ public class LocationDialog extends AlertDialog {
             }
         });
 
-        _location = (TextView) findViewById(R.id.localizacao);
+        _location = (TextView) findViewById(R.id.locationName);
         _location.setText(location);
 
         listener = new ZipCodeOnEditText(_location,zip1,zip2);
@@ -69,6 +67,8 @@ public class LocationDialog extends AlertDialog {
         zip1.addTextChangedListener(listener);
         zip2.addTextChangedListener(listener);
     }
+
+
 
     public void setLocation(TextView location) {
         this._location = location;

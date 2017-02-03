@@ -125,7 +125,7 @@ public class LocationDialog extends DialogFragment implements HttpRequest {
     }
 
     @Override
-    public void onHttpRequestFailed() {
+    public void onHttpRequestFailed(ApiJSON errorData) {
         set = false;
         locationName.setText(R.string.empty);
         progressBar.setVisibility(View.GONE);

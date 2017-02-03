@@ -110,7 +110,6 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             cf.setConnectTimeout(AppDefinitions.TIMEOUT);
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
             template = new RestTemplate(cf);
-            Object answer;//temp before assigning response: may not return ApiJSON
             if(answerType == null)
                 answerType = String.class;
             try {

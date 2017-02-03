@@ -12,6 +12,7 @@ import pt.aodispor.android.api.CPPQueryResult;
 import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
 
+@Deprecated
 public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
     private TextView _location;
 

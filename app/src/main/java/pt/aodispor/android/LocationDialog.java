@@ -9,7 +9,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-
+@Deprecated
 public class LocationDialog extends AlertDialog {
     private TextView _location;
     private String location;

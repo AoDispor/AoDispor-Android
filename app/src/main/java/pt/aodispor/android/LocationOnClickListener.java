@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.view.View;
 import android.widget.TextView;
 
+@Deprecated
 public class LocationOnClickListener implements View.OnClickListener {
     private Activity _activity;
     private ProfileFragment fragment;
@@ -23,7 +24,7 @@ public class LocationOnClickListener implements View.OnClickListener {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                fragment.onLocationDialogCallBack(dialog.getLocation(), dialog.getCp4(), dialog.getCp3(), dialog.isLocationSet());
+                //fragment.onLocationDialogCallBack(dialog.getLocation(), dialog.getCp4(), dialog.getCp3(), dialog.isLocationSet());
             }
         });
         dialog.setLocation(_location);

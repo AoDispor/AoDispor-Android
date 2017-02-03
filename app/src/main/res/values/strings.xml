@@ -28,6 +28,7 @@
     <!-- Location Dialog -->
     <string name="zip_dialog">Insira o seu código postal</string>
     <string name="your_location_is_dialog">A sua localização é: </string>
+    <string name="dash">-</string>
     <string name="zip1_hint">0000</string>
     <string name="zip2_hint">000</string>
 

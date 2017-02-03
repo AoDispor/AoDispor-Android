@@ -31,14 +31,13 @@ import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
-import pt.aodispor.android.dialogs.DialogCallback;
-import pt.aodispor.android.dialogs.PriceDialog;
+import pt.aodispor.android.dialogs.*;
 import pt.aodispor.android.notifications.RegistrationIntentService;
+import pt.aodispor.android.dialogs.LocationDialog;
 
 import static android.app.Activity.RESULT_OK;
-import static pt.aodispor.android.R.id.location;
 
-public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback {
+public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback, LocationDialog.LocationDialogListener {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
     private static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
     private static final int SELECT_PICTURE = 0;
@@ -50,6 +49,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private boolean editingDescription;
     private ImageView imageView;
     private InputMethodManager manager;
+    private final ProfileFragment thisObject = this;
 
     public enum PriceType {
         ByHour,
@@ -87,7 +87,15 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Location
         locationView.setClickable(true);
-        locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView));
+        //locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView)); //TODO DECIDE
+        locationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LocationDialog dialog = new LocationDialog();
+                dialog.setListener(thisObject);
+                dialog.show(getFragmentManager(), "location");
+            }
+        });
 
         // Price
         priceView.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +249,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        request.addAPIAuthentication(AppDefinitions.testPhoneNumber, AppDefinitions.testPassword);
         request.execute();
     }
 
@@ -323,22 +331,20 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     @Override
-    public void onLocationDialogCallBack(String location, String cp4, String cp3, boolean isSet) {
-        if (isSet) {
+    public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
+        if (set && !locationName.equals(locationView.getText().toString())) {
             startLoading();
             HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
             request.setMethod(HttpRequestTask.POST_REQUEST);
             request.setType(HttpRequest.UPDATE_PROFILE);
             request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
             Professional p = new Professional();
-            p.location = location;
-            p.cp4 = cp4;
-            p.cp3 = cp3;
+            p.location = locationName;
+            p.cp4 = prefix;
+            p.cp3 = suffix;
             request.setJSONBody(p);
             request.execute();
-
-            AppDefinitions.postal_code = Integer.parseInt(cp4);
-
+            AppDefinitions.postal_code = Integer.parseInt(prefix);
             if (Utility.checkPlayServices(this.getActivity())) {
                 // Start IntentService to register this application with GCM.
                 Intent intent = new Intent(this.getActivity(), RegistrationIntentService.class);
@@ -510,7 +516,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     private void getViews() {
         priceView = (TextView) professionalCard.findViewById(R.id.price);
-        locationView = (TextView) professionalCard.findViewById(location);
+        locationView = (TextView) professionalCard.findViewById(R.id.location);
         nameView = (TextView) professionalCard.findViewById(R.id.name);
         nameEditText = (EditText) professionalCard.findViewById(R.id.nameEditText);
         professionView = (TextView) professionalCard.findViewById(R.id.profession);

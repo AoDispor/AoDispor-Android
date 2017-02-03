@@ -12,6 +12,7 @@ import pt.aodispor.android.api.CPPQueryResult;
 import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
 
+@Deprecated
 public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
     private TextView _location;
 
@@ -36,15 +37,15 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        if(charSequence.length() == 4)
+        if(charSequence.length() == 4) {
             _zip2.requestFocus();
+        }
     }
 
     @Override
     public void afterTextChanged(Editable editable) {
         String zip1 = _zip1.getText().toString();
         String zip2 = _zip2.getText().toString();
-
         if(zip1.length() == 4 && zip2.length() == 3) {
             _location.setVisibility(TextView.GONE);
             _location.getRootView().findViewById(R.id.location_progress_bar).setVisibility(ProgressBar.VISIBLE);
@@ -54,7 +55,6 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
             request.setType(HttpRequest.GET_LOCATION);
             request.execute();
             Log.v("debug", "Request sent");
-
         } else {
             lastDigit = false;
             locationSet = false;

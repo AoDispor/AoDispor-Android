@@ -33,14 +33,14 @@
     <string name="zip2_hint">000</string>
 
     <!-- Phone Number Request -->
-    <string name="phonerequest_textbox">número de telemóvel</string>
-    <string name="phonerequest_button">ENTRAR</string>
-    <string name="phone_hint">000000000</string>
-    <string name="phone_country_code">351</string>
+    <string name="phonerequest_textbox">Número de telemóvel</string>
+    <string name="phonerequest_button">Entrar</string>
+    <string name="phone_hint">000 000 000</string>
+    <string name="phone_country_code">+351</string>
 
     <!-- SMS Code Request -->
-    <string name="smsvalidation_textbox">insira código de validação</string>
-    <string name="smsvalidation_button">VALIDAR</string>
+    <string name="smsvalidation_textbox">Insira código de validação</string>
+    <string name="smsvalidation_button">Validar</string>
 
     <!-- Permissions Messages
     23>= versions display an informative dialog box before showing the system permission dialog
@@ -48,20 +48,20 @@
     -->
     <string name="permisson_accepted">Autorizado</string>
     <string name="permisson_denied">Não Autorizado</string>
-    <string name="request_permission_phone">AoDispor pretende aceder ao seu cartão para adquirir o seu número telefónico(não confirme se pretender usar um outro número de telemóvel)</string>
-    <string name="request_permission_sms">AoDispor pretende aceder às suas mensagens para adquirir o código de validação</string>
-    <string name="request_permission_internet">AoDispor pretende aceder à internet</string>
-    <string name="request_permission_phone_version_plus23">AoDispor pretende aceder ao seu cartão para adquirir o seu número telefónico (seguidamente, não confirme se pretender usar um outro número de telemóvel)</string>
-    <string name="request_permission_sms_version_plus23">AoDispor pretende aceder às suas mensagens para adquirir o código de validação</string>
-    <string name="request_permission_internet_version_plus23">AoDispor pretende aceder à internet</string>
+    <string name="request_permission_phone">O Ao Dispor precisa de saber o seu número de telemóvel</string>
+    <string name="request_permission_sms">O Ao Dispor precisa de ter acesso aos SMS para obter o seu código de validação</string>
+    <string name="request_permission_internet">O Ao Dispor pretende ter acesso à Internet</string>
+    <string name="request_permission_phone_version_plus23">O Ao Dispor precisa de saber o seu número de telemóvel</string>
+    <string name="request_permission_sms_version_plus23">O Ao Dispor precisa de ter acesso aos SMS para obter o seu código de validação</string>
+    <string name="request_permission_internet_version_plus23">O Ao Dispor pretende ter acesso à Internet</string>
 
     <!-- Other Messages -->
-    <string name="loading">A atualizar&#8230;</string>
+    <string name="loading">A actualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
     <string name="discard">Descartar</string>string>
 
     <!-- Generic Messages -->
-    <string name="okay">OK</string>
+    <string name="okay">Certo</string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
     <string name="cancel">Cancelar</string>
@@ -83,7 +83,7 @@
 
     <!-- Onboarding -->
     <string name="new_user">Novo utilizador</string>
-    <string name="returning_user">Já tenho uma password</string>
+    <string name="returning_user">Já tenho uma palavra-passe</string>
     <string name="validate">Validar</string>
     <string name="send_another">Enviar de novo</string>
     <string name="phone_number">Número de telefone</string>
@@ -91,9 +91,9 @@
     <string name="welcome_text">Bem-vindo ao\n Ao Dispor.</string>
     <string name="ask_phone"> Para o podermos inscrever precisamos de lhe enviar uma SMS.</string>
     <string name="skip">Não me inscrever agora</string>
-    <string name="insert_validation_code">Insira o código de 6 digitos presente na SMS que recebeu.</string>
+    <string name="insert_validation_code">Insira o código de 6 algarismos presente na SMS que recebeu.</string>
     <string name="sms_text">Vi o seu perfil no AoDispor.pt e gostaria de contratar os seus serviços. Podemos falar?</string>
-    <string name="request_permission_gps">AoDispor precisa usar o seu GPS para encontrar os profissionais mais perto de si.</string>
+    <string name="request_permission_gps">O Ao Dispor precisa usar o seu GPS para encontrar os profissionais mais perto de si.</string>
     <string name="http_error">Ocorreu um erro.</string>
     <string name="password_incomplete">O seu código de validação não está completo.</string>
 

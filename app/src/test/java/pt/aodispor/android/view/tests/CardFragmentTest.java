@@ -12,22 +12,12 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
 import org.robolectric.shadows.support.v4.SupportFragmentTestUtil;
 
-//import testrobo.testrobolectric.BuildConfig;
-//import testrobo.testrobolectric.base.CustomTestRule;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.BuildConfig;
 import pt.aodispor.android.view.base.CardFragmentTestClass;
 import pt.aodispor.android.view.base.EmptyActivity;
 import pt.aodispor.android.view.base.ProfessionalTestClass;
-
-import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(RobolectricTestRunner.class)
 //@RunWith(AndroidJUnit4.class)
@@ -185,16 +175,6 @@ public class CardFragmentTest {
         String location = Html.fromHtml(test_data_set.get(iterator).location).toString();
         String title = Html.fromHtml(test_data_set.get(iterator).title).toString();
         Assert.assertEquals((location + title), fragment.getCurrentShownCardProfessionalLocationPlusProfession());
-    }
-
-    @Test
-    public void testDate()
-    {
-        ShadowLog.stream = System.out;
-        ShadowLog.i("", "\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.UK);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        ShadowLog.i("DATEX - ", dateFormat.format(new Date()) );
     }
 
 }

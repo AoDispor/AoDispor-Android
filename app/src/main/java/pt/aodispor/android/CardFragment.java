@@ -431,7 +431,9 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView.addView(cards[1]);
         rootView.addView(cards[0]);
 
-        if (activity instanceof MainActivity) {
+        if (activity instanceof MainActivity
+                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
+                ) {
             SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
             cards[0].setOnTouchListener(listener);
         }
@@ -533,7 +535,9 @@ public class CardFragment extends Fragment implements HttpRequest {
         setCardMargin(0);
         rootView.addView(cards[0]);
 
-        if (activity instanceof MainActivity) {
+        if (activity instanceof MainActivity
+                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
+                ) {
             SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
             cards[0].setOnTouchListener(listener);
         }
@@ -773,7 +777,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     @Override
-    public void onHttpRequestFailed() {
+    public void onHttpRequestFailed(ApiJSON errorData) {
 
     }
 

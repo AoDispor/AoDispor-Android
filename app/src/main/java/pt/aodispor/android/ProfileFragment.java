@@ -291,7 +291,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Started when the HTTP request is unsuccessful. Shows an error message and ends loading.
      */
     @Override
-    public void onHttpRequestFailed() {
+    public void onHttpRequestFailed(ApiJSON errorData) {
         Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();
         endLoading();
     }

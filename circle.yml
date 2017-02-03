@@ -31,6 +31,6 @@ test:
         - find . -type f -regex ".*lint-results-*.*" -exec cp --parent {} $CIRCLE_TEST_REPORTS/lint/ \;
         
         # Documentation (copy)
-        - mkdir -p $CIRCLE_ARTIFACTS/documentation
-        - cp -r ./documentation/* $CIRCLE_ARTIFACTS/documentation
+        #- mkdir -p $CIRCLE_ARTIFACTS/documentation
+        #- cp -r ./documentation/* $CIRCLE_ARTIFACTS/documentation
         

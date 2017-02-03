@@ -56,7 +56,7 @@ public class RegistrationIntentService extends IntentService implements HttpRequ
     }
 
     @Override
-    public void onHttpRequestFailed() {
+    public void onHttpRequestFailed(ApiJSON errorData) {
 
     }
 }

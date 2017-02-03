@@ -2,6 +2,8 @@
 
 Projeto desenvolvido em [**Android Studio**](https://developer.android.com/studio/index.html).
 
+[![CircleCI](https://circleci.com/gh/AoDispor/AoDispor-Android.svg?style=svg)](https://circleci.com/gh/AoDispor/AoDispor-Android)
+
 ### Principais bibliotecas usadas
 
 + [Spring](https://spring.io/)

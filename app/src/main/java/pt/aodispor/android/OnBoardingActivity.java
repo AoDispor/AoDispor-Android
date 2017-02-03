@@ -30,6 +30,7 @@ import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.Register;
+import pt.aodispor.android.api.Error;
 import pt.aodispor.android.api.SearchQueryResult;
 
 import static pt.aodispor.android.AppDefinitions.PASSWORD_SMS_PHONES;
@@ -77,13 +78,6 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         final Button validate = (Button) findViewById(R.id.validate_button);
         final Button sendAnother = (Button) findViewById(R.id.send_another_button);
         final Button skipButton3 = (Button) findViewById(R.id.skip_button3);
-
-        final Window window = this.getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.setStatusBarColor(this.getResources().getColor(R.color.aoDispor));
-        }
 
         final View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
@@ -207,8 +201,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
 
     private void sendRegistrationSMS() {
         requestType = RequestType.register;
-        HttpRequestTask request_register = new HttpRequestTask(
-                String.class, null, REGISTER_URL);
+        HttpRequestTask request_register = new HttpRequestTask(String.class, null, REGISTER_URL);
         request_register.setMethod(HttpRequestTask.POST_REQUEST);
         request_register.setJSONBody(new Register(AppDefinitions.phoneNumber));
         request_register.execute();
@@ -243,7 +236,6 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
 
     @Override
     public void onHttpRequestCompleted(ApiJSON answer, int type) {
-
         switch (requestType) {
             case register:
                 //do things with the register field
@@ -267,7 +259,8 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
     }
 
     @Override
-    public void onHttpRequestFailed() {
-        Toast.makeText(this, getResources().getString(R.string.http_error), Toast.LENGTH_SHORT).show();
+    public void onHttpRequestFailed(ApiJSON errorData) {
+        Error error = (Error) errorData;
+        Toast.makeText(this, error.message, Toast.LENGTH_LONG).show();
     }
 }

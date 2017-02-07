@@ -29,7 +29,7 @@ public class MyViewPager extends ViewPager {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (this.enabled) {
+        if (AppDefinitions.smsLoginDone && this.enabled) {
             return super.onTouchEvent(event);
         }
         return false;
@@ -42,7 +42,7 @@ public class MyViewPager extends ViewPager {
      */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (this.enabled) {
+        if (AppDefinitions.smsLoginDone && this.enabled) {
             return super.onInterceptTouchEvent(event);
         }
         return false;

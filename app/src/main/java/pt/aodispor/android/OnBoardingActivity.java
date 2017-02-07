@@ -7,6 +7,8 @@ import android.os.Build;
 import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -75,6 +77,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         final Button returningUserButton = (Button) findViewById(R.id.returning_user);
         final Button skipButton2 = (Button) findViewById(R.id.skip_button2);
         // Página 3
+        final EditText validationCodeField = (EditText) findViewById(R.id.validation_code);
         final Button validate = (Button) findViewById(R.id.validate_button);
         final Button sendAnother = (Button) findViewById(R.id.send_another_button);
         final Button skipButton3 = (Button) findViewById(R.id.skip_button3);
@@ -158,6 +161,27 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         skipButton2.setOnClickListener(clickListener);
 
         // Página 3
+        // Campo de texto para a password
+        validationCodeField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editable.toString().length() == 6) {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(validate.getWindowToken(), 0);
+
+                    AppDefinitions.userPassword = editable.toString();
+                    validatePassword();
+                }
+            }
+        });
+
+
         // Validar
         validate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,10 +196,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                 imm.hideSoftInputFromWindow(validate.getWindowToken(), 0);
 
                 AppDefinitions.userPassword = validation_code.getText().toString();
-                requestType = RequestType.validate;
-                HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, OnBoardingActivity.this, MYSELF_URL);
-                request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-                request.execute();
+                validatePassword();
             }
         });
         // Enviar de novo
@@ -197,6 +218,13 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         Intent showMainActivity = new Intent(OnBoardingActivity.this, MainActivity.class);
         showMainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(showMainActivity);
+    }
+
+    private void validatePassword() {
+        requestType = RequestType.validate;
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, OnBoardingActivity.this, MYSELF_URL);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        request.execute();
     }
 
     private void sendRegistrationSMS() {
@@ -229,6 +257,10 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                 }
                 final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
                 phoneNumberField.setPhoneNumber(phoneNumber);
+                // havendo um número de telefone, enviar a SMS de registo se o número de telefone for válido
+                final Button newUserButton = (Button) findViewById(R.id.new_user);
+                newUserButton.callOnClick();
+                break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }

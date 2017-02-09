@@ -16,10 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -78,7 +76,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     @VisibleForTesting
     protected enum QueryResult {
-        timeout, emptySet, successful, none
+        error, emptySet, successful, none
     }
 
     @VisibleForTesting
@@ -305,6 +303,8 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     //region NAVIGATION/PAGINATION
 
+
+
     /**
      * to be called when doing a new search
      */
@@ -352,7 +352,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 cards[1] = null;
                 cards[2] = null;
                 break;
-            case timeout: //did not receive answer
+            case error: //did not receive answer
                 cards[0] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
                 cards[1] = null;
                 cards[2] = null;
@@ -366,6 +366,176 @@ public class CardFragment extends Fragment implements HttpRequest {
         centerFirstCard();
         rootView.addView(cards[0]);
     }
+
+
+
+
+
+    /**
+     * <p>evaluate state and update card stack accordingly</p>
+     * <p>first layer indicates how many cards are loaded/visible to the user</p>
+     * <p><b>inset</b> indicates that the index is inside the current card set and all the card shown are also inside the set</p>
+     * <p><b>loaded</b> indicates that the next set has already been loaded and <b>missing</b> that hasn't been loaded yet </p>
+     *   +------------+----+
+     *   |            |    |
+     *+--+-----+    +++  +++
+     *|>1      |    |1|  |0| (number of cards below the top card)
+     *+----------+  +-+  +-+
+     * |         |
+     * |         |
+     * +-----+   +------+
+     * |INSET|   |OUTSET|
+     * +-----+   +---+--+
+     *           |   |
+     *      +----+   +------+
+     *      |LAST|   |      |
+     *      |PAGE|   ++PAGES|
+     *      +----+   +--+---+
+     *               |  |
+     *        +------+  +-------+
+     *        |LOADED|  |MISSING|
+     *        +------+  +-------+
+     */
+    private enum CardStackStateOnDiscard {
+        /**<p>Only a card (the top one) left in the stack. </p>
+         * <p>There may be more sets left to explore in case connection was lost</p>*/
+        ZERO {
+            public void updateCardStack(CardFragment cf) {
+                cf.rootView.addView(cf.cards[0]);
+                //blockAccess = false; -> done in SwipeListener
+            }
+        }
+        /**<p>Only two cards left in the stack. </p>
+         * <p>There may be more sets left to explore in case connection was lost</p>*/
+        ,ONE { public void updateCardStack(CardFragment cf) {
+            cf.setCardMargin(1);
+            cf.rootView.addView(cf.cards[1]);
+            cf.rootView.addView(cf.cards[0]);
+
+            if (cf.activity instanceof MainActivity) {
+                SwipeListener listener = new SwipeListener(cf.cards[0], ((MainActivity) cf.activity).getViewPager(), cf);
+                cf.cards[0].setOnTouchListener(listener);
+            }
+
+            cf.cards[2] = null;
+            //blockAccess = false; -> done in SwipeListener
+        }
+        }
+        ,
+        /**<p>there are more than 2 cards being shown</p>
+         * <p>the index is inside the current card set and all the card shown are also inside the set</p>
+         * */
+        INSET{
+            public void updateCardStack(CardFragment cf) {
+                cf.putCardOnStack(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+                cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
+            }
+        }
+        ,
+        /**<p>there are more than 2 cards being shown</p>
+         * <p>last card from last card is already on the 3 card shown</p>
+         * */
+        LAST{
+            public void updateCardStack(CardFragment cf) {
+                cf.cards[2] = cf.createMessageCard(cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
+                cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
+            }
+        }
+        ,
+        /**<p>there are more than 2 cards being shown</p>
+         * <p>already have the next page information</p>
+         * */
+        LOADED{
+            public void updateCardStack(CardFragment cf) {
+                //negative when there are still cards from the previous set on the pile
+                cf.currentSetCardIndex = cf.currentSetCardIndex - cf.currentSet.data.size();
+                Log.d("updateCardStack", "currentSetCardIndex: " + Integer.toString(cf.currentSetCardIndex));
+                cf.previousSet = cf.currentSet;
+                cf.currentSet = cf.nextSet;
+                cf.nextSet = null;
+                cf.putCardOnStack(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+                cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
+            }
+        }
+        ,
+        /**<p>there are more than 2 cards being shown</p>
+         * <p>missing next page card set<p/>
+         * */
+        MISSING{
+            public void updateCardStack(CardFragment cf) {
+                cf.cards[2] = cf.createMessageCard(cf.getString(R.string.no_conection_title), cf.getString(R.string.no_conection_msg));//TODO missing button
+                cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
+            }
+        }
+        ,
+        /**this state indicates an occurrence that was not expected*/
+        INVALID{
+            public void updateCardStack(CardFragment cf) {
+                Log.e("ERROR", "INVALID.updateCardStack - Unexpected state");
+                //TODO add exception msg here later maybe ???;
+            }
+        }
+        ;
+        public abstract void updateCardStack(CardFragment cf);
+    }
+
+    public void CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate(){
+        //update cards display
+        setCardMargin(0);
+        setCardMargin(1);
+        setCardMargin(2);
+        rootView.addView(cards[2]);
+        rootView.addView(cards[1]);
+        rootView.addView(cards[0]);
+
+        //add listener to top card
+        if (activity instanceof MainActivity
+                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
+                ) {
+            SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
+            cards[0].setOnTouchListener(listener);
+        }
+
+        //prepare next set if needed
+        if (nextSet == null && currentSetCardIndex + AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD >= currentSet.data.size()) {
+            previousSet = null;
+            System.gc();
+            prepareNextPage();
+        }
+    }
+
+    public CardStackStateOnDiscard getCardStackStateOnDiscard(){
+
+        //no more cards below top card
+        if(cards[1] == null) return CardStackStateOnDiscard.ZERO;
+
+        //only one card left on pile card (below top card)
+        //TODO not sure about this line, there may be a prettier way to to it
+        if (cards[2] != null && cards[2].getTag() != null && cards[2].getTag().equals("msg")) return CardStackStateOnDiscard.ONE;
+
+        //in case something unexpected happened and current set is not available anymore -> the cards can't be loaded!
+        if(currentSet == null) return CardStackStateOnDiscard.INVALID;
+
+        //if there are more than 1 card below top card
+
+        if (currentSetCardIndex + 2 < currentSet.data.size()) return CardStackStateOnDiscard.INSET;
+
+            if (currentSet.meta.pagination.getLinks() != null && currentSet.meta.pagination.getLinks().getNext() != null) {
+                if (nextSet != null)
+                {
+                    return CardStackStateOnDiscard.INSET.LOADED; //already have the next page information
+                } else
+                {
+                    return CardStackStateOnDiscard.MISSING; //content failed to get next page/(card set) on time
+                }
+            }
+        //else
+        //there are no more pages to show
+        return CardStackStateOnDiscard.LAST;
+    }
+
+
+
 
     /**
      * This method discards the top card of the card stack, destroys it and brings the other cards
@@ -381,68 +551,10 @@ public class CardFragment extends Fragment implements HttpRequest {
         swapCardsOnStack(1, 0);
         swapCardsOnStack(2, 1);
         centerFirstCard();
-        if (cards[1] == null) {//already reached end of card pile
-            rootView.addView(cards[0]);
-            //blockAccess = false; -> done in SwipeListener
-            return;
-        }
-        if (cards[2] != null && cards[2].getTag() != null && cards[2].getTag().equals("msg")) {//only one card left on pile card TODO not sure about this line, there may be a prettier way to to it
-            setCardMargin(1);
-            rootView.addView(cards[1]);
-            rootView.addView(cards[0]);
 
-            if (activity instanceof MainActivity) {
-                SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
-                cards[0].setOnTouchListener(listener);
-            }
-
-            cards[2] = null;
-            //blockAccess = false; -> done in SwipeListener
-            return;
-        }
-        if (currentSet == null) {
-            Log.d("ERROR 002", "Unexpected state");
-            return;
-        }//TODO add exception msg here later
-
-        //more than one card on card pile
-        if (currentSetCardIndex + 2 < currentSet.data.size()) {
-            putCardOnStack(2, currentSet.data.get(currentSetCardIndex + 2));
-        } else {
-            if (currentSet.meta.pagination.getLinks() != null && currentSet.meta.pagination.getLinks().getNext() != null) {//if there are more pages to show
-                if (nextSet != null) { //we already have the next page information
-                    currentSetCardIndex = currentSetCardIndex - currentSet.data.size(); //negative when there are still cards from the previous set on the pile
-                    Log.d("L155", "currentSetCardIndex: " + Integer.toString(currentSetCardIndex));
-                    previousSet = currentSet;
-                    currentSet = nextSet;
-                    nextSet = null;
-                    putCardOnStack(2, currentSet.data.get(currentSetCardIndex + 2));
-                } else { //content failed to get next page on time
-                    cards[2] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
-                }
-            } else { //there are no more pages to show
-                cards[2] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
-            }
-        }
-        setCardMargin(0);
-        setCardMargin(1);
-        setCardMargin(2);
-        rootView.addView(cards[2]);
-        rootView.addView(cards[1]);
-        rootView.addView(cards[0]);
-
-        if (activity instanceof MainActivity
-                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
-                ) {
-            SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
-            cards[0].setOnTouchListener(listener);
-        }
-
-        if (nextSet == null && currentSetCardIndex + AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD >= currentSet.data.size()) {
-            previousSet = null;
-            System.gc();
-            prepareNextPage();
-        }
+        CardStackStateOnDiscard state = getCardStackStateOnDiscard();
+        Log.d("discardTopCard","STATE = " + state.toString());
+        state.updateCardStack(this);
         //blockAccess = false; -> done in SwipeListener
     }
 
@@ -513,7 +625,7 @@ public class CardFragment extends Fragment implements HttpRequest {
 
                             blockAccess = false;
                             return;
-                        case timeout: //did not receive answer
+                        case error: //did not receive answer
                             cards[0] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
                             break;
                         default:
@@ -664,7 +776,7 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     /**
      * send a new search query
-     * <br>will wait for task to end or timeout (blocking)
+     * <br>will wait for task to end or timeout/error (blocking)
      *
      * @return true if received query result on time
      */
@@ -676,8 +788,11 @@ public class CardFragment extends Fragment implements HttpRequest {
         try {
             result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            //Log.d("L290:EXCP",e.toString());
-            return QueryResult.timeout;
+            Log.e("prepareNewSearchQuery","793:" + e.toString());
+            return QueryResult.error;
+        }
+        if(request.gotError()) {
+            return QueryResult.error;
         }
         if (result != null && result.data != null && result.data.size() > 0) {
             this.currentSet = result;
@@ -720,7 +835,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     /**
-     * try to load previous page immediately! will wait for task to end or timeout (blocking)
+     * try to load previous page immediately! will wait for task to end or error (blocking)
      */
     public QueryResult preparePreviousPageI() {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null)
@@ -740,7 +855,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             Log.d("L330:EXCP", e.toString());
-            return QueryResult.timeout;
+            return QueryResult.error;
         }
         if (result.data != null && result.data.size() > 0) {
             this.currentSet = result;

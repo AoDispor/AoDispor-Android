@@ -48,7 +48,7 @@ public class AppDefinitions {
     };
 
     /**
-     * Number of milliseconds needed for a timeout to occur in requests
+     * Number of milliseconds needed for a error to occur in requests
      */
     public static final int TIMEOUT = 20000;
 

@@ -9,6 +9,7 @@
     android:background="@drawable/card"
     android:orientation="vertical"
     android:padding="0dp"
+    android:focusableInTouchMode="true"
     tools:context="pt.aodispor.android.ProfessionalProfileActivity">
 
     <LinearLayout
@@ -32,6 +33,7 @@
             style="@style/Widget.AppCompat.ProgressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
     </LinearLayout>
 
     <TextView
@@ -71,97 +73,50 @@
         android:layout_width="175dp"
         android:layout_height="175dp" />
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/nameEditText"
-        android:layout_below="@+id/profile_image"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:gravity="center"
-        android:textColor="@android:color/black"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/profession"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/professionEditText"
-        android:layout_below="@+id/name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:gravity="center"
-        android:textColor="@android:color/black"
-        android:textSize="20sp" />
-
     <pt.aodispor.android.CustomEditText
+        style="@style/CustomEditText"
         android:id="@+id/nameEditText"
         android:hint="@string/register_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_image"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:background="@null"
-        android:inputType="text"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:textSize="20sp" />
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" />
 
     <pt.aodispor.android.CustomEditText
+        style="@style/CustomEditText"
         android:id="@+id/professionEditText"
         android:hint="@string/register_profession"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/name"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:background="@null"
-        android:inputType="text"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/profession"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="5dp"
-        android:scrollbars="vertical"
-        android:textSize="20sp" />
+        android:layout_below="@+id/nameEditText" />
 
     <pt.aodispor.android.CustomEditText
+        style="@style/CustomEditText"
         android:id="@+id/descriptionEditText"
         android:hint="@string/register_description"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/profession"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="5dp"
-        android:background="@null"
-        android:gravity="top"
-        android:inputType="textMultiLine"
         android:scrollbars="vertical"
-        android:textSize="20sp" />
+        android:gravity="top"
+        android:inputType="textImeMultiLine"
+        android:layout_below="@+id/professionEditText" />
 
     <TextView
         android:id="@+id/registered_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/name"
         android:layout_centerHorizontal="true"
         android:alpha="0.66"
         android:background="@drawable/round_rectangle_black"

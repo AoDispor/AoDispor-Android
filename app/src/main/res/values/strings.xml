@@ -71,6 +71,7 @@
     <string name="next">Seguinte</string>
     <string name="previous">Anterior</string>
     <string name="empty">Vazio</string>
+    <string name="retry">Tentar novamente</string>
 
     <string name="search_bar_hint">De quem precisa hoje?</string>
     <string name="permission_request_location">Para lhe mostrarmos profissionais perto de si precisamos de aceder à sua localização.</string>

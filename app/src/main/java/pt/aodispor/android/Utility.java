@@ -10,6 +10,10 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -161,6 +165,31 @@ public abstract class Utility {
         Matcher matcher = pattern.matcher(sms);
         matcher.find();
         return matcher.group();
+    }
+
+
+
+
+    public static void startLoading(LinearLayout loadingMessage, RelativeLayout relativeLayout) {
+        if(relativeLayout!=null) hideViews(relativeLayout);
+        loadingMessage.setVisibility(View.VISIBLE);
+    }
+
+    public static void endLoading(LinearLayout loadingMessage, RelativeLayout relativeLayout) {
+        if(relativeLayout!=null) showViews(relativeLayout);
+        loadingMessage.setVisibility(LinearLayout.INVISIBLE);
+    }
+
+    public static void hideViews(RelativeLayout relativeLayout) {
+        for (int i = 0; i < relativeLayout.getChildCount(); i++) {
+            relativeLayout.getChildAt(i).setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public static void showViews(RelativeLayout relativeLayout) {
+        for (int i = 0; i < relativeLayout.getChildCount(); i++) {
+            relativeLayout.getChildAt(i).setVisibility(View.VISIBLE);
+        }
     }
 
 }

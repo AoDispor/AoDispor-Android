@@ -21,8 +21,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -68,8 +70,11 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     @VisibleForTesting
     protected enum RequestType {
-        prevSet, nextSet, newSet
+        prevSet, nextSet, newSet,
+        retry_prevSet, retry_nextSet, retry_newSet;
     }
+
+    RequestType retryRequestType;
 
     /**
      * used to know if the query was successful or not. <br><br>emptySet indicates that an answer was received but no results were found
@@ -78,6 +83,8 @@ public class CardFragment extends Fragment implements HttpRequest {
     protected enum QueryResult {
         error, emptySet, successful, none
     }
+
+    QueryResult queryResult;
 
     @VisibleForTesting
     protected RequestType requestType;
@@ -117,6 +124,8 @@ public class CardFragment extends Fragment implements HttpRequest {
     protected ViewGroup container;
     @VisibleForTesting
     protected Activity activity;
+
+    private LinearLayout loadingMessage;
 
     private String lat = "";
     private String lon = "";
@@ -171,6 +180,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (cards_professional_data[0] == null) return;
                 int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
                 if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                     Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
@@ -185,6 +195,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         smsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (cards_professional_data[0] == null) return;
                 Professional p = cards_professional_data[0];
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + p.phone));
                 intent.putExtra("sms_body", getString(R.string.sms_text));
@@ -197,6 +208,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (cards_professional_data[0] == null) return;
                 Professional p = cards_professional_data[0];
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -207,7 +219,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         });
 
-        setupNewStack();
+        setupNewStack(prepareNewStack());//TODO consider also doing this in background
 
         return rootView;
     }
@@ -218,7 +230,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 case PermissionActivity.PERMISSION_GRANTED:
                     //Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
                     setupLocationManager();
-                    setupNewStack();
+                    setupNewStack(prepareNewStack());//TODO consider also doing this in background
                     break;
                 case PermissionActivity.PERMISSION_DENIED:
                     //Toast.makeText(this, "Denied", Toast.LENGTH_SHORT).show();
@@ -303,21 +315,31 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     //region NAVIGATION/PAGINATION
 
-
-
     /**
      * to be called when doing a new search
      */
-    public void setupNewStack() {
+    public QueryResult prepareNewStack() {
+        return prepareNewStack(true);
+    }
+
+    /**
+     * to be called when doing a new search or retrying to load the same search
+     */
+    public QueryResult prepareNewStack(boolean retry) {
         currentSetCardIndex = 0;
         nextSet = null;
         previousSet = null;
+        return prepareNewSearchQuery(retry);
+    }
+
+    public void setupNewStack(QueryResult queryResult) {
         if (cards != null)
             removeCardViews(cards);
         else
             cards = new RelativeLayout[3];
         cards_professional_data = new Professional[3];
-        switch (prepareNewSearchQuery()) {
+
+        switch (queryResult) {
             case successful://received answer and it has professionals
                 putCardOnStack(0, currentSet.data.get(0));
                 if (currentSet.data.size() > 1) {
@@ -325,10 +347,10 @@ public class CardFragment extends Fragment implements HttpRequest {
                     if (currentSet.data.size() > 2)
                         putCardOnStack(2, currentSet.data.get(2));
                     else
-                        cards[2] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                        createMessageCard(2,getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                 } else {
-                    cards[1] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
-                    cards[2] = null;
+                    cards[1] = createMessageCard(1,getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                    clearCard(2);
                 }
 
                 if (activity instanceof MainActivity) {
@@ -347,20 +369,24 @@ public class CardFragment extends Fragment implements HttpRequest {
                 }
                 break;
             case emptySet: //received answer but there aren't any professionals
-                cards[0] = createMessageCard(getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
+                createMessageCard(0,getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
                         (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>");
-                cards[1] = null;
-                cards[2] = null;
+                clearCard(1);
+                clearCard(2);
                 break;
             case error: //did not receive answer
-                cards[0] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
-                cards[1] = null;
-                cards[2] = null;
+                createNoConnectionMessageCard(0,
+                        (requestType == RequestType.newSet && requestType == RequestType.retry_newSet) ? RequestType.retry_newSet :
+                                (requestType == RequestType.nextSet && requestType == RequestType.retry_newSet) ? RequestType.retry_newSet :
+                                        RequestType.retry_newSet //this last case should never happen
+                );
+                clearCard(1);
+                clearCard(2);
                 break;
             default:
-                cards[0] = createMessageCard("ERROR 001", "");//TODO replace with xml defined strings
-                cards[1] = null;
-                cards[2] = null;
+                createMessageCard(0,"ERRO", "");//TODO replace with xml defined strings
+                clearCard(1);
+                clearCard(2);
                 break;
         }
         centerFirstCard();
@@ -368,37 +394,36 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
 
-
-
-
     /**
      * <p>evaluate state and update card stack accordingly</p>
      * <p>first layer indicates how many cards are loaded/visible to the user</p>
      * <p><b>inset</b> indicates that the index is inside the current card set and all the card shown are also inside the set</p>
      * <p><b>loaded</b> indicates that the next set has already been loaded and <b>missing</b> that hasn't been loaded yet </p>
-     *   +------------+----+
-     *   |            |    |
-     *+--+-----+    +++  +++
-     *|>1      |    |1|  |0| (number of cards below the top card)
-     *+----------+  +-+  +-+
+     * +------------+----+
+     * |            |    |
+     * +--+-----+    +++  +++
+     * |>1      |    |1|  |0| (number of cards below the top card)
+     * +----------+  +-+  +-+
      * |         |
      * |         |
      * +-----+   +------+
      * |INSET|   |OUTSET|
      * +-----+   +---+--+
-     *           |   |
-     *      +----+   +------+
-     *      |LAST|   |      |
-     *      |PAGE|   ++PAGES|
-     *      +----+   +--+---+
-     *               |  |
-     *        +------+  +-------+
-     *        |LOADED|  |MISSING|
-     *        +------+  +-------+
+     * |   |
+     * +----+   +------+
+     * |LAST|   |      |
+     * |PAGE|   ++PAGES|
+     * +----+   +--+---+
+     * |  |
+     * +------+  +-------+
+     * |LOADED|  |MISSING|
+     * +------+  +-------+
      */
     private enum CardStackStateOnDiscard {
-        /**<p>Only a card (the top one) left in the stack. </p>
-         * <p>There may be more sets left to explore in case connection was lost</p>*/
+        /**
+         * <p>Only a card (the top one) left in the stack. </p>
+         * <p>There may be more sets left to explore in case connection was lost</p>
+         */
         ZERO {
             public void updateCardStack(CardFragment cf) {
                 cf.rootView.addView(cf.cards[0]);
@@ -407,45 +432,46 @@ public class CardFragment extends Fragment implements HttpRequest {
         }
         /**<p>Only two cards left in the stack. </p>
          * <p>There may be more sets left to explore in case connection was lost</p>*/
-        ,ONE { public void updateCardStack(CardFragment cf) {
-            cf.setCardMargin(1);
-            cf.rootView.addView(cf.cards[1]);
-            cf.rootView.addView(cf.cards[0]);
+        , ONE {
+            public void updateCardStack(CardFragment cf) {
+                cf.setCardMargin(1);
+                cf.rootView.addView(cf.cards[1]);
+                cf.rootView.addView(cf.cards[0]);
 
-            if (cf.activity instanceof MainActivity) {
-                SwipeListener listener = new SwipeListener(cf.cards[0], ((MainActivity) cf.activity).getViewPager(), cf);
-                cf.cards[0].setOnTouchListener(listener);
+                if (cf.activity instanceof MainActivity) {
+                    SwipeListener listener = new SwipeListener(cf.cards[0], ((MainActivity) cf.activity).getViewPager(), cf);
+                    cf.cards[0].setOnTouchListener(listener);
+                }
+
+                cf.clearCard(2);
+                //blockAccess = false; -> done in SwipeListener
             }
-
-            cf.cards[2] = null;
-            //blockAccess = false; -> done in SwipeListener
-        }
-        }
-        ,
-        /**<p>there are more than 2 cards being shown</p>
+        },
+        /**
+         * <p>there are more than 2 cards being shown</p>
          * <p>the index is inside the current card set and all the card shown are also inside the set</p>
-         * */
-        INSET{
+         */
+        INSET {
             public void updateCardStack(CardFragment cf) {
                 cf.putCardOnStack(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
-        }
-        ,
-        /**<p>there are more than 2 cards being shown</p>
+        },
+        /**
+         * <p>there are more than 2 cards being shown</p>
          * <p>last card from last card is already on the 3 card shown</p>
-         * */
-        LAST{
+         */
+        LAST {
             public void updateCardStack(CardFragment cf) {
-                cf.cards[2] = cf.createMessageCard(cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
+                cf.createMessageCard(2,cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
-        }
-        ,
-        /**<p>there are more than 2 cards being shown</p>
+        },
+        /**
+         * <p>there are more than 2 cards being shown</p>
          * <p>already have the next page information</p>
-         * */
-        LOADED{
+         */
+        LOADED {
             public void updateCardStack(CardFragment cf) {
                 //negative when there are still cards from the previous set on the pile
                 cf.currentSetCardIndex = cf.currentSetCardIndex - cf.currentSet.data.size();
@@ -456,30 +482,31 @@ public class CardFragment extends Fragment implements HttpRequest {
                 cf.putCardOnStack(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
-        }
-        ,
-        /**<p>there are more than 2 cards being shown</p>
+        },
+        /**
+         * <p>there are more than 2 cards being shown</p>
          * <p>missing next page card set<p/>
-         * */
-        MISSING{
+         */
+        MISSING {
             public void updateCardStack(CardFragment cf) {
-                cf.cards[2] = cf.createMessageCard(cf.getString(R.string.no_conection_title), cf.getString(R.string.no_conection_msg));//TODO missing button
+                cf.createNoConnectionMessageCard(2,RequestType.nextSet);
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
-        }
-        ,
-        /**this state indicates an occurrence that was not expected*/
-        INVALID{
+        },
+        /**
+         * this state indicates an occurrence that was not expected
+         */
+        INVALID {
             public void updateCardStack(CardFragment cf) {
                 Log.e("ERROR", "INVALID.updateCardStack - Unexpected state");
                 //TODO add exception msg here later maybe ???;
             }
-        }
-        ;
+        };
+
         public abstract void updateCardStack(CardFragment cf);
     }
 
-    public void CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate(){
+    public void CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate() {
         //update cards display
         setCardMargin(0);
         setCardMargin(1);
@@ -490,7 +517,7 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         //add listener to top card
         if (activity instanceof MainActivity
-                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
+                && cards_professional_data[0] != null //TODO listener only added in profile cards, for now
                 ) {
             SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
             cards[0].setOnTouchListener(listener);
@@ -504,37 +531,34 @@ public class CardFragment extends Fragment implements HttpRequest {
         }
     }
 
-    public CardStackStateOnDiscard getCardStackStateOnDiscard(){
+    public CardStackStateOnDiscard getCardStackStateOnDiscard() {
 
         //no more cards below top card
-        if(cards[1] == null) return CardStackStateOnDiscard.ZERO;
+        if (cards[1] == null) return CardStackStateOnDiscard.ZERO;
 
         //only one card left on pile card (below top card)
         //TODO not sure about this line, there may be a prettier way to to it
-        if (cards[2] != null && cards[2].getTag() != null && cards[2].getTag().equals("msg")) return CardStackStateOnDiscard.ONE;
+        if (cards[2] != null && cards[2].getTag() != null && cards[2].getTag().equals("msg"))
+            return CardStackStateOnDiscard.ONE;
 
         //in case something unexpected happened and current set is not available anymore -> the cards can't be loaded!
-        if(currentSet == null) return CardStackStateOnDiscard.INVALID;
+        if (currentSet == null) return CardStackStateOnDiscard.INVALID;
 
         //if there are more than 1 card below top card
 
         if (currentSetCardIndex + 2 < currentSet.data.size()) return CardStackStateOnDiscard.INSET;
 
-            if (currentSet.meta.pagination.getLinks() != null && currentSet.meta.pagination.getLinks().getNext() != null) {
-                if (nextSet != null)
-                {
-                    return CardStackStateOnDiscard.INSET.LOADED; //already have the next page information
-                } else
-                {
-                    return CardStackStateOnDiscard.MISSING; //content failed to get next page/(card set) on time
-                }
+        if (currentSet.meta.pagination.getLinks() != null && currentSet.meta.pagination.getLinks().getNext() != null) {
+            if (nextSet != null) {
+                return CardStackStateOnDiscard.INSET.LOADED; //already have the next page information
+            } else {
+                return CardStackStateOnDiscard.MISSING; //content failed to get next page/(card set) on time
             }
+        }
         //else
         //there are no more pages to show
         return CardStackStateOnDiscard.LAST;
     }
-
-
 
 
     /**
@@ -553,7 +577,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         centerFirstCard();
 
         CardStackStateOnDiscard state = getCardStackStateOnDiscard();
-        Log.d("discardTopCard","STATE = " + state.toString());
+        Log.d("discardTopCard", "STATE = " + state.toString());
         state.updateCardStack(this);
         //blockAccess = false; -> done in SwipeListener
     }
@@ -608,7 +632,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 nextSet = null;
                 System.gc();
                 if (previousSet == null) {//if previous set was not yet loaded
-                    switch (preparePreviousPageI()) {
+                    switch (preparePreviousPageI()) { //TODO->NOT TESTED i think???
                         case successful:
                             break;
                         case emptySet:
@@ -626,7 +650,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                             blockAccess = false;
                             return;
                         case error: //did not receive answer
-                            cards[0] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
+                            createNoConnectionMessageCard(0,RequestType.retry_prevSet);
                             break;
                         default:
                             break;
@@ -648,7 +672,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView.addView(cards[0]);
 
         if (activity instanceof MainActivity
-                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
+                && cards_professional_data[0] != null //TODO listener only added in profile cards, for now
                 ) {
             SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
             cards[0].setOnTouchListener(listener);
@@ -697,6 +721,12 @@ public class CardFragment extends Fragment implements HttpRequest {
             return;
         cards_professional_data[stackIndex] = professional;
         cards[stackIndex] = professionalCard(cards_professional_data[stackIndex]);
+    }
+
+    /**  */
+    public void clearCard(int card_index){
+        cards[card_index] = null;
+        cards_professional_data[card_index] = null;
     }
 
     public void swapCardsOnStack(int source, int destination) {
@@ -756,11 +786,48 @@ public class CardFragment extends Fragment implements HttpRequest {
         return card;
     }
 
-
-    public RelativeLayout createMessageCard(String title, String message) {
+    public RelativeLayout createMessageCard(int cardIndex, String title, String message) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
         ((TextView) card.findViewById(R.id.title)).setText(Html.fromHtml(title));
         ((TextView) card.findViewById(R.id.message)).setText(Html.fromHtml(message));
+        cards[cardIndex] = card;
+        cards_professional_data[cardIndex] = null;
+        return card;
+    }
+
+    public RelativeLayout createNoConnectionMessageCard(int cardIndex,final RequestType retryType) {
+        //TODO WORKING NOW
+        //TODO WORKING NOW
+        //TODO WORKING NOW
+        //TODO WORKING NOW
+        //TODO WORKING NOW
+        RelativeLayout card = createMessageCard(cardIndex,getString(R.string.no_conection_title), getString(R.string.no_conection_msg));
+        loadingMessage = (LinearLayout) card.findViewById(R.id.loadingMessage);
+        Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
+        retryButton.setText(R.string.retry);
+
+        //TODO REMOVED BUTTON... will only be added when completed
+        //retryButton.setVisibility(View.VISIBLE);
+
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                retryRequestType = retryType;
+                switch (retryType) {
+                    case retry_newSet:
+                        prepareNewStack(true);
+                        break;
+                    case retry_nextSet:
+                        prepareNextPage(true);
+                        break;
+                    case retry_prevSet:
+                        break;
+                    default:
+                        return;
+                }
+                Utility.startLoading(loadingMessage, cards[0]);
+            }
+        });
         return card;
     }
 
@@ -780,18 +847,18 @@ public class CardFragment extends Fragment implements HttpRequest {
      *
      * @return true if received query result on time
      */
-    public QueryResult prepareNewSearchQuery() {
-        requestType = RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
+    public QueryResult prepareNewSearchQuery(boolean retry) {
+        requestType = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}", searchQuery, lat, lon);
 
         SearchQueryResult result;
         try {
             result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            Log.e("prepareNewSearchQuery","793:" + e.toString());
+            Log.e("prepareNewSearchQuery", "793:" + e.toString());
             return QueryResult.error;
         }
-        if(request.gotError()) {
+        if (request.gotError()) {
             return QueryResult.error;
         }
         if (result != null && result.data != null && result.data.size() > 0) {
@@ -801,12 +868,18 @@ public class CardFragment extends Fragment implements HttpRequest {
         return QueryResult.emptySet;
     }
 
+    public void prepareNextPage() {
+        prepareNextPage(false);
+    }
+
     /**
      * will try to load next page on background via AsyncTask (nonblocking)
+     *
+     * @param retry indicates that the page requested should have already been loaded, this will inform the HttpRequest implementation that there is only one card visible (others should be added)
      */
-    public void prepareNextPage() {
+    public void prepareNextPage(boolean retry) {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null) ;
-        requestType = RequestType.nextSet;
+        requestType = retry ? RequestType.retry_nextSet : RequestType.nextSet;
         Links links = currentSet.meta.pagination.getLinks();
         if (links == null)
             return;
@@ -854,9 +927,10 @@ public class CardFragment extends Fragment implements HttpRequest {
         try {
             result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            Log.d("L330:EXCP", e.toString());
+            Log.e("preparePreviousPageI", e.toString());
             return QueryResult.error;
         }
+        if (request.gotError()) return QueryResult.error;
         if (result.data != null && result.data.size() > 0) {
             this.currentSet = result;
             return QueryResult.successful;
@@ -889,22 +963,39 @@ public class CardFragment extends Fragment implements HttpRequest {
         //    nextSet = null;
         //    currentSet = (SearchQueryResult) answer;
         //}
+        if (requestType == RequestType.retry_prevSet
+                || requestType == RequestType.retry_nextSet
+                || requestType == RequestType.retry_newSet
+                ) {
+            Utility.endLoading(loadingMessage, null);
+            //if(queryResult==)
+            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+        }
     }
 
     @Override
     public void onHttpRequestFailed(ApiJSON errorData) {
 
+        if (requestType == RequestType.retry_prevSet
+                || requestType == RequestType.retry_nextSet
+                || requestType == RequestType.retry_newSet
+                ) {
+            Utility.endLoading(loadingMessage, cards[0]);
+            //TODO REMOVE LOADING animation
+            //TODO REMOVE LOADING animation
+            //TODO REMOVE LOADING animation
+            //TODO REMOVE LOADING animation
+            //TODO REMOVE LOADING animation
+        }
+
     }
 
     //endregion
 
-    //region MISC
-
-    public Professional getProfessionalOnTop() {
-        return cards_professional_data[0];
-    }
-
-    //endregion
 
     //region CARD ACTIONS
 

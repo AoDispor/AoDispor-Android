@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
                 CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
                 cardFragment.setSearchQuery("");
-                cardFragment.setupNewStack();
+                cardFragment.setupNewStack(cardFragment.prepareNewStack());
                 //FIXME isto precisa de ter uma maneira para limpar a string pesquisada
             }
         });
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
             SearchView searchView = (SearchView) findViewById(R.id.searchView);
             searchView.setQuery(query, false);
             cardFrag.setSearchQuery(query);
-            cardFrag.setupNewStack();
+            cardFrag.setupNewStack(cardFrag.prepareNewStack());
             mViewPager.setCurrentItem(1, true);
             searchView.clearFocus();
         }
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
                 for(Object frag : getSupportFragmentManager().getFragments())
                     if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
                 cardFrag.setSearchQuery(query);
-                cardFrag.setupNewStack();
+                cardFrag.setupNewStack(cardFrag.prepareNewStack());
                 mViewPager.setCurrentItem(1, true);
                 searchView.clearFocus();
                 return true;
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
                 CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
                 cardFragment.updateLatLon();
-                cardFragment.prepareNewSearchQuery();
+                cardFragment.prepareNewSearchQuery(false);
                 break;
             default:
                 if (android.os.Build.VERSION.SDK_INT >= 23)

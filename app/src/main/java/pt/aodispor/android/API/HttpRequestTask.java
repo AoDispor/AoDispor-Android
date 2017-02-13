@@ -160,8 +160,8 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         if (postExecute == null)
             return;
         if (/*error || */error) {
-            if (data == null)
-                return;
+            //if (data == null)
+            //    return;
             postExecute.onHttpRequestFailed(data);
         } else {
             if (data == null)

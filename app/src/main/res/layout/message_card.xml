@@ -31,6 +31,20 @@
         android:layout_marginTop="42dp"
         android:layout_below="@+id/title"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/messagecard_retry_button" />
+
+    <include layout="@layout/loading_indicator"/>
+
+    <Button
+        android:text="@string/retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="104dp"
+        android:id="@+id/messagecard_retry_button"
+        android:visibility="invisible"
+        />
 
 </RelativeLayout>

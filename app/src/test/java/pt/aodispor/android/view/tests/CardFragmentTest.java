@@ -103,7 +103,7 @@ public class CardFragmentTest {
 
         int i = 85;
 
-        ShadowLog.i("testSwipeCardOrder1", "Verify display order of professional cards over a segment of one single set (backward iteration only)");
+        ShadowLog.i("testSwipeCardOrder2", "Verify display order of professional cards over a segment of one single set (backward iteration only)");
         for (; i > 64; --i) {
             fragment.unblockAccess();
             String location = Html.fromHtml(test_data_set.get(i).location).toString();
@@ -112,7 +112,7 @@ public class CardFragmentTest {
             fragment.restorePreviousCard();
         }
 
-        ShadowLog.i("testSwipeCardOrder1", "Verify display order of professional cards over previous set (backward iteration only)");
+        ShadowLog.i("testSwipeCardOrder2", "Verify display order of professional cards over previous set (backward iteration only)");
         for (; i > 20; --i) {
             fragment.unblockAccess();
             String location = Html.fromHtml(test_data_set.get(i).location).toString();
@@ -140,7 +140,7 @@ public class CardFragmentTest {
 
         iterator = 50;
 
-        ShadowLog.i("testSwipeCardOrder1", "forward and backward iterations inside same set");
+        ShadowLog.i("testSwipeCardOrder3", "forward and backward iterations inside same set");
         assert1ForwardIteration(fragment, test_data_set);
         assert1ForwardIteration(fragment, test_data_set);
         assert1BackwardIteration(fragment, test_data_set);
@@ -150,7 +150,7 @@ public class CardFragmentTest {
         assert1BackwardIteration(fragment, test_data_set);
         assert1BackwardIteration(fragment, test_data_set);
 
-        ShadowLog.i("testSwipeCardOrder1", "forward and backward iterations alternating sets");
+        ShadowLog.i("testSwipeCardOrder3", "forward and backward iterations alternating sets");
         //iterator=52
         for (int i = 0; i < 30; ++i) assert1ForwardIteration(fragment, test_data_set);
         for (int i = 0; i < 30; ++i) assert1BackwardIteration(fragment, test_data_set);

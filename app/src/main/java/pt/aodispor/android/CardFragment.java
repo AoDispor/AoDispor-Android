@@ -11,26 +11,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.crashlytics.android.answers.ShareEvent;
 import com.github.karthyks.runtimepermissions.PermissionActivity;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -70,7 +62,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         retry_prevSet, retry_nextSet, retry_newSet;
     }
 
-    RequestType retryRequestType;
+    //RequestType retryRequestType;
 
     /**
      * used to know if the query was successful or not. <br><br>emptySet indicates that an answer was received but no results were found
@@ -103,9 +95,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     @VisibleForTesting
     protected int currentSetCardIndex;
     @VisibleForTesting
-    protected RelativeLayout[] cards;
-    @VisibleForTesting
-    protected Professional[] cards_professional_data;
+    protected CardStack cardStack;
     /**
      * does not allow discard or recover methods to be called before the previous is finished
      */
@@ -125,7 +115,11 @@ public class CardFragment extends Fragment implements HttpRequest {
     private LinearLayout loadingLL;
 
     private GeoLocation geoLocation;
-    public void updateGeoLocation() {geoLocation.updateLatLon(getContext());}
+
+    public void updateGeoLocation() {
+        geoLocation.updateLatLon(getContext());
+    }
+
     private String searchQuery = "";
 
     /**
@@ -135,6 +129,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         blockAccess = false;
         loadingWidget = new LoadingWidget();
         geoLocation = new GeoLocation();
+        cardStack = new CardStack();
     }
 
     /**
@@ -164,6 +159,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         container = c;
         rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
         activity = getActivity();
+        cardStack.setBasicVariables(this, i, rootView);
 
         updateGeoLocation();
 
@@ -179,7 +175,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (cards_professional_data[0] == null) return;
+                if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
                 int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
                 if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                     Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
@@ -194,8 +190,8 @@ public class CardFragment extends Fragment implements HttpRequest {
         smsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (cards_professional_data[0] == null) return;
-                Professional p = cards_professional_data[0];
+                if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
+                Professional p = cardStack.getCardProfessionalInfoAt(CardStack.TOP);
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + p.phone));
                 intent.putExtra("sms_body", getString(R.string.sms_text));
                 Answers.getInstance().logCustom(new CustomEvent("Envio de SMS").putCustomAttribute("string_id", p.string_id));
@@ -207,8 +203,8 @@ public class CardFragment extends Fragment implements HttpRequest {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (cards_professional_data[0] == null) return;
-                Professional p = cards_professional_data[0];
+                if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
+                Professional p = cardStack.getCardProfessionalInfoAt(CardStack.TOP);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.aodispor.pt/" + p.string_id);
@@ -245,57 +241,6 @@ public class CardFragment extends Fragment implements HttpRequest {
         }
     }
 
-    //region CARD POSITIONING/DISPLAY UTILITIES
-
-    /**
-     * This method sets a card's margin from the stack so that it gives the illusion of seeing the
-     * stack in perspective with the cards on top of each other.
-     *
-     * @param position the position in the stack of a card.
-     */
-    public void setCardMargin(int position) {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[position].getLayoutParams());
-        int card_margin_left = getResources().getDimensionPixelSize(R.dimen.card_margin_left);
-        int card_margin_top = getResources().getDimensionPixelSize(R.dimen.card_margin_top);
-        int card_margin_right = getResources().getDimensionPixelSize(R.dimen.card_margin_right);
-        int card_margin_bottom = getResources().getDimensionPixelSize(R.dimen.card_margin_bottom);
-
-        params.setMargins(card_margin_left, card_margin_top, card_margin_right, card_margin_bottom);
-        cards[position].setLayoutParams(params);
-        cards[position].setTranslationX(getResources().getDimensionPixelSize(R.dimen.card_offset) * (position + 1));
-        cards[position]
-                .animate()
-                .translationX(getResources().getDimensionPixelSize(R.dimen.card_offset) * position)
-                .setInterpolator(new DecelerateInterpolator());
-        cards[position].setTranslationY(getResources().getDimensionPixelSize(R.dimen.card_offset) * (position + 1));
-        cards[position]
-                .animate()
-                .translationY(getResources().getDimensionPixelSize(R.dimen.card_offset) * position)
-                .setInterpolator(new DecelerateInterpolator());
-    }
-
-    /**
-     * This method centers the first card of the stack to the center of this fragment.
-     */
-    private void centerFirstCard() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[0].getLayoutParams());
-        int card_margin_left = getResources().getDimensionPixelSize(R.dimen.card_margin_left);
-        int card_margin_top = getResources().getDimensionPixelSize(R.dimen.card_margin_top);
-        int card_margin_right = getResources().getDimensionPixelSize(R.dimen.card_margin_right);
-        int card_margin_bottom = getResources().getDimensionPixelSize(R.dimen.card_margin_bottom);
-
-        params.setMargins(card_margin_left, card_margin_top, card_margin_right, card_margin_bottom);
-        cards[0].setLayoutParams(params);
-    }
-
-    public void removeCardViews(RelativeLayout cards[]) {
-        for (int i = cards.length - 1; i >= 0; --i)
-            if (cards[i] != null)
-                rootView.removeView(cards[i]);
-    }
-
-    //endregion
-
     //region NAVIGATION/PAGINATION
 
     /**
@@ -316,64 +261,64 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     public void setupNewStack(QueryResult queryResult) {
-        if (cards != null)
-            removeCardViews(cards);
-        else
-            cards = new RelativeLayout[3];
-        cards_professional_data = new Professional[3];
+        if (cardStack.areCardViewsInitialized()) cardStack.removeAllCardViews();
+        else cardStack.initNewStack();
 
         switch (queryResult) {
             case successful://received answer and it has professionals
-                putCardOnStack(0, currentSet.data.get(0));
+                cardStack.addProfessionalCard(0, currentSet.data.get(0));
                 if (currentSet.data.size() > 1) {
-                    putCardOnStack(1, currentSet.data.get(1));
+                    cardStack.addProfessionalCard(1, currentSet.data.get(1));
                     if (currentSet.data.size() > 2)
-                        putCardOnStack(2, currentSet.data.get(2));
+                        cardStack.addProfessionalCard(2, currentSet.data.get(2));
                     else
-                        createMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                        cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                 } else {
-                    cards[1] = createMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
-                    clearCard(2);
+                    cardStack.addMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                    cardStack.clearCard(2);
                 }
 
                 if (activity instanceof MainActivity) {
-                    SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
-                    cards[0].setOnTouchListener(listener);
+                    SwipeListener listener = new SwipeListener(cardStack.getCardAt(0), ((MainActivity) activity).getViewPager(), this);
+                    cardStack.getCardAt(0).setOnTouchListener(listener);
                 }
 
                 if (currentSet.data.size() >= 2) {
-                    setCardMargin(2);
-                    rootView.addView(cards[2]);
+                    //cardStack.setCardMargin(2);
+                    rootView.addView(cardStack.getCardAt(2));
                 }
 
                 if (currentSet.data.size() >= 1) {
-                    setCardMargin(1);
-                    rootView.addView(cards[1]);
+                    //cardStack.setCardMargin(1);
+                    rootView.addView(cardStack.getCardAt(1));
                 }
                 break;
             case emptySet: //received answer but there aren't any professionals
-                createMessageCard(0, getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
+                cardStack.addMessageCard(0, getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
                         (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>");
-                clearCard(1);
-                clearCard(2);
+                cardStack.clearCards(1, 2);
                 break;
             case error: //did not receive answer
-                createNoConnectionMessageCard(0,
-                        (requestType == RequestType.newSet && requestType == RequestType.retry_newSet) ? RequestType.retry_newSet :
-                                (requestType == RequestType.nextSet && requestType == RequestType.retry_newSet) ? RequestType.retry_newSet :
-                                        RequestType.retry_newSet //this last case should never happen
+                loadingLL = cardStack.addNoConnectionCard(0,
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                requestType = RequestType.retry_newSet;
+
+                                loadingWidget.startLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
+                            }
+                        }
                 );
-                clearCard(1);
-                clearCard(2);
+                cardStack.clearCards(1, 2);
                 break;
             default:
-                createMessageCard(0, "ERRO", "");//TODO replace with xml defined strings
-                clearCard(1);
-                clearCard(2);
+                cardStack.addMessageCard(0, "ERRO", "");//TODO replace with xml defined strings
+                cardStack.clearCards(1, 2);
                 break;
         }
-        centerFirstCard();
-        rootView.addView(cards[0]);
+        cardStack.updateAllCardsMargins();
+        //cardStack.centerFirstCard();
+        rootView.addView(cardStack.getCardAt(0));
     }
 
 
@@ -408,25 +353,25 @@ public class CardFragment extends Fragment implements HttpRequest {
          * <p>There may be more sets left to explore in case connection was lost</p>
          */
         ZERO {
-            public void updateCardStack(CardFragment cf) {
-                cf.rootView.addView(cf.cards[0]);
+            public void updateCardStack(final CardFragment cf) {
+                cf.rootView.addView(cf.cardStack.getCardAt(CardStack.TOP));
                 //blockAccess = false; -> done in SwipeListener
             }
         }
         /**<p>Only two cards left in the stack. </p>
          * <p>There may be more sets left to explore in case connection was lost</p>*/
         , ONE {
-            public void updateCardStack(CardFragment cf) {
-                cf.setCardMargin(1);
-                cf.rootView.addView(cf.cards[1]);
-                cf.rootView.addView(cf.cards[0]);
+            public void updateCardStack(final CardFragment cf) {
+                //cf.cardStack.setCardMargin(1);
+                cf.rootView.addView(cf.cardStack.getCardAt(1));
+                cf.rootView.addView(cf.cardStack.getCardAt(CardStack.TOP));
 
                 if (cf.activity instanceof MainActivity) {
-                    SwipeListener listener = new SwipeListener(cf.cards[0], ((MainActivity) cf.activity).getViewPager(), cf);
-                    cf.cards[0].setOnTouchListener(listener);
+                    SwipeListener listener = new SwipeListener(cf.cardStack.getCardAt(CardStack.TOP), ((MainActivity) cf.activity).getViewPager(), cf);
+                    cf.cardStack.getCardAt(CardStack.TOP).setOnTouchListener(listener);
                 }
 
-                cf.clearCard(2);
+                cf.cardStack.clearCard(2);
                 //blockAccess = false; -> done in SwipeListener
             }
         },
@@ -435,8 +380,8 @@ public class CardFragment extends Fragment implements HttpRequest {
          * <p>the index is inside the current card set and all the card shown are also inside the set</p>
          */
         INSET {
-            public void updateCardStack(CardFragment cf) {
-                cf.putCardOnStack(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+            public void updateCardStack(final CardFragment cf) {
+                cf.cardStack.addProfessionalCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -445,8 +390,8 @@ public class CardFragment extends Fragment implements HttpRequest {
          * <p>last card from last card is already on the 3 card shown</p>
          */
         LAST {
-            public void updateCardStack(CardFragment cf) {
-                cf.createMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
+            public void updateCardStack(final CardFragment cf) {
+                cf.cardStack.addMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -455,14 +400,14 @@ public class CardFragment extends Fragment implements HttpRequest {
          * <p>already have the next page information</p>
          */
         LOADED {
-            public void updateCardStack(CardFragment cf) {
+            public void updateCardStack(final CardFragment cf) {
                 //negative when there are still cards from the previous set on the pile
                 cf.currentSetCardIndex = cf.currentSetCardIndex - cf.currentSet.data.size();
                 Log.d("updateCardStack", "currentSetCardIndex: " + Integer.toString(cf.currentSetCardIndex));
                 cf.previousSet = cf.currentSet;
                 cf.currentSet = cf.nextSet;
                 cf.nextSet = null;
-                cf.putCardOnStack(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+                cf.cardStack.addProfessionalCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -471,8 +416,15 @@ public class CardFragment extends Fragment implements HttpRequest {
          * <p>missing next page card set<p/>
          */
         MISSING {
-            public void updateCardStack(CardFragment cf) {
-                cf.createNoConnectionMessageCard(2, RequestType.nextSet);
+            public void updateCardStack(final CardFragment cf) {
+                cf.loadingLL = cf.cardStack.addNoConnectionCard(2, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        cf.requestType = RequestType.retry_nextSet;
+                        cf.prepareNextPage(true);
+                        cf.loadingWidget.startLoading(cf.loadingLL, cf.cardStack.getCardAt(CardStack.TOP));
+                    }
+                });
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -480,30 +432,31 @@ public class CardFragment extends Fragment implements HttpRequest {
          * this state indicates an occurrence that was not expected
          */
         INVALID {
-            public void updateCardStack(CardFragment cf) {
+            public void updateCardStack(final CardFragment cf) {
                 Log.e("ERROR", "INVALID.updateCardStack - Unexpected state");
                 //TODO add exception msg here later maybe ???;
             }
         };
 
-        public abstract void updateCardStack(CardFragment cf);
+        public abstract void updateCardStack(final CardFragment cf);
     }
 
     public void CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate() {
         //update cards display
-        setCardMargin(0);
-        setCardMargin(1);
-        setCardMargin(2);
-        rootView.addView(cards[2]);
-        rootView.addView(cards[1]);
-        rootView.addView(cards[0]);
+        RelativeLayout topCard = cardStack.getCardAt(CardStack.TOP);
+        //cardStack.setCardMargin(0);
+        //cardStack.setCardMargin(1);
+        //cardStack.setCardMargin(2);
+        rootView.addView(cardStack.getCardAt(2));
+        rootView.addView(cardStack.getCardAt(1));
+        rootView.addView(topCard);
 
         //add listener to top card
         if (activity instanceof MainActivity
-                && cards_professional_data[0] != null //TODO listener only added in profile cards, for now
+                && cardStack.getCardProfessionalInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
                 ) {
-            SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
-            cards[0].setOnTouchListener(listener);
+            SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
+            topCard.setOnTouchListener(listener);
         }
 
         //prepare next set if needed
@@ -517,11 +470,11 @@ public class CardFragment extends Fragment implements HttpRequest {
     public CardStackStateOnDiscard getCardStackStateOnDiscard() {
 
         //no more cards below top card
-        if (cards[1] == null) return CardStackStateOnDiscard.ZERO;
+        if (cardStack.getCardAt(1) == null) return CardStackStateOnDiscard.ZERO;
 
         //only one card left on pile card (below top card)
         //TODO not sure about this line, there may be a prettier way to to it
-        if (cards[2] != null && cards[2].getTag() != null && cards[2].getTag().equals("msg"))
+        if (cardStack.getCardAt(2) != null && cardStack.getCardAt(2).getTag() != null && cardStack.getCardAt(2).getTag().equals("msg"))
             return CardStackStateOnDiscard.ONE;
 
         //in case something unexpected happened and current set is not available anymore -> the cards can't be loaded!
@@ -554,14 +507,15 @@ public class CardFragment extends Fragment implements HttpRequest {
     public void discardTopCard() {
         //blockAccess = true; -> done in SwipeListener
         currentSetCardIndex++;
-        removeCardViews(cards);
-        swapCardsOnStack(1, 0);
-        swapCardsOnStack(2, 1);
-        centerFirstCard();
+        cardStack.removeAllCardViews();
+        cardStack.swapCardsOnStack(1, 0);
+        cardStack.swapCardsOnStack(2, 1);
+        //cardStack.centerFirstCard();
 
         CardStackStateOnDiscard state = getCardStackStateOnDiscard();
         Log.d("discardTopCard", "STATE = " + state.toString());
         state.updateCardStack(this);
+        cardStack.updateAllCardsMargins();
         //blockAccess = false; -> done in SwipeListener
     }
 
@@ -580,13 +534,13 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         blockAccess = true;
 
-        RelativeLayout[] originalCardsSetup = {cards[0], cards[1], cards[2]};
-        Professional[] originalProfessionals = {cards_professional_data[0], cards_professional_data[1], cards_professional_data[2]};
-        int originalIndex = currentSetCardIndex;
-        swapCardsOnStack(1, 2);
-        swapCardsOnStack(0, 1);
+        CardStack originalCardStack = new CardStack(cardStack);
 
-        cards[0].setOnTouchListener(null);
+        int originalIndex = currentSetCardIndex;
+        cardStack.swapCardsOnStack(1, 2);
+        cardStack.swapCardsOnStack(0, 1);
+
+        cardStack.getCardAt(CardStack.TOP).setOnTouchListener(null);
 
         currentSetCardIndex--;
         if (currentSetCardIndex >= 0) { //can get previous card from currentSet
@@ -595,7 +549,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 blockAccess = false;
                 return;
             }
-            putCardOnStack(0, currentSet.data.get(currentSetCardIndex));
+            cardStack.addProfessionalCard(0, currentSet.data.get(currentSetCardIndex));
             if (currentSetCardIndex < AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD) {//load in background if possible
                 nextSet = null;
                 System.gc();//try to keep only 2 sets at maximum
@@ -609,7 +563,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             currentSet = previousSet;
             previousSet = null;
             System.gc();// no need to keep 3 sets stored
-            putCardOnStack(0, currentSet.data.get(currentSetCardIndex));
+            cardStack.addProfessionalCard(0, currentSet.data.get(currentSetCardIndex));
         } else {
             if (currentSetCardIndex < 0) {//needs to get card from previous set immediately.
                 nextSet = null;
@@ -621,50 +575,61 @@ public class CardFragment extends Fragment implements HttpRequest {
                         case emptySet:
                             break;
                         case none: //when reached pile start do not change pile state
-                            cards = originalCardsSetup;
-                            cards_professional_data = originalProfessionals;
+                            cardStack = originalCardStack;
                             currentSetCardIndex = originalIndex;
-
                             if (activity instanceof MainActivity) {
-                                SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
-                                cards[0].setOnTouchListener(listener);
+                                RelativeLayout topCard = cardStack.getCardAt(cardStack.TOP);
+                                SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
+                                topCard.setOnTouchListener(listener);
                             }
 
                             blockAccess = false;
                             return;
                         case error: //did not receive answer
-                            createNoConnectionMessageCard(0, RequestType.retry_prevSet);
+                            loadingLL = cardStack.addNoConnectionCard(0,
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            requestType = RequestType.retry_prevSet;
+                                            //TODO missing try to reload prev page
+                                            //TODO loadingWidget.startLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
+                                        }
+                                    }
+                            );
                             break;
                         default:
                             break;
                     }
                 }
                 if (previousSet != null) {//if set was received or was already loaded
-                    putCardOnStack(0, previousSet.data.get(previousSet.data.size() + currentSetCardIndex));
+                    cardStack.addProfessionalCard(0, previousSet.data.get(previousSet.data.size() + currentSetCardIndex));
                 }
             }
         }
-        removeCardViews(originalCardsSetup);
-        setCardMargin(1);
-        if (cards[2] != null)
-            setCardMargin(2);
-        if (cards[2] != null)
-            rootView.addView(cards[2]);
-        rootView.addView(cards[1]);
-        setCardMargin(0);
-        rootView.addView(cards[0]);
+        originalCardStack.removeAllCardViews();
+        //cardStack.setCardMargin(1);
+        RelativeLayout topCard = cardStack.getCardAt(CardStack.TOP);
+        if (cardStack.getCardAt(2) != null) {
+            //cardStack.setCardMargin(2);
+            rootView.addView(cardStack.getCardAt(2));
+        }
+        rootView.addView(cardStack.getCardAt(1));
+        //cardStack.setCardMargin(0);
+        rootView.addView(topCard);
 
         if (activity instanceof MainActivity
-                && cards_professional_data[0] != null //TODO listener only added in profile cards, for now
+                && cardStack.getCardProfessionalInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
                 ) {
-            SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
-            cards[0].setOnTouchListener(listener);
+            SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
+            topCard.setOnTouchListener(listener);
         }
 
-        cards[0].setX(800 * -1);
-        cards[0].setY(700 * -1);
-        cards[0].setRotation(40);
-        cards[0].animate().rotation(0).translationX(0).translationY(0).
+        cardStack.updateAllCardsMargins();
+
+        topCard.setX(800 * -1);
+        topCard.setY(700 * -1);
+        topCard.setRotation(40);
+        topCard.animate().rotation(0).translationX(0).translationY(0).
                 setDuration(RESTORE_ANIMATION_MILLISECONDS).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -687,140 +652,6 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     //endregion
 
-    //region CARDS CREATION
-
-    /**
-     * Because a professional details are separated from the card display use this auxiliary method
-     * to insert new professionals into the card stack
-     *
-     * @param stackIndex   0,1 or 2 (the higher the index the lower it is on the stack)
-     * @param professional
-     * @return
-     */
-    public void putCardOnStack(int stackIndex, Professional professional) {
-        if (stackIndex < 0 || stackIndex > 2)
-            return;
-        if (professional == null)
-            return;
-        cards_professional_data[stackIndex] = professional;
-        cards[stackIndex] = professionalCard(cards_professional_data[stackIndex]);
-    }
-
-    /**  */
-    public void clearCard(int card_index) {
-        cards[card_index] = null;
-        cards_professional_data[card_index] = null;
-    }
-
-    public void swapCardsOnStack(int source, int destination) {
-        if (source < 0 || source > 2)
-            return;
-        if (destination < 0 || destination > 2)
-            return;
-        cards_professional_data[destination] = cards_professional_data[source];
-        cards[destination] = cards[source];
-    }
-
-    public RelativeLayout createProfessionalCard(//String fullname_text,
-                                                 String profession_text,
-                                                 String location_text,
-                                                 String description_text,
-                                                 String price_value,
-                                                 String currency_type,
-                                                 String payment_type,
-                                                 String avatar_scr) {
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
-
-        TextView profession = (TextView) card.findViewById(R.id.profession);
-        profession.setText(Html.fromHtml(profession_text));
-        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-
-        TextView location = (TextView) card.findViewById(R.id.location);
-        location.setText(Html.fromHtml(location_text));
-        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-
-        TextView description = (TextView) card.findViewById(R.id.description);
-        description.setText(Html.fromHtml(description_text));
-        //description.setMovementMethod(new ScrollingMovementMethod());
-
-        TextView price = (TextView) card.findViewById(R.id.price);
-        price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        price.setText(Html.fromHtml(price_value));
-
-        switch (payment_type) {
-            case "H":
-                price.setText(Html.fromHtml(price_value + " " + currency_type + "/h"));
-                price.setTextColor(getResources().getColor(R.color.by_hour));
-                break;
-            case "S":
-                price.setText(Html.fromHtml(price_value + " " + currency_type));
-                price.setTextColor(getResources().getColor(R.color.by_service));
-                break;
-            case "D":
-                price.setText(Html.fromHtml(price_value + " por dia"));
-        }
-
-        ImageView avatar = (ImageView) card.findViewById(R.id.profile_image);
-
-        ImageLoader imageLoader = ImageLoader.getInstance();
-        DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new RoundedBitmapDisplayer(getResources().getDimensionPixelSize(R.dimen.image_border))).build();
-        imageLoader.displayImage(avatar_scr, avatar, options);
-
-        return card;
-    }
-
-    public RelativeLayout createMessageCard(int cardIndex, String title, String message) {
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
-        ((TextView) card.findViewById(R.id.title)).setText(Html.fromHtml(title));
-        ((TextView) card.findViewById(R.id.message)).setText(Html.fromHtml(message));
-        cards[cardIndex] = card;
-        cards_professional_data[cardIndex] = null;
-        return card;
-    }
-
-    public RelativeLayout createNoConnectionMessageCard(int cardIndex, final RequestType retryType) {
-        //TODO WORKING NOW
-        //TODO WORKING NOW
-        //TODO WORKING NOW
-        //TODO WORKING NOW
-        //TODO WORKING NOW
-        RelativeLayout card = createMessageCard(cardIndex, getString(R.string.no_conection_title), getString(R.string.no_conection_msg));
-        loadingLL = (LinearLayout) card.findViewById(R.id.loadingMessage);
-        Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
-        retryButton.setText(R.string.retry);
-
-        //TODO REMOVED BUTTON... will only be added when completed
-        //retryButton.setVisibility(View.VISIBLE);
-
-        retryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                retryRequestType = retryType;
-                switch (retryType) {
-                    case retry_newSet:
-                        prepareNewStack(true);
-                        break;
-                    case retry_nextSet:
-                        prepareNextPage(true);
-                        break;
-                    case retry_prevSet:
-                        break;
-                    default:
-                        return;
-                }
-                loadingWidget.startLoading(loadingLL, cards[0]);
-            }
-        });
-        return card;
-    }
-
-    @VisibleForTesting
-    protected RelativeLayout professionalCard(Professional p) {
-        RelativeLayout card = createProfessionalCard(p.title, p.location, p.description, p.rate, p.currency, p.type, p.avatar_url);
-        return card;
-    }
-
-    //endregion
 
     //region api RELATED
 
@@ -953,7 +784,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 || requestType == RequestType.retry_nextSet
                 || requestType == RequestType.retry_newSet
                 ) {
-            loadingWidget.endLoading(loadingLL, cards[0]);
+            loadingWidget.endLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
             //TODO REMOVE LOADING animation
             //TODO REMOVE LOADING animation
             //TODO REMOVE LOADING animation
@@ -969,7 +800,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     //region CARD ACTIONS
 
     void callProfessional() {
-        Professional p = cards_professional_data[0];
+        Professional p = cardStack.getCardProfessionalInfoAt(cardStack.TOP);
         Answers.getInstance().logCustom(new CustomEvent("Telefonema").putCustomAttribute("string_id", p.string_id));
         startActivity(new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", p.phone, null)));
     }

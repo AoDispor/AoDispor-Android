@@ -7,27 +7,27 @@ import android.widget.RelativeLayout;
 
 public class LoadingWidget {
 
-    public interface OnSwitch {
-        public void execute();
+    public interface OnLoading {
+        public void beforeStartLoading();
+        public void afterStartLoading();
+        public void beforeEndLoading();
+        public void afterEndLoading();
     }
 
-    OnSwitch beforeStartLoading;
-    OnSwitch afterStartLoading;
-    OnSwitch beforeEndLoading;
-    OnSwitch afterEndLoading;
+    OnLoading additionalBehaviour;
 
     public void startLoading(LinearLayout loadingWidget, RelativeLayout hideViews) {
-        if (beforeStartLoading != null) beforeStartLoading.execute();
+        if (additionalBehaviour != null) additionalBehaviour.beforeStartLoading();
         if (hideViews != null) hideViews(hideViews);
         loadingWidget.setVisibility(View.VISIBLE);
-        if (afterStartLoading != null) afterStartLoading.execute();
+        if (additionalBehaviour != null) additionalBehaviour.afterStartLoading();
     }
 
     public void endLoading(LinearLayout loadingWidget, RelativeLayout showViews) {
-        if (beforeEndLoading != null) beforeEndLoading.execute();
+        if (additionalBehaviour != null) additionalBehaviour.beforeEndLoading();
         if (showViews != null) showViews(showViews);
         loadingWidget.setVisibility(LinearLayout.INVISIBLE);
-        if (afterEndLoading != null) afterEndLoading.execute();
+        if (additionalBehaviour != null) additionalBehaviour.afterEndLoading();
     }
 
     public void hideViews(RelativeLayout relativeLayout) {

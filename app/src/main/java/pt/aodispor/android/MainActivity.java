@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
                 CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
-                cardFragment.updateLatLon();
+                cardFragment.updateGeoLocation();
                 cardFragment.prepareNewSearchQuery(false);
                 break;
             default:

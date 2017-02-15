@@ -3,16 +3,12 @@ package pt.aodispor.android;
 import android.Manifest;
 import android.animation.Animator;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -36,7 +32,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import pt.aodispor.android.api.ApiJSON;
@@ -61,9 +56,10 @@ public class CardFragment extends Fragment implements HttpRequest {
         searchQuery = query;
     }
 
-    private LocationManager locationManager;
-    public static final int REQUEST_CODE = 111;
+    //private LocationManager locationManager;
+    public static final int REQUEST_CODE = 111;//TODO document what request_code is...
 
+    private static final String queryProfilesURL = "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}";
 
     /**
      * used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query
@@ -125,10 +121,11 @@ public class CardFragment extends Fragment implements HttpRequest {
     @VisibleForTesting
     protected Activity activity;
 
-    private LinearLayout loadingMessage;
+    private LoadingWidget loadingWidget;
+    private LinearLayout loadingLL;
 
-    private String lat = "";
-    private String lon = "";
+    private GeoLocation geoLocation;
+    public void updateGeoLocation() {geoLocation.updateLatLon(getContext());}
     private String searchQuery = "";
 
     /**
@@ -136,6 +133,8 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     public CardFragment() {
         blockAccess = false;
+        loadingWidget = new LoadingWidget();
+        geoLocation = new GeoLocation();
     }
 
     /**
@@ -166,7 +165,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
         activity = getActivity();
 
-        updateLatLon();
+        updateGeoLocation();
 
         ImageButton returnButton = (ImageButton) rootView.findViewById(R.id.returnButton);
         returnButton.setOnClickListener(new View.OnClickListener() {
@@ -229,7 +228,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             switch (resultCode) {
                 case PermissionActivity.PERMISSION_GRANTED:
                     //Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
-                    setupLocationManager();
+                    updateGeoLocation();//setupLocationManager();
                     setupNewStack(prepareNewStack());//TODO consider also doing this in background
                     break;
                 case PermissionActivity.PERMISSION_DENIED:
@@ -243,22 +242,6 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    private void setupLocationManager() {
-        //Get coordinates
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        List<String> l = locationManager.getProviders(true);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            for (String s : l) {
-                Location loc = locationManager.getLastKnownLocation(s);
-                if (loc != null) {
-                    lat = "" + loc.getLatitude();
-                    lon = "" + loc.getLongitude();
-                    break;
-                }
-            }
         }
     }
 
@@ -347,9 +330,9 @@ public class CardFragment extends Fragment implements HttpRequest {
                     if (currentSet.data.size() > 2)
                         putCardOnStack(2, currentSet.data.get(2));
                     else
-                        createMessageCard(2,getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                        createMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                 } else {
-                    cards[1] = createMessageCard(1,getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                    cards[1] = createMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                     clearCard(2);
                 }
 
@@ -369,7 +352,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 }
                 break;
             case emptySet: //received answer but there aren't any professionals
-                createMessageCard(0,getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
+                createMessageCard(0, getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
                         (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>");
                 clearCard(1);
                 clearCard(2);
@@ -384,7 +367,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 clearCard(2);
                 break;
             default:
-                createMessageCard(0,"ERRO", "");//TODO replace with xml defined strings
+                createMessageCard(0, "ERRO", "");//TODO replace with xml defined strings
                 clearCard(1);
                 clearCard(2);
                 break;
@@ -463,7 +446,7 @@ public class CardFragment extends Fragment implements HttpRequest {
          */
         LAST {
             public void updateCardStack(CardFragment cf) {
-                cf.createMessageCard(2,cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
+                cf.createMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -489,7 +472,7 @@ public class CardFragment extends Fragment implements HttpRequest {
          */
         MISSING {
             public void updateCardStack(CardFragment cf) {
-                cf.createNoConnectionMessageCard(2,RequestType.nextSet);
+                cf.createNoConnectionMessageCard(2, RequestType.nextSet);
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -650,7 +633,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                             blockAccess = false;
                             return;
                         case error: //did not receive answer
-                            createNoConnectionMessageCard(0,RequestType.retry_prevSet);
+                            createNoConnectionMessageCard(0, RequestType.retry_prevSet);
                             break;
                         default:
                             break;
@@ -724,7 +707,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     /**  */
-    public void clearCard(int card_index){
+    public void clearCard(int card_index) {
         cards[card_index] = null;
         cards_professional_data[card_index] = null;
     }
@@ -795,14 +778,14 @@ public class CardFragment extends Fragment implements HttpRequest {
         return card;
     }
 
-    public RelativeLayout createNoConnectionMessageCard(int cardIndex,final RequestType retryType) {
+    public RelativeLayout createNoConnectionMessageCard(int cardIndex, final RequestType retryType) {
         //TODO WORKING NOW
         //TODO WORKING NOW
         //TODO WORKING NOW
         //TODO WORKING NOW
         //TODO WORKING NOW
-        RelativeLayout card = createMessageCard(cardIndex,getString(R.string.no_conection_title), getString(R.string.no_conection_msg));
-        loadingMessage = (LinearLayout) card.findViewById(R.id.loadingMessage);
+        RelativeLayout card = createMessageCard(cardIndex, getString(R.string.no_conection_title), getString(R.string.no_conection_msg));
+        loadingLL = (LinearLayout) card.findViewById(R.id.loadingMessage);
         Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
         retryButton.setText(R.string.retry);
 
@@ -825,7 +808,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                     default:
                         return;
                 }
-                Utility.startLoading(loadingMessage, cards[0]);
+                loadingWidget.startLoading(loadingLL, cards[0]);
             }
         });
         return card;
@@ -849,7 +832,8 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     public QueryResult prepareNewSearchQuery(boolean retry) {
         requestType = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}", searchQuery, lat, lon);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
+                queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
 
         SearchQueryResult result;
         try {
@@ -938,21 +922,6 @@ public class CardFragment extends Fragment implements HttpRequest {
         return QueryResult.emptySet;
     }
 
-    public void updateLatLon() {
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        List<String> l = locationManager.getProviders(true);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            for (String s : l) {
-                Location loc = locationManager.getLastKnownLocation(s);
-                if (loc != null) {
-                    lat = "" + loc.getLatitude();
-                    lon = "" + loc.getLongitude();
-                    break;
-                }
-            }
-        }
-    }
-
     @Override
     public void onHttpRequestCompleted(ApiJSON answer, int type) {
         if (requestType == RequestType.nextSet)
@@ -967,7 +936,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 || requestType == RequestType.retry_nextSet
                 || requestType == RequestType.retry_newSet
                 ) {
-            Utility.endLoading(loadingMessage, null);
+            loadingWidget.endLoading(loadingLL, null);
             //if(queryResult==)
             //TODO REMOVE LOADING animation & ADD VIEW REFRESH
             //TODO REMOVE LOADING animation & ADD VIEW REFRESH
@@ -984,7 +953,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 || requestType == RequestType.retry_nextSet
                 || requestType == RequestType.retry_newSet
                 ) {
-            Utility.endLoading(loadingMessage, cards[0]);
+            loadingWidget.endLoading(loadingLL, cards[0]);
             //TODO REMOVE LOADING animation
             //TODO REMOVE LOADING animation
             //TODO REMOVE LOADING animation

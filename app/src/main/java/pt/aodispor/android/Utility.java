@@ -167,29 +167,4 @@ public abstract class Utility {
         return matcher.group();
     }
 
-
-
-
-    public static void startLoading(LinearLayout loadingMessage, RelativeLayout relativeLayout) {
-        if(relativeLayout!=null) hideViews(relativeLayout);
-        loadingMessage.setVisibility(View.VISIBLE);
-    }
-
-    public static void endLoading(LinearLayout loadingMessage, RelativeLayout relativeLayout) {
-        if(relativeLayout!=null) showViews(relativeLayout);
-        loadingMessage.setVisibility(LinearLayout.INVISIBLE);
-    }
-
-    public static void hideViews(RelativeLayout relativeLayout) {
-        for (int i = 0; i < relativeLayout.getChildCount(); i++) {
-            relativeLayout.getChildAt(i).setVisibility(View.INVISIBLE);
-        }
-    }
-
-    public static void showViews(RelativeLayout relativeLayout) {
-        for (int i = 0; i < relativeLayout.getChildCount(); i++) {
-            relativeLayout.getChildAt(i).setVisibility(View.VISIBLE);
-        }
-    }
-
 }

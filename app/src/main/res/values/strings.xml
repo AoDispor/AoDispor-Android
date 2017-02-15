@@ -97,4 +97,15 @@
     <string name="http_error">Ocorreu um erro.</string>
     <string name="password_incomplete">O seu código de validação não está completo.</string>
 
+    <!-- Amplify -->
+    <string name="amplify_question_title">String 1</string>
+    <string name="amplify_question_yes">String 2</string>
+    <string name="amplify_question_no">String 3</string>
+    <string name="amplify_positive_title">String 4</string>
+    <string name="amplify_positive_yes">String 5</string>
+    <string name="amplify_positive_no">String 6</string>
+    <string name="amplify_negative_question">String 7</string>
+    <string name="amplify_negative_yes">String 8</string>
+    <string name="amplify_negative_no">String 9</string>
+    <string name="amplify_thanks">String 10</string>
 </resources>

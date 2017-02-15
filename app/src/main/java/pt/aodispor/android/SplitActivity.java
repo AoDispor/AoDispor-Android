@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
+import com.github.stkent.amplify.tracking.Amplify;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -17,7 +18,12 @@ public class SplitActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Fabric.with(this, new Answers(), new Crashlytics());
+
+        Amplify.initSharedInstance(this.getApplication())
+                .setFeedbackEmailAddress("geral@aodispor.pt")
+                .applyAllDefaultRules();
 
         final Class<? extends Activity> activityClass;
         LoginDataPreferences preferences = new LoginDataPreferences(getApplicationContext());

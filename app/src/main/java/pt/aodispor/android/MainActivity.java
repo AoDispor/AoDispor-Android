@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.stkent.amplify.prompt.DefaultLayoutPromptView;
+import com.github.stkent.amplify.tracking.Amplify;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -57,6 +59,13 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            DefaultLayoutPromptView promptView
+                    = (DefaultLayoutPromptView) findViewById(R.id.prompt_view);
+
+            Amplify.getSharedInstance().promptIfReady(promptView);
+        }
 
         installFonts();
 

@@ -98,14 +98,14 @@
     <string name="password_incomplete">O seu código de validação não está completo.</string>
 
     <!-- Amplify -->
-    <string name="amplify_question_title">String 1</string>
-    <string name="amplify_question_yes">String 2</string>
-    <string name="amplify_question_no">String 3</string>
-    <string name="amplify_positive_title">String 4</string>
-    <string name="amplify_positive_yes">String 5</string>
-    <string name="amplify_positive_no">String 6</string>
-    <string name="amplify_negative_question">String 7</string>
-    <string name="amplify_negative_yes">String 8</string>
-    <string name="amplify_negative_no">String 9</string>
-    <string name="amplify_thanks">String 10</string>
+    <string name="amplify_question_title">Está a gostar do Ao Dispor?</string>
+    <string name="amplify_question_yes">Sim, gosto</string>
+    <string name="amplify_question_no">Não, tenho críticas</string>
+    <string name="amplify_positive_title">Poderia ajudar-nos com uma crítica positiva na Play Store?</string>
+    <string name="amplify_positive_yes">Sim, posso recomendar-vos</string>
+    <string name="amplify_positive_no">Não, fica para outra altura</string>
+    <string name="amplify_negative_question">Poderia explicar-nos como poderemos melhorar?</string>
+    <string name="amplify_negative_yes">Sim, tenho sugestões</string>
+    <string name="amplify_negative_no">Noutra altura</string>
+    <string name="amplify_thanks">Obrigado por nos ajudar a servi-lo!</string>
 </resources>

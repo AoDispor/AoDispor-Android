@@ -105,7 +105,7 @@
     <string name="amplify_positive_yes">Sim, posso recomendar-vos</string>
     <string name="amplify_positive_no">Não, fica para outra altura</string>
     <string name="amplify_negative_question">Poderia explicar-nos como poderemos melhorar?</string>
-    <string name="amplify_negative_yes">Sim, tenho sugestões</string>
+    <string name="amplify_negative_yes">Tenho sugestões</string>
     <string name="amplify_negative_no">Noutra altura</string>
     <string name="amplify_thanks">Obrigado por nos ajudar a servi-lo!</string>
 </resources>

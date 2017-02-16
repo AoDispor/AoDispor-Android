@@ -116,6 +116,7 @@
         app:prompt_view_critical_feedback_question_positive_button_label="@string/amplify_negative_yes"
         app:prompt_view_critical_feedback_question_negative_button_label="@string/amplify_negative_no"
         app:prompt_view_thanks_title="@string/amplify_thanks"
-        app:prompt_view_thanks_display_time_ms="2000" />
+        app:prompt_view_thanks_display_time_ms="2000"
+        app:prompt_view_background_color="@color/aoDisporGreen"/>
 
 </android.support.design.widget.CoordinatorLayout>

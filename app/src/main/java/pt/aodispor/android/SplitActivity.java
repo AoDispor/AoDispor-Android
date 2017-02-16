@@ -22,7 +22,7 @@ public class SplitActivity extends Activity
         Fabric.with(this, new Answers(), new Crashlytics());
 
         Amplify.initSharedInstance(this.getApplication())
-                .setFeedbackEmailAddress("geral@aodispor.pt")
+                .setFeedbackEmailAddress(R.string.feedback_email)
                 .applyAllDefaultRules();
 
         final Class<? extends Activity> activityClass;

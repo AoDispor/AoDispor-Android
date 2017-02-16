@@ -25,12 +25,13 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import pt.aodispor.android.AppDefinitions;
+import pt.aodispor.android.R;
 
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     public static final int GET_REQUEST = 0;
     public static final int POST_REQUEST = 1;
     public static final int PUT_REQUEST = 2;
-    private static final String token = "4bsHGsYeva6eud8VsLiKEVVQYQEgmfCafwtuNrhuFYFcPjxWnT";
+    private static final String token = R.string.api_key;
     //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
     private static final String serverTimeZone = "UTC";
 

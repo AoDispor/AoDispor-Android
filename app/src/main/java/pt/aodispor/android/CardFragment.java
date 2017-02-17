@@ -173,6 +173,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (cards_professional_data[0] == null) return;
                 int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
                 if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                     Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
@@ -187,6 +188,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         smsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (cards_professional_data[0] == null) return;
                 Professional p = cards_professional_data[0];
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + p.phone));
                 intent.putExtra("sms_body", getString(R.string.sms_text));
@@ -199,6 +201,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (cards_professional_data[0] == null) return;
                 Professional p = cards_professional_data[0];
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -324,11 +327,15 @@ public class CardFragment extends Fragment implements HttpRequest {
                     putCardOnStack(1, currentSet.data.get(1));
                     if (currentSet.data.size() > 2)
                         putCardOnStack(2, currentSet.data.get(2));
-                    else
+                    else{
                         cards[2] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                        cards_professional_data[2] = null;
+                    }
                 } else {
                     cards[1] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                     cards[2] = null;
+                    cards_professional_data[1] = null;
+                    cards_professional_data[2] = null;
                 }
 
                 if (activity instanceof MainActivity) {
@@ -351,16 +358,25 @@ public class CardFragment extends Fragment implements HttpRequest {
                         (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>");
                 cards[1] = null;
                 cards[2] = null;
+                cards_professional_data[0] = null;
+                cards_professional_data[1] = null;
+                cards_professional_data[2] = null;
                 break;
             case timeout: //did not receive answer
                 cards[0] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
                 cards[1] = null;
                 cards[2] = null;
+                cards_professional_data[0] = null;
+                cards_professional_data[1] = null;
+                cards_professional_data[2] = null;
                 break;
             default:
                 cards[0] = createMessageCard("ERROR 001", "");//TODO replace with xml defined strings
                 cards[1] = null;
                 cards[2] = null;
+                cards_professional_data[0] = null;
+                cards_professional_data[1] = null;
+                cards_professional_data[2] = null;
                 break;
         }
         centerFirstCard();
@@ -397,6 +413,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
 
             cards[2] = null;
+            cards_professional_data[2] = null;
             //blockAccess = false; -> done in SwipeListener
             return;
         }
@@ -419,9 +436,11 @@ public class CardFragment extends Fragment implements HttpRequest {
                     putCardOnStack(2, currentSet.data.get(currentSetCardIndex + 2));
                 } else { //content failed to get next page on time
                     cards[2] = createMessageCard(getString(R.string.no_conection_title), getString(R.string.no_conection_msg));//TODO missing button
+                    cards_professional_data[2] = null;
                 }
             } else { //there are no more pages to show
                 cards[2] = createMessageCard(getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                cards_professional_data[2] = null;
             }
         }
         setCardMargin(0);
@@ -432,7 +451,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView.addView(cards[0]);
 
         if (activity instanceof MainActivity
-                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
+                && cards_professional_data[0] != null //TODO listener only added in profile cards, for now
                 ) {
             SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
             cards[0].setOnTouchListener(listener);
@@ -536,7 +555,7 @@ public class CardFragment extends Fragment implements HttpRequest {
         rootView.addView(cards[0]);
 
         if (activity instanceof MainActivity
-                && cards_professional_data[0]!=null //TODO listener only added in profile cards, for now
+                && cards_professional_data[0] != null //TODO listener only added in profile cards, for now
                 ) {
             SwipeListener listener = new SwipeListener(cards[0], ((MainActivity) activity).getViewPager(), this);
             cards[0].setOnTouchListener(listener);

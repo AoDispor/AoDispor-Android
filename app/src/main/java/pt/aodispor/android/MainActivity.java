@@ -164,15 +164,10 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         profileView = ((ImageView) findViewById(R.id.profile_icon));
         stackView = ((ImageView) findViewById(R.id.stack_icon));
 
-        if(AppDefinitions.phoneNumber == "" || AppDefinitions.userPassword == "") {
-            profileView.setVisibility(View.INVISIBLE);
-            stackView.setVisibility(View.INVISIBLE);
-            mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador estiver loggado
-            mViewPager.setEnabled(false);
-        }
-
         stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
         profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+
+        if(AppDefinitions.smsLoginDone)
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -214,6 +209,13 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
                 return true;
             }
         });
+
+        if(!AppDefinitions.smsLoginDone) {
+            profileView.setVisibility(View.INVISIBLE);
+            stackView.setVisibility(View.INVISIBLE);
+            mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador estiver loggado
+            mViewPager.setEnabled(false);
+        }
     }
 
 

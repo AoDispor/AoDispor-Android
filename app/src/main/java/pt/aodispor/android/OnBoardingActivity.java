@@ -61,6 +61,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
             /*AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
             AppDefinitions.userPassword = AppDefinitions.testPassword;*/
             showMainActivity();
+            return;
         }
 
         coordinatorLayout = (WelcomeCoordinatorLayout)findViewById(R.id.coordinator);
@@ -133,6 +134,8 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                     AppDefinitions.phoneNumber = phoneNumberField.getPhoneNumber();
                     //Permission.requestPermission(OnBoardingActivity.this, AppDefinitions.PERMISSIONS_REQUEST_READ_SMS);
                     sendRegistrationSMS();
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(validate.getWindowToken(), 0);
                 }
             }
         });
@@ -283,7 +286,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                 LoginDataPreferences preferences = new LoginDataPreferences(getApplicationContext());
                 LoginData loginData = new LoginDataPreferences.LoginDataImpl(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
                 preferences.edit().put(loginData).apply();
-
+                AppDefinitions.smsLoginDone=true;
                 showMainActivity();
             default:
                 break;

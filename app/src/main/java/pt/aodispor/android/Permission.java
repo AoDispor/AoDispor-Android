@@ -47,7 +47,7 @@ public final class Permission {
      */
     public static void requestPermission(final Activity activity, final int requestCode) {
         String permission_dialog_message = null;
-        final String[] permission;
+        final String permission;
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_READ_SMS:
                 permission_dialog_message = activity.getResources().getString(
@@ -55,14 +55,14 @@ public final class Permission {
                                 R.string.request_permission_sms_version_plus23 :
                                 R.string.request_permission_sms
                 );
-                permission = new String[]{Manifest.permission.READ_SMS};
+                permission = Manifest.permission.READ_SMS;
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_INTERNET:
                 permission_dialog_message = activity.getResources().getString(
                         android.os.Build.VERSION.SDK_INT >= 23 ?
                                 R.string.request_permission_internet_version_plus23 : R.string.request_permission_internet
                 );
-                permission = new String[]{Manifest.permission.INTERNET};
+                permission = Manifest.permission.INTERNET;
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
                 permission_dialog_message = activity.getResources().getString(
@@ -70,11 +70,11 @@ public final class Permission {
                                 R.string.request_permission_phone_version_plus23 :
                                 R.string.request_permission_phone
                 );
-                permission = new String[]{Manifest.permission.READ_PHONE_STATE};
+                permission = Manifest.permission.READ_PHONE_STATE;
                 break;
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
                 permission_dialog_message = activity.getString(R.string.request_permission_gps);
-                permission = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+                permission = Manifest.permission.ACCESS_FINE_LOCATION;
                 break;
             default:
                 permission = null;
@@ -83,7 +83,7 @@ public final class Permission {
 
         if (Build.VERSION.SDK_INT >= 23) {
             Log.d("PERMISSION:", "VERSION>=23");
-            int hasWriteContactsPermission = activity.checkSelfPermission(permission[0]);
+            int hasWriteContactsPermission = activity.checkSelfPermission(permission);
             if (true || hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
 
                 new AlertDialog.Builder(activity)
@@ -92,7 +92,7 @@ public final class Permission {
                             @Override
                             @TargetApi(Build.VERSION_CODES.M)
                             public void onClick(DialogInterface dialog, int which) {
-                                activity.requestPermissions(permission, requestCode);
+                                activity.requestPermissions(new String[]{permission}, requestCode);
                             }
                         }).setCancelable(false)
                         .create()
@@ -103,20 +103,20 @@ public final class Permission {
         } else {
             Log.d("PERMISSION:", "VERSION<23");
             int hasWriteContactsPermission = ContextCompat.checkSelfPermission(activity,
-                    permission[0]);
-            if (true || hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-                if (true || !ActivityCompat.shouldShowRequestPermissionRationale(activity, permission[0])) {
-                    showMessageOKCancel(activity, permission_dialog_message, permission, requestCode);
+                    permission);
+            if ( hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+                if ( !ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                    showMessageOKCancel(activity, permission_dialog_message, new String[]{permission}, requestCode);
                     return;
                 }
-                ActivityCompat.requestPermissions(activity, permission, requestCode);
+                ActivityCompat.requestPermissions(activity,new String[]{} , requestCode);
                 return;
             }
 
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            activity.onRequestPermissionsResult(requestCode, permission, new int[]{AppDefinitions.PERMISSION_NOT_REQUESTED});
+            activity.onRequestPermissionsResult(requestCode, new String[]{permission}, new int[]{AppDefinitions.PERMISSION_NOT_REQUESTED});
         }
     }
 

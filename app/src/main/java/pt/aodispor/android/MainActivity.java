@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
     private final String REGISTER_URL = "https://api.aodispor.pt/users/register";
 
+
     /**
      * This method is called when the main activity is created.
      *
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
                 CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
                 cardFragment.setSearchQuery("");
-                cardFragment.setupNewStack();
+                cardFragment.setupNewStack(cardFragment.prepareNewStack());
                 //FIXME isto precisa de ter uma maneira para limpar a string pesquisada
             }
         });
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
             SearchView searchView = (SearchView) findViewById(R.id.searchView);
             searchView.setQuery(query, false);
             cardFrag.setSearchQuery(query);
-            cardFrag.setupNewStack();
+            cardFrag.setupNewStack(cardFrag.prepareNewStack());
             mViewPager.setCurrentItem(1, true);
             searchView.clearFocus();
         }
@@ -167,8 +168,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
         profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
 
-        if(AppDefinitions.smsLoginDone)
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        if(AppDefinitions.smsLoginDone) mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (positionOffset != 0) {
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
                 for(Object frag : getSupportFragmentManager().getFragments())
                     if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
                 cardFrag.setSearchQuery(query);
-                cardFrag.setupNewStack();
+                cardFrag.setupNewStack(cardFrag.prepareNewStack());
                 mViewPager.setCurrentItem(1, true);
                 searchView.clearFocus();
                 return true;
@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         if(!AppDefinitions.smsLoginDone) {
             profileView.setVisibility(View.INVISIBLE);
             stackView.setVisibility(View.INVISIBLE);
-            mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador estiver loggado
+            mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador não estiver loggado
             mViewPager.setEnabled(false);
         }
     }
@@ -236,8 +236,8 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
                 CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
-                cardFragment.updateLatLon();
-                cardFragment.prepareNewSearchQuery();
+                cardFragment.updateGeoLocation();
+                cardFragment.prepareNewSearchQuery(false);
                 break;
             default:
                 if (android.os.Build.VERSION.SDK_INT >= 23)

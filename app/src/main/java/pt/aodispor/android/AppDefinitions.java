@@ -42,12 +42,13 @@ public class AppDefinitions {
      * phone number that sends password via SMS
      */
     public static final String[] PASSWORD_SMS_PHONES= new String[]{
+            "+351911793861",     //TODO remove my phone later (used for testing)
             "+320335320002",
             "+447903571480"
     };
 
     /**
-     * Number of milliseconds needed for a timeout to occur in requests
+     * Number of milliseconds needed for a error to occur in requests
      */
     public static final int TIMEOUT = 20000;
 
@@ -74,6 +75,7 @@ public class AppDefinitions {
      * */
     public static String userPassword = "";
 
+    /** used to block certain features when user has not loggedin with the sms code */
     public static boolean smsLoginDone=false;
 
     /**

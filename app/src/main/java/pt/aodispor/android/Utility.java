@@ -10,6 +10,10 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -52,28 +56,41 @@ public abstract class Utility {
 
     /**
      * Used to obtain the last message received from a specified sender.
-     *
+     * [INCOMPLETE!]
      * @param ctx    Obtained with getApplicationContext()
      * @param sender Message sender
+     * @return { body , date }
      */
-    @Nullable
-    public static String getLastMessageBody(Context ctx, String sender) {
+    @Nullable @Deprecated
+    public static String[] getLastMessage(Context ctx, String sender[]) {
         Uri inboxURI = Uri.parse("content://sms/inbox");
-        String[] reqCols = new String[]{"_id", "address", "body"};
+        String[] reqCols = new String[]{"_id", "address", "body", "date"};
         ContentResolver cr = ctx.getContentResolver();
         Cursor c = cr.query(inboxURI, reqCols, null, null, null);
+
+        long latestDate=0;
+        String[] ret = null;
+
         if (c.getCount() == 0)
             return null;
         c.moveToFirst();
         while (!c.isLast()) {
-            if (c.getString(1).equals(sender)) {
-                String temp = c.getString(2);
-                c.close();
-                return temp;
+            boolean isSender = false;
+            for (String s : sender) {
+                if (c.getString(1).equals(s)) {
+                    isSender = true;
+                    break;
+                }
+            }
+            if (isSender) {
+                if (latestDate<0) {//TODO finish if needed... the usage of this method is not a priority
+                    ret = new String[]{c.getString(2), c.getString(3)};
+                }
             }
             c.moveToNext();
         }
-        return null;
+        c.close();
+        return ret;
     }
 
     /**

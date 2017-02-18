@@ -13,6 +13,7 @@ import org.mockito.Mock;
 
 import java.util.ArrayList;
 
+import pt.aodispor.android.CardStack;
 import pt.aodispor.android.api.Links;
 import pt.aodispor.android.api.Meta;
 import pt.aodispor.android.api.Pagination;
@@ -44,8 +45,8 @@ public class CardFragmentTestClass extends CardFragment {
 
     public String getCurrentShownCardProfessionalLocationPlusProfession() {
         return
-                ((TextView) cards[0].findViewById(R.id.location)).getText().toString()
-                        + ((TextView) cards[0].findViewById(R.id.profession)).getText().toString();
+                ((TextView) cardStack.getCardAt(CardStack.TOP).findViewById(R.id.location)).getText().toString()
+                        + ((TextView) cardStack.getCardAt(CardStack.TOP).findViewById(R.id.profession)).getText().toString();
     }
 
     @Mock
@@ -58,6 +59,11 @@ public class CardFragmentTestClass extends CardFragment {
     }
 
     public void setTestData(ArrayList<Professional> test_dataset, Test test) {
+
+        cardStack = new CardStackTestClass();
+        cardStack.initNewStack();
+        cardStack.setBasicVariables(this,inflater,rootView);
+
         links = mock(Links.class);
         when(links.getPrevious()).thenReturn("some prev link");
         when(links.getNext()).thenReturn("some next link");
@@ -80,83 +86,32 @@ public class CardFragmentTestClass extends CardFragment {
         }
         when(currentSet.meta.pagination.getLinks()).thenReturn(links);
 
-        cards = new RelativeLayout[3];
-        cards_professional_data = new Professional[3];
+        cardStack.initNewStack();
 
         switch (test) {
             case forward:
                 currentSetCardIndex = 0;
-                cards[0] = professionalCard(test_dataset.get(0));
-                cards[1] = professionalCard(test_dataset.get(1));
-                cards[2] = professionalCard(test_dataset.get(2));
-                cards_professional_data[0] = test_dataset.get(0);
-                cards_professional_data[1] = test_dataset.get(1);
-                cards_professional_data[2] = test_dataset.get(2);
+                cardStack.addProfessionalCard(0,test_dataset.get(0));
+                cardStack.addProfessionalCard(1,test_dataset.get(1));
+                cardStack.addProfessionalCard(2,test_dataset.get(2));
                 break;
             case backward:
                 currentSetCardIndex = 85 - 64;
-                cards[0] = professionalCard(test_dataset.get(85));
-                cards[1] = professionalCard(test_dataset.get(86));
-                cards[2] = professionalCard(test_dataset.get(87));
-                cards_professional_data[0] = test_dataset.get(85);
-                cards_professional_data[1] = test_dataset.get(86);
-                cards_professional_data[2] = test_dataset.get(87);
+                cardStack.addProfessionalCard(0,test_dataset.get(85));
+                cardStack.addProfessionalCard(1,test_dataset.get(86));
+                cardStack.addProfessionalCard(2,test_dataset.get(87));
                 break;
             case mix:
                 currentSetCardIndex = 50;
-                cards[0] = professionalCard(test_dataset.get(50));
-                cards[1] = professionalCard(test_dataset.get(51));
-                cards[2] = professionalCard(test_dataset.get(52));
-                cards_professional_data[0] = test_dataset.get(51);
-                cards_professional_data[1] = test_dataset.get(52);
-                cards_professional_data[2] = test_dataset.get(53);
+                cardStack.addProfessionalCard(0,test_dataset.get(50));
+                cardStack.addProfessionalCard(1,test_dataset.get(51));
+                cardStack.addProfessionalCard(2,test_dataset.get(52));
                 break;
             default:
                 break;
         }
     }
 
-    @Override
-    public RelativeLayout createProfessionalCard(String profession_text,
-                                                 String location_text,
-                                                 String description_text,
-                                                 String price_value,
-                                                 String currency_type,
-                                                 String payment_type,
-                                                 String avatar_scr) {
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
 
-        TextView profession = (TextView) card.findViewById(R.id.profession);
-        profession.setText(Html.fromHtml(profession_text));
-        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-
-        TextView location = (TextView) card.findViewById(R.id.location);
-        location.setText(Html.fromHtml(location_text));
-        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-
-        TextView description = (TextView) card.findViewById(R.id.description);
-        description.setText(Html.fromHtml(description_text));
-        description.setMovementMethod(new ScrollingMovementMethod());
-
-        TextView price = (TextView) card.findViewById(R.id.price);
-
-        price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        price.setText(Html.fromHtml(price_value));
-
-        switch (payment_type) {
-            case "H":
-                price.setText(Html.fromHtml(price_value + " " + currency_type + "/h"));
-                price.setTextColor(getResources().getColor(R.color.by_hour));
-                break;
-            case "S":
-                price.setText(Html.fromHtml(price_value + " " + currency_type));
-                price.setTextColor(getResources().getColor(R.color.by_service));
-                break;
-            case "D":
-                price.setText(Html.fromHtml(price_value + " por dia"));
-        }
-
-        return card;
-    }
 
 }

@@ -38,8 +38,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private Class answerType;
     private String url;
     private String[] urlVariables;
-    private boolean timeout = false;
+    //error can't be detected with handler (would need to use the systems time to find out error occurrences)
+    //private boolean error = false;
     private boolean error = false;
+    public boolean gotError(){return error;}
     private HttpEntity<?> entityReq;
     private HttpMethod method;
     private ApiJSON body;
@@ -49,7 +51,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     /**
      * handler that executes after an answer is received.
-     * <br>using the handler allows the application to run without waiting for a timeout or an answer.
+     * <br>using the handler allows the application to run without waiting for a error or an answer.
      * <br>can be set to null
      */
     private HttpRequest postExecute;
@@ -155,9 +157,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     protected void onPostExecute(ApiJSON data) {
         if (postExecute == null)
             return;
-        if (timeout || error) {
-            if (data == null)
-                return;
+        if (/*error || */error) {
+            //if (data == null)
+            //    return;
             postExecute.onHttpRequestFailed(data);
         } else {
             if (data == null)

@@ -176,6 +176,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             @Override
             public void onClick(View view) {
                 if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
+
                 int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
                 if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                     Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
@@ -192,6 +193,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             public void onClick(View view) {
                 if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
                 Professional p = cardStack.getCardProfessionalInfoAt(CardStack.TOP);
+
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + p.phone));
                 intent.putExtra("sms_body", getString(R.string.sms_text));
                 Answers.getInstance().logCustom(new CustomEvent("Envio de SMS").putCustomAttribute("string_id", p.string_id));
@@ -205,6 +207,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             public void onClick(View view) {
                 if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
                 Professional p = cardStack.getCardProfessionalInfoAt(CardStack.TOP);
+
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.aodispor.pt/" + p.string_id);
@@ -270,9 +273,13 @@ public class CardFragment extends Fragment implements HttpRequest {
                 if (currentSet.data.size() > 1) {
                     cardStack.addProfessionalCard(1, currentSet.data.get(1));
                     if (currentSet.data.size() > 2)
+                    {
                         cardStack.addProfessionalCard(2, currentSet.data.get(2));
-                    else
+                    }
+                    else{
+                        cardStack.clearCard(2);
                         cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                    }
                 } else {
                     cardStack.addMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                     cardStack.clearCard(2);
@@ -354,6 +361,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 cf.rootView.addView(cf.cardStack.getCardAt(CardStack.TOP));
                 //blockAccess = false; -> done in SwipeListener
             }
+
         }
         /**<p>Only two cards left in the stack. </p>
          * <p>There may be more sets left to explore in case connection was lost</p>*/

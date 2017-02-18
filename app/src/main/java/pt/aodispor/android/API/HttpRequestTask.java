@@ -1,8 +1,8 @@
 package pt.aodispor.android.api;
 
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Base64;
-import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -10,14 +10,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -25,12 +22,13 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import pt.aodispor.android.AppDefinitions;
+import pt.aodispor.android.R;
 
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     public static final int GET_REQUEST = 0;
     public static final int POST_REQUEST = 1;
     public static final int PUT_REQUEST = 2;
-    private static final String token = "4bsHGsYeva6eud8VsLiKEVVQYQEgmfCafwtuNrhuFYFcPjxWnT";
+    private static final String token = Resources.getSystem().getString(R.string.ao_dispor_api_key);
     //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
     private static final String serverTimeZone = "UTC";
 

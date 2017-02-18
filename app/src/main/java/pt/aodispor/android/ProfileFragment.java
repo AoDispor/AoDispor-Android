@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
@@ -13,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -38,17 +38,20 @@ import pt.aodispor.android.dialogs.LocationDialog;
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment implements HttpRequest, DialogCallback, LocationDialog.LocationDialogListener {
+    private static final String LOCATION_TAG = "location";
+    private static final String PRICE_DIALOG_TAG = "price-dialog";
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
     private static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
     private static final int SELECT_PICTURE = 0;
+    private RelativeLayout rootView;
     private RelativeLayout professionalCard;
     private PriceDialog priceDialog;
     private LinearLayout loadingMessage;
-    private TextView priceView, locationView, professionView, descriptionView, nameView;
-    private EditText nameEditText, professionEditText, descriptionEditText;
-    private boolean editingDescription;
+    private TextView priceView, locationView;
+    private String oldName, oldProfession, oldDescription;
+    private CustomEditText nameEditText, professionEditText, descriptionEditText;
     private ImageView imageView;
-    private InputMethodManager manager;
+    private InputMethodManager inputManager;
     private final ProfileFragment thisObject = this;
 
     public enum PriceType {
@@ -68,8 +71,14 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        inputManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        RelativeLayout rootView = new RelativeLayout(getActivity());
+        rootView = new RelativeLayout(getActivity());
         rootView.setBackgroundResource(R.drawable.tabletop1);
         professionalCard = (RelativeLayout) inflater.inflate(R.layout.profile_card, container, false);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(professionalCard.getLayoutParams());
@@ -77,12 +86,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         int p = getResources().getDimensionPixelSize(R.dimen.register_layout_margin);
         params.setMargins(p, p, p, p);
         professionalCard.setLayoutParams(params);
-        editingDescription = false;
 
-        // Get Views
         getViews();
-
-        // Set Fonts
         setFonts();
 
         // Location
@@ -93,7 +98,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             public void onClick(View view) {
                 LocationDialog dialog = new LocationDialog();
                 dialog.setListener(thisObject);
-                dialog.show(getFragmentManager(), "location");
+                dialog.show(getFragmentManager(), LOCATION_TAG);
             }
         });
 
@@ -103,120 +108,14 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             public void onClick(View view) {
                 // Show Price Dialog
                 if (!priceDialog.isAdded()) {
-                    priceDialog.show(getFragmentManager(), "price-dialog");
+                    priceDialog.show(getFragmentManager(), PRICE_DIALOG_TAG);
                 }
             }
         });
 
-        // Name
-        manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        nameView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                nameView.setVisibility(TextView.INVISIBLE);
-                nameEditText.setVisibility(EditText.VISIBLE);
-                nameEditText.setText("");
-                nameEditText.append(nameView.getText());
-                nameEditText.requestFocus();
-                manager.showSoftInput(nameEditText, InputMethodManager.SHOW_IMPLICIT);
-            }
-        });
-        nameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean focused) {
-                if (!focused) {
-                    nameEditText.setVisibility(EditText.INVISIBLE);
-                    nameView.setVisibility(TextView.VISIBLE);
-                }
-            }
-        });
-        nameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_DONE) {
-                    nameEditText.setVisibility(EditText.INVISIBLE);
-                    nameView.setVisibility(TextView.VISIBLE);
-                    String trimmed = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
-                    if (!trimmed.isEmpty() && !trimmed.equals(nameView.getText().toString())) {
-                        startLoading();
-                        editName();
-                    }
-                    return false;
-                }
-                return false;
-            }
-        });
-
-        //Profession
-        manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        professionView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                professionView.setVisibility(TextView.INVISIBLE);
-                professionEditText.setVisibility(EditText.VISIBLE);
-                professionEditText.setText("");
-                professionEditText.append(professionView.getText());
-                professionEditText.requestFocus();
-                manager.showSoftInput(professionEditText, InputMethodManager.SHOW_IMPLICIT);
-            }
-        });
-        professionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean focused) {
-                if (!focused) {
-                    professionEditText.setVisibility(EditText.INVISIBLE);
-                    professionView.setVisibility(TextView.VISIBLE);
-                }
-            }
-        });
-        professionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_DONE) {
-                    professionEditText.setVisibility(EditText.INVISIBLE);
-                    professionView.setVisibility(TextView.VISIBLE);
-                    String trimmed = professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
-                    if (!trimmed.isEmpty() && !trimmed.equals(professionView.getText().toString())) {
-                        startLoading();
-                        editProfession();
-                    }
-                    return false;
-                }
-                return false;
-            }
-        });
-
-        // Description
-        descriptionView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editingDescription = true;
-                descriptionView.setVisibility(TextView.INVISIBLE);
-                descriptionEditText.setVisibility(EditText.VISIBLE);
-                descriptionEditText.setText("");
-                descriptionEditText.append(descriptionView.getText());
-                descriptionEditText.requestFocus();
-                manager.showSoftInput(descriptionEditText, InputMethodManager.SHOW_IMPLICIT);
-            }
-        });
-        descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean focused) {
-                if (!focused) {
-                    if (editingDescription) {
-                        descriptionEditText.setVisibility(EditText.INVISIBLE);
-                        descriptionView.setVisibility(TextView.VISIBLE);
-                        String trimmed = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
-                        if (!trimmed.isEmpty() && !trimmed.equals(descriptionView.getText().toString())) {
-                            startLoading();
-                            editDescription();
-                        }
-                        editingDescription = false;
-                    }
-                }
-            }
-        });
-
+        configureNameEditText();
+        configureProfessionEditText();
+        configureDescriptionEditText();
 
         // Loading Message
         loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
@@ -234,8 +133,11 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         startLoading();
         getProfileInfo();
 
+        rootView.requestFocus();
         return rootView;
     }
+
+
 
     /**
      * Makes a GET HTTP request to get user profile information.
@@ -249,7 +151,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.testPhoneNumber, AppDefinitions.testPassword);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         request.execute();
     }
 
@@ -293,6 +195,9 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     @Override
     public void onHttpRequestFailed(ApiJSON errorData) {
         Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();
+        nameEditText.setText(oldName);
+        professionEditText.setText(oldProfession);
+        descriptionEditText.setText(oldDescription);
         endLoading();
     }
 
@@ -353,37 +258,148 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         }
     }
 
-    private void editName() {
+    private void sendUpdateRequest(Professional p) {
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-        Professional p = new Professional();
-        p.full_name = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         request.setJSONBody(p);
         request.execute();
+    }
+
+    private void configureNameEditText() {
+        oldName = nameEditText.getText().toString();
+        nameEditText.setOnBackPressedListener(new CustomEditText.OnBackPressedListener() {
+            @Override
+            public void onBackPressed() {
+                rootView.requestFocus();
+                editName();
+            }
+        });
+        nameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                    rootView.requestFocus();
+                    hideSoftKeyboard();
+                    editName();
+                }
+                return false;
+            }
+        });
+        nameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if(hasFocus) {
+                    setAllViewsEnabledExcept(false, view);
+                    oldName = nameEditText.getText().toString();
+                } else {
+                    enableAllViews();
+                }
+            }
+        });
+    }
+
+    private void configureProfessionEditText() {
+        oldProfession = professionEditText.getText().toString();
+        professionEditText.setOnBackPressedListener(new CustomEditText.OnBackPressedListener() {
+            @Override
+            public void onBackPressed() {
+                rootView.requestFocus();
+                editProfession();
+            }
+        });
+        professionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                    rootView.requestFocus();
+                    hideSoftKeyboard();
+                    editProfession();
+                }
+                return false;
+            }
+        });
+        professionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if(hasFocus) {
+                    setAllViewsEnabledExcept(false, view);
+                    oldProfession = professionEditText.getText().toString();
+                } else {
+                    enableAllViews();
+                }
+            }
+        });
+    }
+
+    private void configureDescriptionEditText() {
+        oldDescription = descriptionEditText.getText().toString();
+        descriptionEditText.setOnBackPressedListener(new CustomEditText.OnBackPressedListener() {
+            @Override
+            public void onBackPressed() {
+                rootView.requestFocus();
+                editDescription();
+            }
+        });
+        descriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                    rootView.requestFocus();
+                    hideSoftKeyboard();
+                    editDescription();
+                }
+                return false;
+            }
+        });
+        descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if(hasFocus) {
+                    setAllViewsEnabledExcept(false, view);
+                    oldDescription = descriptionEditText.getText().toString();
+                } else {
+                    enableAllViews();
+                }
+            }
+        });
+    }
+
+    private void editName() {
+        String newName = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
+        if (!newName.equals(oldName)) {
+            Professional p = new Professional();
+            p.full_name = newName;
+            startLoading();
+            sendUpdateRequest(p);
+        } else {
+            nameEditText.setText(oldName);
+        }
     }
 
     private void editProfession() {
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
-        request.setMethod(HttpRequestTask.POST_REQUEST);
-        request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-        Professional p = new Professional();
-        p.title = professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
-        request.setJSONBody(p);
-        request.execute();
+        String newProfession = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
+        if (!newProfession.equals(oldProfession)) {
+            Professional p = new Professional();
+            p.title = oldProfession;
+            startLoading();
+            sendUpdateRequest(p);
+        } else {
+            professionEditText.setText(oldProfession);
+        }
     }
 
     private void editDescription() {
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
-        request.setMethod(HttpRequestTask.POST_REQUEST);
-        request.setType(HttpRequest.UPDATE_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-        Professional p = new Professional();
-        p.description = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
-        request.setJSONBody(p);
-        request.execute();
+        String newDescription = descriptionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
+        if (!newDescription.equals(oldDescription)) {
+            Professional p = new Professional();
+            p.description = newDescription;
+            startLoading();
+            sendUpdateRequest(p);
+        } else {
+            descriptionEditText.setText(oldDescription);
+        }
     }
 
     /*
@@ -441,31 +457,28 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         // Profession
         String professionText = p.title;
         if (professionText != null) {
-            professionView.setText(professionText.trim().replaceAll("\\s{2,}", " "));
-            professionView.setTextColor(black);
+            professionEditText.setText(professionText);
+            oldProfession = professionText;
         } else {
-            professionView.setTextColor(grey);
-            professionView.setText(R.string.register_profession);
+            professionEditText.setText("");
         }
 
         // Name
         String nameText = p.full_name;
         if (nameText != null) {
-            nameView.setText(nameText.trim().replaceAll("\\s{2,}]", " "));
-            nameView.setTextColor(black);
+            nameEditText.setText(nameText);
+            oldName = nameText;
         } else {
-            nameView.setTextColor(grey);
-            nameView.setText(R.string.register_name);
+            nameEditText.setText("");
         }
 
         // Description
         String descriptionText = p.description;
         if (descriptionText != null) {
-            descriptionView.setText(descriptionText.trim().replaceAll("\\s{2,}", " "));
-            descriptionView.setTextColor(black);
+            descriptionEditText.setText(descriptionText);
+            oldDescription = descriptionText;
         } else {
-            descriptionView.setTextColor(grey);
-            descriptionView.setText(R.string.register_description);
+            descriptionEditText.setText("");
         }
 
         // Profile Image
@@ -485,10 +498,28 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     private void endLoading() {
         showViews();
-        professionEditText.setVisibility(EditText.INVISIBLE);
-        nameEditText.setVisibility(EditText.INVISIBLE);
-        descriptionEditText.setVisibility(EditText.INVISIBLE);
         loadingMessage.setVisibility(LinearLayout.INVISIBLE);
+    }
+
+    private void setAllViewsEnabledExcept(boolean enable, View view) {
+        for (int i = 0; i < professionalCard.getChildCount(); i++) {
+            if(view.getId() != professionalCard.getChildAt(i).getId()) {
+                professionalCard.getChildAt(i).setEnabled(enable);
+            }
+        }
+    }
+
+    private void enableAllViews() {
+        for (int i = 0; i < professionalCard.getChildCount(); i++) {
+            professionalCard.getChildAt(i).setEnabled(true);
+        }
+    }
+
+    private void hideSoftKeyboard() {
+        View view = getActivity().getCurrentFocus();
+        if(view != null) {
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     private void hideViews() {
@@ -517,23 +548,17 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     private void getViews() {
         priceView = (TextView) professionalCard.findViewById(R.id.price);
         locationView = (TextView) professionalCard.findViewById(R.id.location);
-        nameView = (TextView) professionalCard.findViewById(R.id.name);
-        nameEditText = (EditText) professionalCard.findViewById(R.id.nameEditText);
-        professionView = (TextView) professionalCard.findViewById(R.id.profession);
-        professionEditText = (EditText) professionalCard.findViewById(R.id.professionEditText);
-        descriptionView = (TextView) professionalCard.findViewById(R.id.description);
-        descriptionEditText = (EditText) professionalCard.findViewById(R.id.descriptionEditText);
+        nameEditText = (CustomEditText) professionalCard.findViewById(R.id.nameEditText);
+        professionEditText = (CustomEditText) professionalCard.findViewById(R.id.professionEditText);
+        descriptionEditText = (CustomEditText) professionalCard.findViewById(R.id.descriptionEditText);
         imageView = (ImageView) professionalCard.findViewById(R.id.profile_image);
     }
 
     private void setFonts() {
         priceView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         locationView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         nameEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         professionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         descriptionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
     }
 

@@ -284,12 +284,10 @@ public class CardFragment extends Fragment implements HttpRequest {
                 }
 
                 if (currentSet.data.size() >= 2) {
-                    //cardStack.setCardMargin(2);
                     rootView.addView(cardStack.getCardAt(2));
                 }
 
                 if (currentSet.data.size() >= 1) {
-                    //cardStack.setCardMargin(1);
                     rootView.addView(cardStack.getCardAt(1));
                 }
                 break;
@@ -317,7 +315,6 @@ public class CardFragment extends Fragment implements HttpRequest {
                 break;
         }
         cardStack.updateAllCardsMargins();
-        //cardStack.centerFirstCard();
         rootView.addView(cardStack.getCardAt(0));
     }
 
@@ -325,26 +322,26 @@ public class CardFragment extends Fragment implements HttpRequest {
     /**
      * <p>evaluate state and update card stack accordingly</p>
      * <p>first layer indicates how many cards are loaded/visible to the user</p>
-     * <p><b>inset</b> indicates that the index is inside the current card set and all the card shown are also inside the set</p>
+     * <p><b>inset</b> indicates that the index is inside the currentSet and all the card shown are also from that set</p>
      * <p><b>loaded</b> indicates that the next set has already been loaded and <b>missing</b> that hasn't been loaded yet </p>
-     * +------------+----+
-     * |            |    |
-     * +--+-----+    +++  +++
-     * |>1      |    |1|  |0| (number of cards below the top card)
-     * +----------+  +-+  +-+
+     * +----------------+----+
+     * |                |    |
+     * +--+--+          +++  +++
+     * |>1   |          |1|  |0| (number of cards below the top card)
+     * +-----+------+   +-+  +-+
+     * |            |
+     * |            |
+     * +--------+   +--+------+
+     * |INSET   |      |OUTSET| (all shown cards inside currentSet?)
+     * +--------+---+  +---+--+
+     * |            |
+     * +------+     +-----+
+     * |      |     |LAST |    | (current page is the last page?)
+     * |+PAGES|     |SET  |
+     * +------+--+  +-----+
      * |         |
-     * |         |
-     * +-----+   +------+
-     * |INSET|   |OUTSET|
-     * +-----+   +---+--+
-     * |   |
-     * +----+   +------+
-     * |LAST|   |      |
-     * |PAGE|   ++PAGES|
-     * +----+   +--+---+
-     * |  |
      * +------+  +-------+
-     * |LOADED|  |MISSING|
+     * |LOADED|  |MISSING|  (is the nextSet loaded?)
      * +------+  +-------+
      */
     private enum CardStackStateOnDiscard {
@@ -376,8 +373,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         },
         /**
-         * <p>there are more than 2 cards being shown</p>
-         * <p>the index is inside the current card set and all the card shown are also inside the set</p>
+         *  <p>the index is inside the current card set and all the card shown are also inside the set</p>
          */
         INSET {
             public void updateCardStack(final CardFragment cf) {
@@ -386,7 +382,6 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         },
         /**
-         * <p>there are more than 2 cards being shown</p>
          * <p>last card from last card is already on the 3 card shown</p>
          */
         LAST {
@@ -396,7 +391,6 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         },
         /**
-         * <p>there are more than 2 cards being shown</p>
          * <p>already have the next page information</p>
          */
         LOADED {
@@ -412,7 +406,6 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         },
         /**
-         * <p>there are more than 2 cards being shown</p>
          * <p>missing next page card set<p/>
          */
         MISSING {
@@ -444,9 +437,6 @@ public class CardFragment extends Fragment implements HttpRequest {
     public void CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate() {
         //update cards display
         RelativeLayout topCard = cardStack.getCardAt(CardStack.TOP);
-        //cardStack.setCardMargin(0);
-        //cardStack.setCardMargin(1);
-        //cardStack.setCardMargin(2);
         rootView.addView(cardStack.getCardAt(2));
         rootView.addView(cardStack.getCardAt(1));
         rootView.addView(topCard);
@@ -510,7 +500,6 @@ public class CardFragment extends Fragment implements HttpRequest {
         cardStack.removeAllCardViews();
         cardStack.swapCardsOnStack(1, 0);
         cardStack.swapCardsOnStack(2, 1);
-        //cardStack.centerFirstCard();
 
         CardStackStateOnDiscard state = getCardStackStateOnDiscard();
         Log.d("discardTopCard", "STATE = " + state.toString());
@@ -607,14 +596,11 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         }
         originalCardStack.removeAllCardViews();
-        //cardStack.setCardMargin(1);
         RelativeLayout topCard = cardStack.getCardAt(CardStack.TOP);
         if (cardStack.getCardAt(2) != null) {
-            //cardStack.setCardMargin(2);
             rootView.addView(cardStack.getCardAt(2));
         }
         rootView.addView(cardStack.getCardAt(1));
-        //cardStack.setCardMargin(0);
         rootView.addView(topCard);
 
         if (activity instanceof MainActivity
@@ -759,11 +745,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             nextSet = (SearchQueryResult) answer;
         else if (requestType == RequestType.prevSet)
             previousSet = (SearchQueryResult) answer;
-        //else if (requestType == RequestType.newSet) { //not used right now
-        //    nextSet = null;
-        //    currentSet = (SearchQueryResult) answer;
-        //}
-        if (requestType == RequestType.retry_prevSet
+        else if (requestType == RequestType.retry_prevSet
                 || requestType == RequestType.retry_nextSet
                 || requestType == RequestType.retry_newSet
                 ) {

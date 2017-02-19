@@ -382,7 +382,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         String newProfession = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         if (!newProfession.equals(oldProfession)) {
             Professional p = new Professional();
-            p.title = oldProfession;
+            p.title = newProfession;
             startLoading();
             sendUpdateRequest(p);
         } else {

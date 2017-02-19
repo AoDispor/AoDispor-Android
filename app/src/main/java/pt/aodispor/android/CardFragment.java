@@ -114,9 +114,10 @@ public class CardFragment extends Fragment implements HttpRequest {
     private LoadingWidget loadingWidget;
     private LinearLayout loadingLL;
 
-    private GeoLocation geoLocation;
+    private static GeoLocation geoLocation = null;
 
     public void updateGeoLocation() {
+        if(geoLocation==null) geoLocation = new GeoLocation();
         geoLocation.updateLatLon(getContext());
     }
 
@@ -128,7 +129,6 @@ public class CardFragment extends Fragment implements HttpRequest {
     public CardFragment() {
         blockAccess = false;
         loadingWidget = new LoadingWidget();
-        geoLocation = new GeoLocation();
         cardStack = new CardStack();
     }
 

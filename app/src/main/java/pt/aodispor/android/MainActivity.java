@@ -115,15 +115,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            CardFragment cardFrag = null;
-            for(Object frag : getSupportFragmentManager().getFragments())
-                if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
-            SearchView searchView = (SearchView) findViewById(R.id.searchView);
-            searchView.setQuery(query, false);
-            cardFrag.setSearchQuery(query);
-            cardFrag.setupNewStack(cardFrag.prepareNewStack());
-            mViewPager.setCurrentItem(1, true);
-            searchView.clearFocus();
+            launchSearch(query);
         }
     }
 
@@ -198,13 +190,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                CardFragment cardFrag = null;
-                for(Object frag : getSupportFragmentManager().getFragments())
-                    if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
-                cardFrag.setSearchQuery(query);
-                cardFrag.setupNewStack(cardFrag.prepareNewStack());
-                mViewPager.setCurrentItem(1, true);
-                searchView.clearFocus();
+                launchSearch(query);
                 return true;
             }
         });
@@ -256,4 +242,23 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
             super.onBackPressed();
         }
     }
+
+    private void launchSearch(String query)
+    {
+        if(query.length()<AppDefinitions.QUERY_MIN_LENGTH)
+        {
+            Toast.makeText(this, R.string.query_too_short, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        CardFragment cardFrag = null;
+        for(Object frag : getSupportFragmentManager().getFragments())
+            if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
+        SearchView searchView = (SearchView) findViewById(R.id.searchView);
+        searchView.setQuery(query, false);
+        cardFrag.setSearchQuery(query);
+        cardFrag.setupNewStack(cardFrag.prepareNewStack());
+        mViewPager.setCurrentItem(1, true);
+        searchView.clearFocus();
+    }
+
 }

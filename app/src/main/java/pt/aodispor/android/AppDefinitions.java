@@ -52,6 +52,8 @@ public class AppDefinitions {
      */
     public static final int TIMEOUT = 20000;
 
+    public static final int QUERY_MIN_LENGTH = 5;
+
     /**
      * [CardFragment.java] - nextSet loading
      * will try to load the nextSet

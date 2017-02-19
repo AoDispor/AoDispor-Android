@@ -28,7 +28,12 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     public static final int GET_REQUEST = 0;
     public static final int POST_REQUEST = 1;
     public static final int PUT_REQUEST = 2;
-    private static final String token = Resources.getSystem().getString(R.string.ao_dispor_api_key);
+    private static String token = null;
+
+    public static void setToken(String token) {
+        if(HttpRequestTask.token==null) HttpRequestTask.token = token;
+    }
+
     //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
     private static final String serverTimeZone = "UTC";
 
@@ -41,7 +46,11 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     //error can't be detected with handler (would need to use the systems time to find out error occurrences)
     //private boolean error = false;
     private boolean error = false;
-    public boolean gotError(){return error;}
+
+    public boolean gotError() {
+        return error;
+    }
+
     private HttpEntity<?> entityReq;
     private HttpMethod method;
     private ApiJSON body;
@@ -110,7 +119,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             cf.setConnectTimeout(AppDefinitions.TIMEOUT);
             cf.setReadTimeout(AppDefinitions.TIMEOUT);
             template = new RestTemplate(cf);
-            if(answerType == null)
+            if (answerType == null)
                 answerType = String.class;
             try {
                 ApiJSON response = null;
@@ -132,7 +141,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
                         entityReq = new HttpEntity<>(httpHeaders);
                         response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
                         //if (answerType != null && ApiJSON.class.isAssignableFrom(answerType))
-                            //response = (ApiJSON) answer;
+                        //response = (ApiJSON) answer;
                         break;
                 }
                 return response;

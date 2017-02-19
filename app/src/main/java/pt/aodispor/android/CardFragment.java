@@ -250,7 +250,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      * to be called when doing a new search
      */
     public QueryResult prepareNewStack() {
-        return prepareNewStack(true);
+        return prepareNewStack(false);
     }
 
     /**

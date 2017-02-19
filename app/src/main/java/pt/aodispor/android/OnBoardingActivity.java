@@ -62,6 +62,8 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_on_boarding);
 
+        HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
+
         if (AppDefinitions.SKIP_LOGIN) {
             /*AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
             AppDefinitions.userPassword = AppDefinitions.testPassword;*/

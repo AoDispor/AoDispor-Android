@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
     private final String REGISTER_URL = "https://api.aodispor.pt/users/register";
 
-
     /**
      * This method is called when the main activity is created.
      *

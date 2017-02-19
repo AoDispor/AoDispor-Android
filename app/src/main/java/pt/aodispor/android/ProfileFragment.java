@@ -294,9 +294,11 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if(hasFocus) {
+                    disableSwiping();
                     setAllViewsEnabledExcept(false, view);
                     oldName = nameEditText.getText().toString();
                 } else {
+                    enableSwiping();
                     enableAllViews();
                 }
             }
@@ -327,9 +329,11 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if(hasFocus) {
+                    disableSwiping();
                     setAllViewsEnabledExcept(false, view);
                     oldProfession = professionEditText.getText().toString();
                 } else {
+                    enableSwiping();
                     enableAllViews();
                 }
             }
@@ -360,9 +364,11 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if(hasFocus) {
+                    disableSwiping();
                     setAllViewsEnabledExcept(false, view);
                     oldDescription = descriptionEditText.getText().toString();
                 } else {
+                    enableSwiping();
                     enableAllViews();
                 }
             }
@@ -382,7 +388,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     }
 
     private void editProfession() {
-        String newProfession = nameEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
+        String newProfession = professionEditText.getText().toString().trim().replaceAll("\\s{2,}", " ");
         if (!newProfession.equals(oldProfession)) {
             Professional p = new Professional();
             p.title = newProfession;
@@ -563,6 +569,14 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         nameEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         professionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         descriptionEditText.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+    }
+
+    private void disableSwiping() {
+        ((MainActivity)getActivity()).getViewPager().setSwipeEnabled(false);
+    }
+
+    private void enableSwiping() {
+        ((MainActivity)getActivity()).getViewPager().setSwipeEnabled(true);
     }
 
     @Override

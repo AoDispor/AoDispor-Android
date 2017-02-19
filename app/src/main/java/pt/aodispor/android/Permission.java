@@ -83,8 +83,8 @@ public final class Permission {
 
         if (Build.VERSION.SDK_INT >= 23) {
             Log.d("PERMISSION:", "VERSION>=23");
-            int hasWriteContactsPermission = activity.checkSelfPermission(permission);
-            if (true || hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            int hasPermission = activity.checkSelfPermission(permission);
+            if (hasPermission != PackageManager.PERMISSION_GRANTED) {
 
                 new AlertDialog.Builder(activity)
                         .setMessage(permission_dialog_message)
@@ -102,9 +102,8 @@ public final class Permission {
             }
         } else {
             Log.d("PERMISSION:", "VERSION<23");
-            int hasWriteContactsPermission = ContextCompat.checkSelfPermission(activity,
-                    permission);
-            if ( hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            int hasPermission = ContextCompat.checkSelfPermission(activity, permission);
+            if ( hasPermission != PackageManager.PERMISSION_GRANTED) {
                 if ( !ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                     showMessageOKCancel(activity, permission_dialog_message, new String[]{permission}, requestCode);
                     return;

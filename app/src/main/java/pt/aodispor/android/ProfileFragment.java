@@ -194,7 +194,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      */
     @Override
     public void onHttpRequestFailed(ApiJSON errorData) {
-        Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();
+        //TODO -> this fragment shouldn't even be loaded in the first place
+        if(AppDefinitions.smsLoginDone) {
+            Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();
+        }
         nameEditText.setText(oldName);
         professionEditText.setText(oldProfession);
         descriptionEditText.setText(oldDescription);

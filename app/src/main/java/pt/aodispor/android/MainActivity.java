@@ -15,7 +15,9 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -44,6 +46,7 @@ import pt.aodispor.android.Advanceable;
  */
 public class MainActivity extends AppCompatActivity implements Advanceable {
     private MyViewPager mViewPager;
+    private SearchView searchView;
     private ImageView profileView, stackView;
 
     int mLastPage = 0;
@@ -179,8 +182,17 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
             }
         });
 
-        final SearchView searchView = (SearchView) findViewById(R.id.searchView);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) findViewById(R.id.searchView);
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if(!hasFocus) {
+                    closeSearchView();
+                }
+            }
+        });
+        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -215,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
                         cardFrag.setupNewStack(cardFrag.prepareNewStack());
                     }
                     mViewPager.setCurrentItem(1, true);
-                    searchView.clearFocus();
+                    closeSearchView();
                 } else {
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_bar_toast), Toast.LENGTH_SHORT).show();
                 }
@@ -263,6 +275,13 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
     @Override
     public void onBackPressed() {
+        /**
+         * Close the search view if its already open.
+         *
+        if(!searchView.isIconified()) {
+            closeSearchView();
+        }*/
+        searchView.setIconified(true);
         if (mViewPager.getCurrentItem() == 1) {
             CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
             cardFragment.restorePreviousCard();
@@ -287,6 +306,12 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         cardFrag.setupNewStack(cardFrag.prepareNewStack());
         mViewPager.setCurrentItem(1, true);
         searchView.clearFocus();
+    }
+
+    private void closeSearchView() {
+        searchView.setQuery("", false);
+        searchView.clearFocus();
+        searchView.setIconified(true);
     }
 
 }

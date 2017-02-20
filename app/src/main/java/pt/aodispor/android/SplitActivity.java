@@ -21,23 +21,18 @@ public class SplitActivity extends Activity
 
         Fabric.with(this, new Answers(), new Crashlytics());
 
-        Amplify.initSharedInstance(this.getApplication())
-                .setFeedbackEmailAddress(getString(R.string.feedback_email))
-                .applyAllDefaultRules();
-
         final Class<? extends Activity> activityClass;
         LoginDataPreferences preferences = new LoginDataPreferences(getApplicationContext());
 
         Log.d("PREFERENCES", preferences.get().telephone());
         Log.d("PREFERENCES", preferences.get().password());
 
-        preferences.edit().clear().apply();
-
         if(preferences.get().hasValidPair()) {
             // Guardar username e password no AppDefinitions para a API poder usar
             // FIXME devia ser qualquer coisa mais segura...
             AppDefinitions.phoneNumber = preferences.get().telephone();
             AppDefinitions.userPassword = preferences.get().password();
+            AppDefinitions.smsLoginDone = true;
             activityClass = MainActivity.class;
         } else {
             activityClass = OnBoardingActivity.class;

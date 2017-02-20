@@ -82,7 +82,6 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         // Página 2
         final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
         final Button newUserButton = (Button) findViewById(R.id.new_user);
-        final Button returningUserButton = (Button) findViewById(R.id.returning_user);
         final Button skipButton2 = (Button) findViewById(R.id.skip_button2);
         // Página 3
         final EditText validationCodeField = (EditText) findViewById(R.id.validation_code);
@@ -140,30 +139,10 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                     coordinatorLayout.setCurrentPage(coordinatorLayout.getPageSelected() + 1, true);
                     AppDefinitions.phoneNumber = phoneNumberField.getPhoneNumber();
                     //TODO may add code t check SMSs
-                    prevSMS = Utility.getLastMessage(getApplicationContext(), AppDefinitions.PASSWORD_SMS_PHONES);
+                    //prevSMS = Utility.getLastMessage(getApplicationContext(), AppDefinitions.PASSWORD_SMS_PHONES);
                     sendRegistrationSMS();
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(validate.getWindowToken(), 0);
-                }
-            }
-        });
-        // Enviar SMS - Já tenho password
-        returningUserButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean valid = true;
-
-                if (phoneNumberField.isValid()) {
-                    phoneNumberField.setError(null);
-                } else {
-                    phoneNumberField.setError("Número de telefone inválido");
-                    valid = false;
-                }
-
-                if (valid) {
-                    coordinatorLayout.setCurrentPage(coordinatorLayout.getPageSelected() + 1, true);
-                    AppDefinitions.phoneNumber = phoneNumberField.getPhoneNumber();
-                    //Permission.requestPermission(OnBoardingActivity.this, AppDefinitions.PERMISSIONS_REQUEST_READ_SMS);
                 }
             }
         });

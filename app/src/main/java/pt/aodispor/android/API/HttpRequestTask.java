@@ -189,7 +189,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         MediaType[] mediaTypes = {MediaType.APPLICATION_JSON};
         httpHeaders.setAccept(Arrays.asList(mediaTypes));
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("api-Authorization", token + date);
+        httpHeaders.set("API-Authorization", token + date);
     }
 
     /**

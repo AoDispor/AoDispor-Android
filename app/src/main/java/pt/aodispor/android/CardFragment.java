@@ -3,6 +3,7 @@ package pt.aodispor.android;
 import android.Manifest;
 import android.animation.Animator;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -117,8 +118,14 @@ public class CardFragment extends Fragment implements HttpRequest {
     private static GeoLocation geoLocation = null;
 
     public void updateGeoLocation() {
+        updateGeoLocation(null);
+    }
+
+    public void updateGeoLocation(Context context) {
         if(geoLocation==null) geoLocation = new GeoLocation();
-        geoLocation.updateLatLon(getContext());
+
+        if(context != null) geoLocation.updateLatLon(context);
+        else geoLocation.updateLatLon(getContext());
     }
 
     private String searchQuery = "";

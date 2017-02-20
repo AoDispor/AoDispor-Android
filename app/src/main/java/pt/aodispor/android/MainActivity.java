@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         });
     }
 
-    protected void onActivityCreated (Bundle savedInstanceState) {
+    protected void onPostCreate (Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
         Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_GPS);
     }
 
@@ -265,8 +266,8 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
-                CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
-                cardFragment.updateGeoLocation();
+                CardFragment cardFragment = (CardFragment) ((TabPagerAdapter) mViewPager.getAdapter()).getItem(1);
+                cardFragment.updateGeoLocation(getBaseContext());
                 cardFragment.prepareNewSearchQuery(false);
                 break;
             default:

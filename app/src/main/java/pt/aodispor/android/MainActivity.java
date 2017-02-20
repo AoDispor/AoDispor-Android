@@ -87,7 +87,10 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
             }
         });
 
-        Permission.requestPermission(MainActivity.this, AppDefinitions.PERMISSIONS_REQUEST_GPS);
+    }
+
+    protected void onActivityCreated (Bundle savedInstanceState) {
+        Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_GPS);
     }
 
     /**

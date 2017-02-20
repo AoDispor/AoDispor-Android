@@ -61,12 +61,6 @@
                     android:id="@+id/new_user" />
 
                 <Button
-                    android:text="@string/returning_user"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/returning_user" />
-
-                <Button
                     android:text="@string/skip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -78,8 +78,7 @@ public class AppDefinitions {
     public static String userPassword = "";
 
     /** used to block certain features when user has not loggedin with the sms code */
-    public static boolean smsLoginDone=false;
-
+    public static boolean smsLoginDone = false;
     /**
      * postal code to be sent to 'tokens' database
      */

@@ -27,13 +27,12 @@ public class SplitActivity extends Activity
         Log.d("PREFERENCES", preferences.get().telephone());
         Log.d("PREFERENCES", preferences.get().password());
 
-        preferences.edit().clear().apply();
-
         if(preferences.get().hasValidPair()) {
             // Guardar username e password no AppDefinitions para a API poder usar
             // FIXME devia ser qualquer coisa mais segura...
             AppDefinitions.phoneNumber = preferences.get().telephone();
             AppDefinitions.userPassword = preferences.get().password();
+            AppDefinitions.smsLoginDone = true;
             activityClass = MainActivity.class;
         } else {
             activityClass = OnBoardingActivity.class;

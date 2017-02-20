@@ -60,10 +60,11 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null) {
-            DefaultLayoutPromptView promptView
-                    = (DefaultLayoutPromptView) findViewById(R.id.prompt_view);
+        // TODO arranjar uma maneira de centralizar esta cena do token
+        HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
 
+        if (savedInstanceState == null) {
+            DefaultLayoutPromptView promptView = (DefaultLayoutPromptView) findViewById(R.id.prompt_view);
             Amplify.getSharedInstance().promptIfReady(promptView);
         }
 
@@ -86,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
                 //FIXME isto precisa de ter uma maneira para limpar a string pesquisada
             }
         });
-
     }
 
     protected void onActivityCreated (Bundle savedInstanceState) {
@@ -162,25 +162,27 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
         profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
 
-        if(AppDefinitions.smsLoginDone) mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (positionOffset != 0) {
-                    profileView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.white), ContextCompat.getColor(getApplicationContext(), R.color.black), positionOffset));
-                    stackView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.black), ContextCompat.getColor(getApplicationContext(), R.color.white), positionOffset));
+        if(AppDefinitions.smsLoginDone) {
+            mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    if (positionOffset != 0) {
+                        profileView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.white), ContextCompat.getColor(getApplicationContext(), R.color.black), positionOffset));
+                        stackView.setColorFilter(ColorUtils.blendARGB(ContextCompat.getColor(getApplicationContext(), R.color.black), ContextCompat.getColor(getApplicationContext(), R.color.white), positionOffset));
+                    }
                 }
-            }
 
-            @Override
-            public void onPageSelected(int position) {
+                @Override
+                public void onPageSelected(int position) {
 
-            }
+                }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+                @Override
+                public void onPageScrollStateChanged(int state) {
 
-            }
-        });
+                }
+            });
+        }
 
         final SearchView searchView = (SearchView) findViewById(R.id.searchView);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);

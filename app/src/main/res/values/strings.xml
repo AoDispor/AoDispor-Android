@@ -74,6 +74,7 @@
     <string name="retry">Tentar novamente</string>
 
     <string name="search_bar_hint">De quem precisa hoje?</string>
+    <string name="search_bar_toast">A pesquisa deverá ter no mínimo cinco caracteres</string>
     <string name="permission_request_location">Para lhe mostrarmos profissionais perto de si precisamos de aceder à sua localização.</string>
 
     <!-- Floating Action Menu -->

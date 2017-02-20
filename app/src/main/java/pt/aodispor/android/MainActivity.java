@@ -198,13 +198,35 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                CardFragment cardFrag = null;
-                for(Object frag : getSupportFragmentManager().getFragments())
-                    if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
-                cardFrag.setSearchQuery(query);
-                cardFrag.setupNewStack(cardFrag.prepareNewStack());
-                mViewPager.setCurrentItem(1, true);
-                searchView.clearFocus();
+                /**
+                 * Get all the words in the query to get rid of spaces and then
+                 * build another String with all the words in order separated by
+                 * only one space in between each of them.
+                 */
+                String[] words = query.split("\\s+");
+                String newQuery = "";
+                for (int i = 0; i < words.length; i++) {
+                    newQuery += words[i];
+                    if(i < words.length - 1) {
+                        newQuery += " ";
+                    }
+                }
+                if(newQuery.length() >= 5) {
+                    CardFragment cardFrag = null;
+                    for(Object frag : getSupportFragmentManager().getFragments()) {
+                        if (frag instanceof CardFragment) {
+                            cardFrag = (CardFragment) frag;
+                        }
+                    }
+                    if(cardFrag != null) {
+                        cardFrag.setSearchQuery(query);
+                        cardFrag.setupNewStack(cardFrag.prepareNewStack());
+                    }
+                    mViewPager.setCurrentItem(1, true);
+                    searchView.clearFocus();
+                } else {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_bar_toast), Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
         });

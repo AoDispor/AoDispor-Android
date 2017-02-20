@@ -59,6 +59,7 @@
     <string name="loading">A actualizar&#8230;</string>
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
     <string name="discard">Descartar</string>string>
+    <string name="query_too_short">Palavra demasiado curta</string>
 
     <!-- Generic Messages -->
     <string name="okay">Certo</string>

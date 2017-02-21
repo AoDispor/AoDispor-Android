@@ -45,6 +45,8 @@ import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
  */
 public class CardFragment extends Fragment implements HttpRequest {
 
+    static private boolean started = false;
+
     public void setSearchQuery(String query) {
         searchQuery = query;
     }
@@ -226,6 +228,10 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         setupNewStack(prepareNewStack());//TODO consider also doing this in background
 
+        if(!started){
+            started=true;
+            Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_GPS);
+        }
         return rootView;
     }
 

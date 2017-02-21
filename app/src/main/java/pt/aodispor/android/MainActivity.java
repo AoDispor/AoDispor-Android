@@ -92,10 +92,9 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         });
     }
 
-    protected void onPostCreate (Bundle savedInstanceState) {
+    /*protected void onPostCreate (Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        Permission.requestPermission(this, AppDefinitions.PERMISSIONS_REQUEST_GPS);
-    }
+    }*/
 
     /**
      * Returns this activity's custom ViewPager.
@@ -266,9 +265,9 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
-                CardFragment cardFragment = (CardFragment) ((TabPagerAdapter) mViewPager.getAdapter()).getItem(1);
-                cardFragment.updateGeoLocation(getBaseContext());
-                cardFragment.prepareNewSearchQuery(false);
+                CardFragment cardFragment =  ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
+                cardFragment.updateGeoLocation();
+                cardFragment.setupNewStack(cardFragment.prepareNewSearchQuery(false));
                 break;
             default:
                 if (android.os.Build.VERSION.SDK_INT >= 23)

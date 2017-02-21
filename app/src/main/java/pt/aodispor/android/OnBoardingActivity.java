@@ -57,6 +57,8 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
     String phoneNumber;
     WelcomeCoordinatorLayout coordinatorLayout;
 
+    private Button newUserButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +83,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         final Button skipButton = (Button) findViewById(R.id.skip_button);
         // Página 2
         final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
-        final Button newUserButton = (Button) findViewById(R.id.new_user);
+        newUserButton = (Button) findViewById(R.id.new_user);
         final Button skipButton2 = (Button) findViewById(R.id.skip_button2);
         // Página 3
         final EditText validationCodeField = (EditText) findViewById(R.id.validation_code);
@@ -249,7 +251,6 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                 final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
                 phoneNumberField.setPhoneNumber(phoneNumber);
                 // havendo um número de telefone, enviar a SMS de registo se o número de telefone for válido
-                final Button newUserButton = (Button) findViewById(R.id.new_user);
                 newUserButton.callOnClick();
                 break;
             default:

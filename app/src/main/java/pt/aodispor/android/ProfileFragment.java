@@ -3,6 +3,8 @@ package pt.aodispor.android;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -24,6 +26,8 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import pt.aodispor.android.api.ApiJSON;
@@ -545,12 +549,10 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
     public void openGallery(int req_code) {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.putExtra("crop", "true");
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-        intent.putExtra("outputX", 200);
-        intent.putExtra("outputY", 200);
-        intent.putExtra("return-data", true);
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
         startActivityForResult(intent, req_code);
     }
 
@@ -582,20 +584,31 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
-            startLoading();
-            Bundle bundle = data.getExtras();
-            Bitmap image = bundle.getParcelable("data");
-            if(image != null) {
-                int byteNum = image.getByteCount();
-                ByteBuffer buffer = ByteBuffer.allocate(byteNum);
-                image.copyPixelsToBuffer(buffer);
-                HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_UPLOAD_IMAGE);
-                request.setMethod(HttpRequestTask.PUT_REQUEST);
-                request.setType(HttpRequest.UPDATE_PROFILE);
-                request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-                request.setBitmapBody(Utility.convertBitmapToBinary(image));
-                request.execute();
+            try {
+                startLoading();
+
+                Uri uri = data.getData();
+                InputStream imageStream = null;
+
+                imageStream = this.getContext().getContentResolver().openInputStream(uri);
+                Bitmap originalImage = BitmapFactory.decodeStream(imageStream);
+                Bitmap image = Bitmap.createScaledBitmap(originalImage, 1024, 1024, true);
+
+                if(image != null) {
+                    int byteNum = image.getByteCount();
+                    ByteBuffer buffer = ByteBuffer.allocate(byteNum);
+                    image.copyPixelsToBuffer(buffer);
+                    HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_UPLOAD_IMAGE);
+                    request.setMethod(HttpRequestTask.PUT_REQUEST);
+                    request.setType(HttpRequest.UPDATE_PROFILE);
+                    request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+                    request.setBitmapBody(Utility.convertBitmapToBinary(image));
+                    request.execute();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
+
         }
     }
 

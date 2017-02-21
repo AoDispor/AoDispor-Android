@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1); //TODO Mostrar o perfil se a pessoa se tiver registado
+        mViewPager.setCurrentItem(1);
 
         profileView = ((ImageView) findViewById(R.id.profile_icon));
         stackView = ((ImageView) findViewById(R.id.stack_icon));
@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
 
         if(AppDefinitions.smsLoginDone) {
+            mViewPager.setCurrentItem(0);
             mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

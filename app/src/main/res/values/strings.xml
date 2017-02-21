@@ -60,6 +60,7 @@
     <string name="timeout">Ups! Parece que ocorreu um erro :(\n Verifique a sua ligação.</string>
     <string name="discard">Descartar</string>string>
     <string name="query_too_short">Palavra demasiado curta</string>
+    <string name="cannot_load_image">Não foi possível carregar a sua imagem.</string>
 
     <!-- Generic Messages -->
     <string name="okay">Certo</string>
@@ -111,4 +112,6 @@
     <string name="amplify_negative_yes">Tenho sugestões</string>
     <string name="amplify_negative_no">Noutra altura</string>
     <string name="amplify_thanks">Obrigado por nos ajudar a servi-lo!</string>
+    <string name="label_select_picture">Selecionar imagem</string>
+    <string name="request_permission_read_storage">O Ao Dispor pretender aceder às suas fotografias.</string>
 </resources>

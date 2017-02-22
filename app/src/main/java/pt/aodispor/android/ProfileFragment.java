@@ -78,6 +78,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inputManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
     }
 
     @Override

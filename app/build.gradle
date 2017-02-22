@@ -27,8 +27,8 @@ android {
         applicationId "pt.aodispor.android"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 15
-        versionName "0.9"
+        versionCode 16
+        versionName "0.9.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

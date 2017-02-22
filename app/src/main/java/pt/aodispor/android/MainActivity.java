@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
 
         if(AppDefinitions.smsLoginDone) {
+            stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+            profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
             mViewPager.setCurrentItem(0);
             mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override

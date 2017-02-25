@@ -4,73 +4,62 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/colorPrimaryDark"
     style="@style/AppTheme.NoActionBar">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="20dp"
         android:id="@+id/layoutContainer"
-        android:orientation="horizontal"
-        android:layout_alignParentTop="true"
-        android:baselineAligned="false"
-        android:background="?attr/colorPrimaryDark">
+        android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="0dip"
-            android:layout_height="fill_parent"
-            android:layout_weight="0.15">
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="0dip"
+        <TextView android:text="@string/welcome_text"
             android:layout_height="wrap_content"
-            android:layout_weight="0.7">
+            android:id="@+id/welcome"
+            android:textSize="30sp"
+            android:textAlignment="center"
+            android:layout_width="match_parent"
+            android:textStyle="normal|bold"
+            android:textAllCaps="false" />
 
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:orientation="vertical"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentBottom="true">
+        <Button
+            android:text="@string/next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/next_button"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:background="@drawable/button"
+            android:textColor="@color/grey3"
+            android:textStyle="normal|bold" />
 
-                <TextView android:text="@string/welcome_text"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView4"
-                    android:textSize="28sp"
-                    android:textAlignment="center"
-                    android:layout_width="match_parent" />
+        <Button
+            android:text="@string/skip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/skip_button"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:background="@drawable/button"
+            android:textStyle="normal|bold"
+            android:textColor="@color/grey3" />
 
-                <Button
-                    android:text="@string/next"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/next_button" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView1"
+            android:layout_marginTop="20dp"
+            android:baselineAlignBottom="false"
+            android:clickable="false"
+            android:contentDescription="Boneco"
+            app:srcCompat="@drawable/inscricoes" />
 
-                <Button
-                    android:text="@string/skip"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/skip_button" />
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/imageView1"
-                    android:baselineAlignBottom="false"
-                    android:clickable="false"
-                    android:layout_marginTop="-55dp"
-                    android:scaleX="0.8"
-                    android:scaleY="0.8"
-                    android:contentDescription="Boneco"
-                    app:srcCompat="@drawable/inscricoes" />
-            </LinearLayout>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="0dip"
-            android:layout_height="fill_parent"
-            android:layout_weight="0.15">
-        </RelativeLayout>
     </LinearLayout>
+
 </com.redbooth.WelcomePageLayout>

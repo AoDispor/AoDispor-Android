@@ -3,6 +3,7 @@ package pt.aodispor.android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -289,4 +291,5 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         Error error = (Error) errorData;
         Toast.makeText(this, error.message, Toast.LENGTH_LONG).show();
     }
+
 }

@@ -89,12 +89,12 @@
     <string name="new_user">Novo utilizador</string>
     <string name="returning_user">Já tenho uma palavra-passe</string>
     <string name="validate">Validar</string>
-    <string name="send_another">Enviar de novo</string>
+    <string name="send_another"><u>Enviar de novo</u></string>
     <string name="phone_number">Número de telefone</string>
     <string name="validation_code">Código de validação</string>
-    <string name="welcome_text">Bem-vindo ao\n Ao Dispor.</string>
+    <string name="welcome_text">Bem-vindo ao\nAo Dispor.</string>
     <string name="ask_phone"> Para o podermos inscrever precisamos de lhe enviar uma SMS.</string>
-    <string name="skip">Não me inscrever agora</string>
+    <string name="skip"><u>Não me inscrever agora.</u></string>
     <string name="insert_validation_code">Insira o código de 6 algarismos presente na SMS que recebeu.</string>
     <string name="sms_text">Vi o seu perfil no AoDispor.pt e gostaria de contratar os seus serviços. Podemos falar?</string>
     <string name="request_permission_gps">O Ao Dispor precisa usar o seu GPS para encontrar os profissionais mais perto de si.</string>

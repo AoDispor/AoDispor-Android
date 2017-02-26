@@ -3,6 +3,8 @@ package pt.aodispor.android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
@@ -16,12 +18,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.lamudi.phonefield.PhoneEditText;
 import com.redbooth.WelcomeCoordinatorLayout;
+
+import org.w3c.dom.Text;
 
 import java.util.Date;
 import java.util.Objects;
@@ -80,16 +85,16 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
 
         // Página 1
         final Button nextButton = (Button) findViewById(R.id.next_button);
-        final Button skipButton = (Button) findViewById(R.id.skip_button);
+        final TextView skipView = (TextView) findViewById(R.id.skip_text);
         // Página 2
         final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
         newUserButton = (Button) findViewById(R.id.new_user);
-        final Button skipButton2 = (Button) findViewById(R.id.skip_button2);
+        final TextView skipText2 = (TextView) findViewById(R.id.skip_text2);
         // Página 3
         final EditText validationCodeField = (EditText) findViewById(R.id.validation_code);
         final Button validate = (Button) findViewById(R.id.validate_button);
-        final Button sendAnother = (Button) findViewById(R.id.send_another_button);
-        final Button skipButton3 = (Button) findViewById(R.id.skip_button3);
+        final TextView sendAnother = (TextView) findViewById(R.id.send_another_text);
+        final TextView skipText3 = (TextView) findViewById(R.id.skip_text3);
 
         final View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
@@ -110,7 +115,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
             }
         });
         // Saltar
-        skipButton.setOnClickListener(clickListener);
+        skipView.setOnClickListener(clickListener);
 
         // Página 2
         // Telefone
@@ -150,7 +155,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         });
 
         // Saltar
-        skipButton2.setOnClickListener(clickListener);
+        skipText2.setOnClickListener(clickListener);
 
         // Página 3
         // Campo de texto para a password
@@ -200,7 +205,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
             }
         });
         // Saltar
-        skipButton3.setOnClickListener(clickListener);
+        skipText3.setOnClickListener(clickListener);
     }
 
     private void showMainActivity() {
@@ -289,4 +294,5 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         Error error = (Error) errorData;
         Toast.makeText(this, error.message, Toast.LENGTH_LONG).show();
     }
+
 }

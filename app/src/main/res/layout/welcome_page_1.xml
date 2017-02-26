@@ -39,16 +39,17 @@
             android:textColor="@color/grey3"
             android:textStyle="normal|bold" />
 
-        <Button
+        <TextView
             android:text="@string/skip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/skip_button"
-            android:layout_marginTop="20dp"
+            android:id="@+id/skip_text"
+            android:layout_marginTop="10dp"
             android:textSize="20sp"
-            android:background="@drawable/button"
-            android:textStyle="normal|bold"
-            android:textColor="@color/grey3" />
+            android:background="@android:color/transparent"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:textAllCaps="false" />
 
         <ImageView
             android:layout_width="match_parent"

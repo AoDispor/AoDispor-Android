@@ -17,6 +17,7 @@
 
     <dimen name="button_bar_bottom">10dp</dimen>
     <dimen name="button_bar_top">10dp</dimen>
+    <dimen name="button_border_radius">5dp</dimen>
 
     <dimen name="avatar_size">175dp</dimen>
 

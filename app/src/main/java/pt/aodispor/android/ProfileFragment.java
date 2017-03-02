@@ -78,6 +78,8 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inputManager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
     }
 
     @Override
@@ -217,7 +219,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * @param type    The type of the service.
      */
     @Override
-    public void onPriceDialogCallBack(int value, boolean isFinal, PriceType type) {
+    public void onPriceDialogCallBack(int value, boolean isFinal, PriceType type, String currency) {
         startLoading();
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
@@ -238,6 +240,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
                 p.type = "S";
                 break;
         }
+        p.currency = currency;
         request.setJSONBody(p);
         request.execute();
     }

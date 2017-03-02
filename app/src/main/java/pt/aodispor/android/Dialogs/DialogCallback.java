@@ -7,5 +7,5 @@ import pt.aodispor.android.ProfileFragment;
  * do something when the dialog is dismissed.
  */
 public interface DialogCallback {
-    void onPriceDialogCallBack(int value, boolean isFinal, ProfileFragment.PriceType type);
+    void onPriceDialogCallBack(int value, boolean isFinal, ProfileFragment.PriceType type, String currency);
 }

@@ -29,6 +29,8 @@ android {
         targetSdkVersion 25
         versionCode 16
         versionName "0.9.1"
+        versionCode 19
+        versionName "0.9.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -47,7 +49,7 @@ android {
     }
 	lintOptions {
           abortOnError false
-      }
+    }
 }
 
 dependencies {
@@ -59,10 +61,13 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.android.support:design:25.0.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile 'com.google.android.gms:play-services-gcm:10.0.0'
+
+    androidTestCompile 'tools.fastlane:screengrab:1.0.2'
+    androidTestCompile 'com.android.support:appcompat-v7:25.1.0'
 
     compile 'de.hdodenhof:circleimageview:2.1.0'
 
@@ -92,6 +97,7 @@ dependencies {
     testCompile "org.hamcrest:hamcrest-core:$HAMCREST_VERSION"
     testCompile "org.hamcrest:hamcrest-library:$HAMCREST_VERSION"
     testCompile "org.hamcrest:hamcrest-integration:$HAMCREST_VERSION"
+
 }
 
 apply plugin: 'com.google.gms.google-services'

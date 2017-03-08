@@ -226,7 +226,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         });
 
-        setupNewStack(prepareNewStack());//TODO consider also doing this in background
+        prepareNewStack();//TODO consider also doing this in background
 
         if(!started){
             started=true;
@@ -241,7 +241,7 @@ public class CardFragment extends Fragment implements HttpRequest {
                 case PermissionActivity.PERMISSION_GRANTED:
                     //Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
                     updateGeoLocation();//setupLocationManager();
-                    setupNewStack(prepareNewStack());//TODO consider also doing this in background
+                    prepareNewStack();//TODO consider also doing this in background
                     break;
                 case PermissionActivity.PERMISSION_DENIED:
                     //Toast.makeText(this, "Denied", Toast.LENGTH_SHORT).show();
@@ -260,22 +260,26 @@ public class CardFragment extends Fragment implements HttpRequest {
     //region NAVIGATION/PAGINATION
 
     /**
-     * to be called when doing a new search
+     * to be called when doing a new search. call before setupNewStack().
      */
-    public QueryResult prepareNewStack() {
-        return prepareNewStack(false);
+    public void prepareNewStack() {
+        prepareNewStack(false);
     }
 
     /**
      * to be called when doing a new search or retrying to load the same search
      */
-    public QueryResult prepareNewStack(boolean retry) {
+    public void prepareNewStack(boolean retry) {
         currentSetCardIndex = 0;
         nextSet = null;
         previousSet = null;
-        return prepareNewSearchQuery(retry);
+        if(cardStack!=null && cardStack.getCardAt(CardStack.TOP)!=null){
+            loadingWidget.startLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
+        }
+        prepareNewSearchQuery(retry);
     }
 
+    /** to be called after receiving an answer (or not) from API */
     public void setupNewStack(QueryResult queryResult) {
         if (cardStack.areCardViewsInitialized()) cardStack.removeAllCardViews();
         else cardStack.initNewStack();
@@ -322,8 +326,8 @@ public class CardFragment extends Fragment implements HttpRequest {
                             @Override
                             public void onClick(View view) {
                                 requestType = RequestType.retry_newSet;
-
                                 loadingWidget.startLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
+                                prepareNewStack(true);
                             }
                         }
                 );
@@ -668,11 +672,12 @@ public class CardFragment extends Fragment implements HttpRequest {
      *
      * @return true if received query result on time
      */
-    public QueryResult prepareNewSearchQuery(boolean retry) {
+    public void prepareNewSearchQuery(boolean retry) {
         requestType = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this,
                 queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
-
+        request.execute();
+        /*
         SearchQueryResult result;
         try {
             result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
@@ -687,7 +692,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             this.currentSet = result;
             return QueryResult.successful;
         }
-        return QueryResult.emptySet;
+        return QueryResult.emptySet;*/
     }
 
     public void prepareNextPage() {
@@ -766,12 +771,25 @@ public class CardFragment extends Fragment implements HttpRequest {
             nextSet = (SearchQueryResult) answer;
         else if (requestType == RequestType.prevSet)
             previousSet = (SearchQueryResult) answer;
+        else if(requestType == RequestType.newSet){
+            loadingWidget.endLoading(loadingLL,null);
+            //TODO review this later
+            if (answer != null ) {
+                SearchQueryResult result = (SearchQueryResult) answer;
+                if(result.data != null && result.data.size() > 0) {
+                    this.currentSet = result;
+                    setupNewStack(QueryResult.successful);
+                }
+                else {
+                    setupNewStack(QueryResult.emptySet);
+                }
+            }
+        }
         else if (requestType == RequestType.retry_prevSet
                 || requestType == RequestType.retry_nextSet
                 || requestType == RequestType.retry_newSet
                 ) {
             loadingWidget.endLoading(loadingLL, null);
-            //if(queryResult==)
             //TODO REMOVE LOADING animation & ADD VIEW REFRESH
             //TODO REMOVE LOADING animation & ADD VIEW REFRESH
             //TODO REMOVE LOADING animation & ADD VIEW REFRESH
@@ -783,7 +801,13 @@ public class CardFragment extends Fragment implements HttpRequest {
     @Override
     public void onHttpRequestFailed(ApiJSON errorData) {
 
-        if (requestType == RequestType.retry_prevSet
+        if(requestType == RequestType.newSet){
+            //TODO possibly inform user about some errors
+            //if (errorData!=null) do something...
+            setupNewStack(QueryResult.error);
+            loadingWidget.endLoading(loadingLL,null);
+        }
+        else if (requestType == RequestType.retry_prevSet
                 || requestType == RequestType.retry_nextSet
                 || requestType == RequestType.retry_newSet
                 ) {

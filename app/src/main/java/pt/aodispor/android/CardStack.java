@@ -45,7 +45,10 @@ public class CardStack {
         return cards != null;
     }
 
-    public RelativeLayout getCardAt(int index){return cards[index];}
+    public RelativeLayout getCardAt(int index){
+        if (cards==null) return null;
+        return cards[index];
+    }
     public Professional getCardProfessionalInfoAt(int index){return cards_professional_data[index];}
 
     public CardStack(){}
@@ -250,7 +253,7 @@ public class CardStack {
         retryButton.setText(R.string.retry);
 
         //TODO REMOVED BUTTON... will only be added when completed
-        //retryButton.setVisibility(View.VISIBLE);
+        retryButton.setVisibility(View.VISIBLE);
 
         retryButton.setOnClickListener(listener);
 

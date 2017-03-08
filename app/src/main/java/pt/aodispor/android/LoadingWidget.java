@@ -19,14 +19,14 @@ public class LoadingWidget {
     public void startLoading(LinearLayout loadingWidget, RelativeLayout hideViews) {
         if (additionalBehaviour != null) additionalBehaviour.beforeStartLoading();
         if (hideViews != null) hideViews(hideViews);
-        loadingWidget.setVisibility(View.VISIBLE);
+        if (loadingWidget!=null) loadingWidget.setVisibility(View.VISIBLE);
         if (additionalBehaviour != null) additionalBehaviour.afterStartLoading();
     }
 
     public void endLoading(LinearLayout loadingWidget, RelativeLayout showViews) {
         if (additionalBehaviour != null) additionalBehaviour.beforeEndLoading();
         if (showViews != null) showViews(showViews);
-        loadingWidget.setVisibility(LinearLayout.INVISIBLE);
+        if (loadingWidget!=null) loadingWidget.setVisibility(LinearLayout.INVISIBLE);
         if (additionalBehaviour != null) additionalBehaviour.afterEndLoading();
     }
 

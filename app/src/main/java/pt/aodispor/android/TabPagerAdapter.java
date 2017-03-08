@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+
 /**
  * Custom FragmentPagerAdapter class to control any sort of fragment class and to select the text
  * to be shown in the tabs.

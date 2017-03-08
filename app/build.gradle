@@ -27,8 +27,6 @@ android {
         applicationId "pt.aodispor.android"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 16
-        versionName "0.9.1"
         versionCode 19
         versionName "0.9.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

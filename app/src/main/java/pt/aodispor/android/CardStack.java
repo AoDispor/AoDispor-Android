@@ -237,7 +237,7 @@ public class CardStack {
         return card;
     }
 
-    public LinearLayout addNoConnectionCard(
+    public void addNoConnectionCard(
             int cardIndex,
             //final CardFragment.RequestType retryType,
             View.OnClickListener listener
@@ -248,7 +248,7 @@ public class CardStack {
         //TODO WORKING NOW
         //TODO WORKING NOW
         RelativeLayout card = addMessageCard(cardIndex, fragment.getString(R.string.no_conection_title), fragment.getString(R.string.no_conection_msg));
-        LinearLayout loadingLL = (LinearLayout) card.findViewById(R.id.loadingMessage);
+        //LinearLayout loadingLL = (LinearLayout) card.findViewById(R.id.loadingMessage);
         Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
         retryButton.setText(R.string.retry);
 
@@ -257,7 +257,7 @@ public class CardStack {
 
         retryButton.setOnClickListener(listener);
 
-        return loadingLL;
+        //return loadingLL;
     }
 
     //endregion

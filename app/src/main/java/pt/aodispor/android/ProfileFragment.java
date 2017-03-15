@@ -124,7 +124,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
         configureDescriptionEditText();
 
         // Loading Message
-        loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingMessage);
+        loadingMessage = (LinearLayout) professionalCard.findViewById(R.id.loadingWidgetLayout);
 
         imageView.setClickable(true);
         imageView.setOnClickListener(new View.OnClickListener() {

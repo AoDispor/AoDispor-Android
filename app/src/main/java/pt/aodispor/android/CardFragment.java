@@ -60,9 +60,31 @@ public class CardFragment extends Fragment implements HttpRequest {
      * used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query
      */
     @VisibleForTesting
-    protected enum RequestType {
-        prevSet, nextSet, newSet,
-        retry_prevSet, retry_nextSet, retry_newSet;
+    protected class RequestType {
+        public int val = 0;
+
+        public final static int prevSet = 0;
+        public final static int nextSet = 1;
+        public final static int newSet = 2;
+        public final static int retry_prevSet = 4 + 0;
+        public final static int retry_nextSet = 4 + 1;
+        public final static int retry_newSet = 4 + 2;
+
+        public boolean isRetry() {
+            return (val & 4) == 4;
+        }
+
+        public boolean isPrev() {
+            return (val & 3) == 0;
+        }
+
+        public boolean isNext() {
+            return (val & 3) == 1;
+        }
+
+        public boolean isNew() {
+            return (val & 3) == 2;
+        }
     }
 
     //RequestType retryRequestType;
@@ -78,7 +100,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     QueryResult queryResult;
 
     @VisibleForTesting
-    protected RequestType requestType;
+    protected final RequestType requestType = new RequestType();
     /**
      * contains the previous page data
      */
@@ -114,8 +136,16 @@ public class CardFragment extends Fragment implements HttpRequest {
     @VisibleForTesting
     protected Activity activity;
 
-    private LoadingWidget loadingWidget;
+    static private LoadingWidget loadingWidget;
     private LinearLayout loadingLL;
+
+    public LinearLayout getLoadingLayout() {
+        //if (loadingLL == null)
+            loadingLL = (LinearLayout) rootView.findViewById(R.id.loadingWidgetLayout);
+
+        return loadingLL;
+    }
+
 
     private static GeoLocation geoLocation = null;
 
@@ -124,9 +154,9 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     public void updateGeoLocation(Context context) {
-        if(geoLocation==null) geoLocation = new GeoLocation();
+        if (geoLocation == null) geoLocation = new GeoLocation();
 
-        if(context != null) geoLocation.updateLatLon(context);
+        if (context != null) geoLocation.updateLatLon(context);
         else geoLocation.updateLatLon(getContext());
     }
 
@@ -228,8 +258,8 @@ public class CardFragment extends Fragment implements HttpRequest {
 
         prepareNewStack();//TODO consider also doing this in background
 
-        if(!started){
-            started=true;
+        if (!started) {
+            started = true;
             Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_GPS);
         }
         return rootView;
@@ -273,14 +303,18 @@ public class CardFragment extends Fragment implements HttpRequest {
         currentSetCardIndex = 0;
         nextSet = null;
         previousSet = null;
-        if(cardStack!=null && cardStack.getCardAt(CardStack.TOP)!=null){
-            loadingWidget.startLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
-        }
+
+        loadingWidget.startLoading(getLoadingLayout(), cardStack.getCardAt(CardStack.TOP));
+
         prepareNewSearchQuery(retry);
     }
 
-    /** to be called after receiving an answer (or not) from API */
+    /**
+     * to be called after receiving an answer (or not) from API
+     */
     public void setupNewStack(QueryResult queryResult) {
+        this.queryResult=queryResult;
+
         if (cardStack.areCardViewsInitialized()) cardStack.removeAllCardViews();
         else cardStack.initNewStack();
 
@@ -289,11 +323,9 @@ public class CardFragment extends Fragment implements HttpRequest {
                 cardStack.addProfessionalCard(0, currentSet.data.get(0));
                 if (currentSet.data.size() > 1) {
                     cardStack.addProfessionalCard(1, currentSet.data.get(1));
-                    if (currentSet.data.size() > 2)
-                    {
+                    if (currentSet.data.size() > 2) {
                         cardStack.addProfessionalCard(2, currentSet.data.get(2));
-                    }
-                    else{
+                    } else {
                         cardStack.clearCard(2);
                         cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
                     }
@@ -321,13 +353,13 @@ public class CardFragment extends Fragment implements HttpRequest {
                 cardStack.clearCards(1, 2);
                 break;
             case error: //did not receive answer
-                loadingLL = cardStack.addNoConnectionCard(0,
+                cardStack.addNoConnectionCard(0,
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                requestType = RequestType.retry_newSet;
-                                loadingWidget.startLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
-                                prepareNewStack(true);
+                                //requestType = RequestType.retry_newSet;
+                                //loadingWidget.startLoading(getLoadingLayout(), cardStack.getCardAt(CardStack.TOP));
+                                CardFragment.this.prepareNewStack(true);
                             }
                         }
                 );
@@ -398,7 +430,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             }
         },
         /**
-         *  <p>the index is inside the current card set and all the card shown are also inside the set</p>
+         * <p>the index is inside the current card set and all the card shown are also inside the set</p>
          */
         INSET {
             public void updateCardStack(final CardFragment cf) {
@@ -435,12 +467,12 @@ public class CardFragment extends Fragment implements HttpRequest {
          */
         MISSING {
             public void updateCardStack(final CardFragment cf) {
-                cf.loadingLL = cf.cardStack.addNoConnectionCard(2, new View.OnClickListener() {
+                cf.cardStack.addNoConnectionCard(2, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        cf.requestType = RequestType.retry_nextSet;
+                        //cf.requestType = RequestType.retry_nextSet;
+                        //cf.loadingWidget.startLoading(cf.getLoadingLayout(), cf.cardStack.getCardAt(CardStack.TOP));
                         cf.prepareNextPage(true);
-                        cf.loadingWidget.startLoading(cf.loadingLL, cf.cardStack.getCardAt(CardStack.TOP));
                     }
                 });
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
@@ -538,7 +570,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      * <also> reponsable for requesting the loading of the previous page and updating the currentSet and nextSet
      */
     public void restorePreviousCard() {
-        if (blockAccess) {
+        if (blockAccess || queryResult!=QueryResult.successful) {
             return; //don't make anything while animation plays
         }
 
@@ -600,11 +632,11 @@ public class CardFragment extends Fragment implements HttpRequest {
                             blockAccess = false;
                             return;
                         case error: //did not receive answer
-                            loadingLL = cardStack.addNoConnectionCard(0,
+                            cardStack.addNoConnectionCard(0,
                                     new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            requestType = RequestType.retry_prevSet;
+                                            //requestType = RequestType.retry_prevSet;
                                             //TODO missing try to reload prev page
                                             //TODO loadingWidget.startLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
                                         }
@@ -673,7 +705,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      * @return true if received query result on time
      */
     public void prepareNewSearchQuery(boolean retry) {
-        requestType = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
+        requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this,
                 queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
         request.execute();
@@ -706,7 +738,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     public void prepareNextPage(boolean retry) {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null) ;
-        requestType = retry ? RequestType.retry_nextSet : RequestType.nextSet;
+        requestType.val = retry ? RequestType.retry_nextSet : RequestType.nextSet;
         Links links = currentSet.meta.pagination.getLinks();
         if (links == null)
             return;
@@ -723,7 +755,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     public void preparePreviousPage() {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null)
             return;
-        requestType = RequestType.prevSet;
+        requestType.val = RequestType.prevSet;
         Links links = currentSet.meta.pagination.getLinks();
         if (links == null)
             return;
@@ -740,7 +772,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     public QueryResult preparePreviousPageI() {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null)
             return QueryResult.none;
-        requestType = RequestType.prevSet;
+        requestType.val = RequestType.prevSet;
         Links links = currentSet.meta.pagination.getLinks();
         if (links == null)
             return QueryResult.none;
@@ -767,51 +799,51 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     @Override
     public void onHttpRequestCompleted(ApiJSON answer, int type) {
-        if (requestType == RequestType.nextSet)
+        if (requestType.isNext()) {
             nextSet = (SearchQueryResult) answer;
-        else if (requestType == RequestType.prevSet)
+        } else if (requestType.isPrev()) {
             previousSet = (SearchQueryResult) answer;
-        else if(requestType == RequestType.newSet){
-            loadingWidget.endLoading(loadingLL,null);
+        } else if (requestType.isNew()) {
+            loadingWidget.endLoading(false);
             //TODO review this later
-            if (answer != null ) {
+            if (answer != null) {
                 SearchQueryResult result = (SearchQueryResult) answer;
-                if(result.data != null && result.data.size() > 0) {
+                if (result.data != null && result.data.size() > 0) {
                     this.currentSet = result;
                     setupNewStack(QueryResult.successful);
-                }
-                else {
+                } else {
                     setupNewStack(QueryResult.emptySet);
                 }
             }
         }
-        else if (requestType == RequestType.retry_prevSet
-                || requestType == RequestType.retry_nextSet
-                || requestType == RequestType.retry_newSet
-                ) {
-            loadingWidget.endLoading(loadingLL, null);
-            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-            //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+
+        //reload top card
+        if (requestType.val == RequestType.retry_prevSet) {
+            loadingWidget.endLoading(false);
         }
+        if (requestType.val == RequestType.retry_nextSet) {
+            loadingWidget.endLoading(false);
+        }
+
+        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
+
     }
 
     @Override
     public void onHttpRequestFailed(ApiJSON errorData) {
 
-        if(requestType == RequestType.newSet){
+        if (requestType.val == RequestType.newSet) {
             //TODO possibly inform user about some errors
             //if (errorData!=null) do something...
+
+            loadingWidget.endLoading(false);
             setupNewStack(QueryResult.error);
-            loadingWidget.endLoading(loadingLL,null);
-        }
-        else if (requestType == RequestType.retry_prevSet
-                || requestType == RequestType.retry_nextSet
-                || requestType == RequestType.retry_newSet
-                ) {
-            loadingWidget.endLoading(loadingLL, cardStack.getCardAt(CardStack.TOP));
+        } else if (requestType.isRetry()) {
+            loadingWidget.endLoading(true);
             //TODO REMOVE LOADING animation
             //TODO REMOVE LOADING animation
             //TODO REMOVE LOADING animation

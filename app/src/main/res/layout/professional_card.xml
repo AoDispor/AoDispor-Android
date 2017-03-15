@@ -11,7 +11,7 @@
     android:padding="0dp"
     tools:context="pt.aodispor.android.ProfessionalProfileActivity">
 
-    <include layout="@layout/loading_indicator"/>
+    <!--include layout="@layout/loading_indicator"/-->
 
     <TextView
         android:id="@+id/location"

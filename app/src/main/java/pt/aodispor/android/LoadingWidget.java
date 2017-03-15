@@ -15,12 +15,31 @@ public class LoadingWidget {
     }
 
     OnLoading additionalBehaviour;
+    LinearLayout loadingWidget;
+    RelativeLayout views;
 
     public void startLoading(LinearLayout loadingWidget, RelativeLayout hideViews) {
+        this.loadingWidget = loadingWidget;
+        this.views = hideViews;
         if (additionalBehaviour != null) additionalBehaviour.beforeStartLoading();
         if (hideViews != null) hideViews(hideViews);
-        if (loadingWidget!=null) loadingWidget.setVisibility(View.VISIBLE);
+        if (loadingWidget!=null) {
+            //loadingWidget.clearAnimation();
+            loadingWidget.setVisibility(View.VISIBLE);
+        }
         if (additionalBehaviour != null) additionalBehaviour.afterStartLoading();
+    }
+
+    public void endLoading(boolean showViews) {
+        if (additionalBehaviour != null) additionalBehaviour.beforeEndLoading();
+        if (views != null && showViews) showViews(views);
+        if (loadingWidget!=null) {
+            //loadingWidget.clearAnimation();
+            //loadingWidget.setVisibility(LinearLayout.GONE);
+            loadingWidget.clearAnimation();
+            loadingWidget.setVisibility(LinearLayout.INVISIBLE);
+        }
+        if (additionalBehaviour != null) additionalBehaviour.afterEndLoading();
     }
 
     public void endLoading(LinearLayout loadingWidget, RelativeLayout showViews) {

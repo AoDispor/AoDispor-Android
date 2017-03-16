@@ -1,5 +1,6 @@
 package pt.aodispor.android;
 
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,7 +12,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class TabPagerAdapter extends FragmentPagerAdapter {
     /** Number of pages this adapter supports. */
     private final int NUMBER_OF_PAGES = 2;
-    private ProfileFragment profileFragment;
+    //TODO mudar se necessário private ProfileFragment profileFragment;
+    private TabbedProfile tabbedProfile;
     private CardFragment cardFragment;
 
     /**
@@ -32,8 +34,9 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         Fragment f = null;
         switch (position){
             case 0:
-                f = ProfileFragment.newInstance();
-                profileFragment = (ProfileFragment) f;
+                f = TabbedProfile.newInstance();
+                //TODO mudar se necessário profileFragment = (ProfileFragment) f;
+                tabbedProfile = (TabbedProfile) f;
                 break;
             case 1:
                 f = CardFragment.newInstance();
@@ -43,8 +46,14 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         return f;
     }
 
+    /* TODO mudar se necessário
     public ProfileFragment getProfileFragment() {
         return profileFragment;
+    }
+    */
+
+    public TabbedProfile getTabbedProfile() {
+        return tabbedProfile;
     }
 
     public CardFragment getCardFragment() {

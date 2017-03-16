@@ -96,7 +96,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Location
         locationView.setClickable(true);
-        //locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView)); //TODO DECIDE
         locationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

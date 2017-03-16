@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="allowed_currencies">
+        <item>EUR</item>
+        <item>MOP</item>
+        <item>USD</item>
+    </string-array>
+</resources>

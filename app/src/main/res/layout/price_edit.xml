@@ -18,16 +18,27 @@
             android:textColor="@color/black"
             android:layout_marginBottom="10dp" />
 
-        <EditText
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:maxLength="3"
-            android:inputType="number"
-            android:id="@+id/price_input"
-            android:background="@drawable/line_input"
-            android:layout_height="50dp"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            android:layout_marginBottom="10dp" />
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:layout_width="169dp"
+                android:maxLength="3"
+                android:inputType="number"
+                android:id="@+id/price_input"
+                android:background="@drawable/line_input"
+                android:layout_height="50dp"
+                android:textAlignment="center"
+                android:textSize="30sp"
+                android:layout_marginBottom="10dp" />
+
+            <Spinner
+                android:id="@+id/currency_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
         <Switch
             android:layout_width="match_parent"

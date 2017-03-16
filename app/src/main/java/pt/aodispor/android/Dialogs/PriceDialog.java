@@ -14,8 +14,10 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -33,6 +35,7 @@ public class PriceDialog extends DialogFragment {
     private ProfileFragment.PriceType priceType;
     private int rate;
     private Switch priceSwitch;
+    private Spinner currencySpinner;
 
     public PriceDialog() {
 
@@ -97,6 +100,7 @@ public class PriceDialog extends DialogFragment {
         Button byDay = (Button) root.findViewById(R.id.type2);
         Button byService = (Button) root.findViewById(R.id.type3);
         priceSwitch = (Switch) root.findViewById(R.id.priceSwitch);
+        currencySpinner = (Spinner) root.findViewById(R.id.currency_spinner);
 
         // Radio Buttons
         buttons = new Button[]{ byHour, byDay, byService };
@@ -123,6 +127,12 @@ public class PriceDialog extends DialogFragment {
                 }
             });
         }
+
+        Spinner spinner = (Spinner) root.findViewById(R.id.currency_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(root.getContext(), R.array.allowed_currencies, R.layout.currency_spinner_layout);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
         updateViews();
         return root;
     }
@@ -137,13 +147,20 @@ public class PriceDialog extends DialogFragment {
     public void onPause() {
         super.onPause();
         ProfileFragment pf = (ProfileFragment) getTargetFragment();
+
         int nRate = rate;
+
         if (priceView.getText().length() != 0) {
             nRate = Integer.parseInt(priceView.getText().toString());
         }
+
         boolean nFinal = priceSwitch.isChecked();
+
         ProfileFragment.PriceType nPriceType = ProfileFragment.PriceType.values()[buttonChosen];
-        pf.onPriceDialogCallBack(nRate,nFinal,nPriceType);
+
+        String nCurrency = currencySpinner.getSelectedItem().toString();
+
+        pf.onPriceDialogCallBack(nRate,nFinal,nPriceType,nCurrency);
     }
 
     private void updateViews() {

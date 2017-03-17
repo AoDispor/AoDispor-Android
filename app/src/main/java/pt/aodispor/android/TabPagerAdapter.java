@@ -13,7 +13,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     /** Number of pages this adapter supports. */
     private final int NUMBER_OF_PAGES = 2;
     //TODO mudar se necessário private ProfileFragment profileFragment;
-    private TabbedProfile tabbedProfile;
+    private TabbedUserArea tabbedProfile;
     private CardFragment cardFragment;
 
     /**
@@ -34,9 +34,9 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         Fragment f = null;
         switch (position){
             case 0:
-                f = TabbedProfile.newInstance();
+                f = TabbedUserArea.newInstance();
                 //TODO mudar se necessário profileFragment = (ProfileFragment) f;
-                tabbedProfile = (TabbedProfile) f;
+                tabbedProfile = (TabbedUserArea) f;
                 break;
             case 1:
                 f = CardFragment.newInstance();
@@ -52,7 +52,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     }
     */
 
-    public TabbedProfile getTabbedProfile() {
+    public TabbedUserArea getTabbedProfile() {
         return tabbedProfile;
     }
 

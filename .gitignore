@@ -53,5 +53,8 @@ gen-external-apklibs
 
 # End of https://www.gitignore.io/api/android
 
+# App
+nontracked.xml
+
 documentation/
 

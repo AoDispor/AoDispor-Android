@@ -1,4 +1,4 @@
-package pt.aodispor.android;
+package pt.aodispor.android.profile;
 
 import android.support.v4.app.Fragment;
 

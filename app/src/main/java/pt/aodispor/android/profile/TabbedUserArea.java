@@ -1,4 +1,4 @@
-package pt.aodispor.android;
+package pt.aodispor.android.profile;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -6,6 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import pt.aodispor.android.MyViewPager;
+import pt.aodispor.android.R;
+import pt.aodispor.android.TabPagerAdapter;
 
 public class TabbedUserArea extends Fragment {
     private final static int PROFILE = 0;
@@ -31,7 +35,7 @@ public class TabbedUserArea extends Fragment {
         return profileView;
     }
 
-    private class TabbedProfilePagerAdapter extends TabPagerAdapter{
+    private class TabbedProfilePagerAdapter extends TabPagerAdapter {
 
         public TabbedProfilePagerAdapter(FragmentManager fm) {
             super(fm);

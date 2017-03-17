@@ -1,9 +1,10 @@
 package pt.aodispor.android;
 
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import pt.aodispor.android.profile.TabbedUserArea;
 
 /**
  * Custom FragmentPagerAdapter class to control any sort of fragment class and to select the text

@@ -12,11 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class NewProfileFragment extends Fragment{
+public class UserAreaFragment extends Fragment{
     private ListView listView;
 
-    public static NewProfileFragment newInstance() {
-        return new NewProfileFragment();
+    public static UserAreaFragment newInstance() {
+        return new UserAreaFragment();
     }
 
     @Nullable
@@ -24,7 +24,7 @@ public class NewProfileFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.new_profile, container, false);
         listView = (ListView) root.findViewById(R.id.list);
-        ListItem[] list = {new ListItemField(getContext(), "loool"), new ListItemField(getContext(), "loool"), new ListItemField(getContext(), "loool")};
+        ListItem[] list = { new Profile(getContext()) };
         listView.setAdapter(new CustomAdapter(getContext(), R.layout.profile_field, list));
         return root;
     }

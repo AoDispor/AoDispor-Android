@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TabbedProfile extends Fragment {
+public class TabbedUserArea extends Fragment {
     private final static int PROFILE = 0;
     private final static int SETTINGS = 1;
     private MyViewPager viewPager;
@@ -18,8 +18,8 @@ public class TabbedProfile extends Fragment {
      *
      * @return the ProfileFragment object created.
      */
-    public static TabbedProfile newInstance() {
-        return new TabbedProfile();
+    public static TabbedUserArea newInstance() {
+        return new TabbedUserArea();
     }
 
     @Override
@@ -41,10 +41,10 @@ public class TabbedProfile extends Fragment {
         public Fragment getItem(int i) {
             Fragment f = null;
             switch (i) {
-                case 0:
-                    f = NewProfileFragment.newInstance();
+                case PROFILE:
+                    f = UserAreaFragment.newInstance();
                     break;
-                case 1:
+                case SETTINGS:
                     f = SettingsFragment.newInstance();
                     break;
             }

@@ -23,6 +23,7 @@ import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
+import pt.aodispor.android.dialogs.NewPriceDialog;
 
 public class UserAreaFragment extends Fragment implements HttpRequest{
     private static final String LOCATION_TAG = "location";
@@ -68,7 +69,7 @@ public class UserAreaFragment extends Fragment implements HttpRequest{
         request.execute();
     }
 
-    private void startLoading() { //TODO
+    private void startLoading() {
         listView.setVisibility(View.INVISIBLE);
         loadingMessage.setVisibility(View.VISIBLE);
     }
@@ -100,8 +101,6 @@ public class UserAreaFragment extends Fragment implements HttpRequest{
         updateProfile(p);
 
         endLoading();
-
-        //TODO endLoading();
     }
 
     public void updateProfile(Professional professional) {
@@ -109,7 +108,21 @@ public class UserAreaFragment extends Fragment implements HttpRequest{
         profile.setName(professional.full_name);
         profile.setProfession(professional.title);
         profile.setLocation(professional.location);
-        profile.setPrice(professional.rate);
+        int rate = Integer.parseInt(professional.rate);
+        boolean isFinal = Boolean.parseBoolean("true");
+        NewPriceDialog.PriceType type = NewPriceDialog.PriceType.ByDay;
+        switch (professional.type) {
+            case "H":
+                type = NewPriceDialog.PriceType.ByHour;
+                break;
+            case "D":
+                type = NewPriceDialog.PriceType.ByDay;
+                break;
+            case "S":
+                type = NewPriceDialog.PriceType.ByService;
+                break;
+        }
+        profile.setPrice(rate, isFinal, type, professional.currency);
         profile.setDescription(professional.description);
         arrayAdapter.add(profile);
         arrayAdapter.notifyDataSetChanged();

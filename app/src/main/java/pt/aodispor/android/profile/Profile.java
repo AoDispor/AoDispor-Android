@@ -7,17 +7,20 @@ import android.view.View;
 import android.widget.EditText;
 
 import pt.aodispor.android.R;
-import pt.aodispor.android.api.ApiJSON;
-import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.dialogs.LocationDialog;
+import pt.aodispor.android.dialogs.NewPriceDialog;
 
-public class Profile extends ListItem implements LocationDialog.LocationDialogListener, HttpRequest {
+public class Profile extends ListItem implements LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
     private final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
     private FragmentActivity activity;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
     private View root;
+    private int rate;
+    private boolean isFinal;
+    private String currency;
+    private NewPriceDialog.PriceType type;
 
     public Profile(Context c, FragmentActivity a) {
         super(c);
@@ -36,6 +39,15 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
                 LocationDialog dialog = new LocationDialog();
                 dialog.setListener(thisObject);
                 dialog.show(activity.getSupportFragmentManager(), LOCATION_TAG);
+            }
+        });
+
+        priceEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NewPriceDialog dialog = NewPriceDialog.newInstance(rate, isFinal, type, currency);
+                dialog.setListener(thisObject);
+                dialog.show(activity.getSupportFragmentManager(), PRICE_DIALOG_TAG);
             }
         });
     }
@@ -57,8 +69,12 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
         locationEdit.setText(l);
     }
 
-    public void setPrice(String p) {
-        priceEdit.setText(p);
+    public void setPrice(int p, boolean f, NewPriceDialog.PriceType t, String c) {
+        rate = p;
+        isFinal = f;
+        type = t;
+        currency = c;
+        priceEdit.setText(rate + " " + currency);
     }
 
     public void setDescription(String d) {
@@ -86,19 +102,13 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
     }
 
 
-
-    @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
-
-    }
-
-    @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
-
-    }
-
     @Override
     public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
 
+    }
+
+    @Override
+    public void onPriceChanged(int rate, boolean isFinal, NewPriceDialog.PriceType type, String currency) {
+        setPrice(rate, isFinal, type, currency);
     }
 }

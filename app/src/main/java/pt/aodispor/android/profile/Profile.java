@@ -5,7 +5,9 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.dialogs.LocationDialog;
 import pt.aodispor.android.dialogs.NewPriceDialog;
@@ -27,11 +29,26 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
         thisObject = this;
         activity = a;
         root = LayoutInflater.from(context).inflate(R.layout.profile, null);
+        TextView nameView = (TextView) root.findViewById(R.id.name);
+        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        TextView professionView = (TextView) root.findViewById(R.id.profession);
+        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        TextView priceView = (TextView) root.findViewById(R.id.price);
+        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        TextView locationView = (TextView) root.findViewById(R.id.location);
+        locationView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        TextView descriptionView = (TextView) root.findViewById(R.id.description);
+        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         nameEdit = (EditText) root.findViewById(R.id.nameEdit);
+        nameEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         professionEdit = (EditText) root.findViewById(R.id.professionEdit);
+        professionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         locationEdit = (EditText) root.findViewById(R.id.locationEdit);
+        locationEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         priceEdit = (EditText) root.findViewById(R.id.priceEdit);
+        priceEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         descriptionEdit = (EditText) root.findViewById(R.id.descriptionEdit);
+        descriptionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
 
         locationEdit.setOnClickListener(new View.OnClickListener() {
             @Override

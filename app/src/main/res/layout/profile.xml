@@ -1,78 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey4"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="20dp"
+        android:paddingStart="20dp"
         android:text="@string/register_name"
-        android:textSize="18sp" />
+        android:textColor="@color/black2"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/nameEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:ems="10"
-        android:inputType="textPersonName" />
+        android:hint="escreva aqui o seu nome"
+        android:inputType="textPersonName"
+        android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/profession"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingStart="20dp"
         android:text="@string/register_profession"
-        android:textSize="18sp" />
+        android:textColor="@color/black2"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/professionEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:ems="10"
-        android:inputType="text" />
+        android:hint="Escreva aqui a sua profissão"
+        android:inputType="text"
+        android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingStart="20dp"
         android:text="@string/register_location"
-        android:textSize="18sp" />
+        android:textColor="@color/black2"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/locationEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:ems="10"
+        android:focusable="false"
+        android:hint="Escreva aqui a sua localização"
         android:inputType="text"
-        android:focusable="false" />
+        android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
+        android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/price"
+    <LinearLayout
+        android:id="@+id/priceContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/register_price"
-        android:textSize="18sp" />
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/priceEdit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="number"
-        android:focusable="false" />
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="20dp"
+            android:text="@string/register_price"
+            android:textColor="@color/black2"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/priceEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:focusable="false"
+            android:inputType="number"
+            android:textSize="20sp" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingStart="20dp"
         android:text="@string/register_description"
-        android:textSize="18sp" />
+        android:textColor="@color/black2"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/descriptionEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:ems="10"
-        android:inputType="textMultiLine" />
+        android:hint="Escreva aqui a descrição"
+        android:inputType="textMultiLine"
+        android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
+        android:textSize="20sp" />
 
 </LinearLayout>

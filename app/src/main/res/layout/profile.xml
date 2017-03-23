@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey4"
@@ -79,34 +80,30 @@
         android:textColorHint="@color/grey3"
         android:textSize="20sp" />
 
-    <LinearLayout
-        android:id="@+id/priceContainer"
+    <TextView
+        android:id="@+id/price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
         android:layout_marginTop="20dp"
-        android:orientation="horizontal">
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingStart="20dp"
+        android:text="@string/register_price"
+        android:textColor="@color/black2"
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/price"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingStart="20dp"
-            android:text="@string/register_price"
-            android:textColor="@color/black2"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/priceEdit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:focusable="false"
-            android:inputType="number"
-            android:textSize="20sp" />
-
-    </LinearLayout>
+    <EditText
+        android:id="@+id/priceEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="Toque aqui para editar o seu valor"
+        android:inputType="number"
+        android:padding="20dp"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/description"

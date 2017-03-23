@@ -17,6 +17,7 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
     private FragmentActivity activity;
+    private TextView nameView, professionView, locationView, priceView, descriptionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
     private View root;
     private int rate;
@@ -29,26 +30,20 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
         thisObject = this;
         activity = a;
         root = LayoutInflater.from(context).inflate(R.layout.profile, null);
-        TextView nameView = (TextView) root.findViewById(R.id.name);
-        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        TextView professionView = (TextView) root.findViewById(R.id.profession);
-        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        TextView priceView = (TextView) root.findViewById(R.id.price);
-        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        TextView locationView = (TextView) root.findViewById(R.id.location);
-        locationView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        TextView descriptionView = (TextView) root.findViewById(R.id.description);
-        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+
+        // Get Text Views
+        nameView = (TextView) root.findViewById(R.id.name);
+        professionView = (TextView) root.findViewById(R.id.profession);
+        priceView = (TextView) root.findViewById(R.id.price);
+        locationView = (TextView) root.findViewById(R.id.location);
+        descriptionView = (TextView) root.findViewById(R.id.description);
+
+        // Get Edit Text Views
         nameEdit = (EditText) root.findViewById(R.id.nameEdit);
-        nameEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         professionEdit = (EditText) root.findViewById(R.id.professionEdit);
-        professionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         locationEdit = (EditText) root.findViewById(R.id.locationEdit);
-        locationEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         priceEdit = (EditText) root.findViewById(R.id.priceEdit);
-        priceEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         descriptionEdit = (EditText) root.findViewById(R.id.descriptionEdit);
-        descriptionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
 
         locationEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,5 +122,21 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
     @Override
     public void onPriceChanged(int rate, boolean isFinal, NewPriceDialog.PriceType type, String currency) {
         setPrice(rate, isFinal, type, currency);
+    }
+
+    private void setFonts() {
+        // Text Views
+        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        locationView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+
+        // Edit Views
+        nameEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        professionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        locationEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        priceEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        descriptionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
     }
 }

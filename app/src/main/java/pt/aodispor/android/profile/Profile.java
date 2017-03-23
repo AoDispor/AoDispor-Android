@@ -13,6 +13,7 @@ import pt.aodispor.android.dialogs.LocationDialog;
 import pt.aodispor.android.dialogs.NewPriceDialog;
 
 public class Profile extends ListItem implements LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
+    private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
     private final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
@@ -45,6 +46,8 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
         priceEdit = (EditText) root.findViewById(R.id.priceEdit);
         descriptionEdit = (EditText) root.findViewById(R.id.descriptionEdit);
 
+        setFonts();
+
         locationEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,6 +70,16 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
     @Override
     public View getView() {
         return root;
+    }
+
+    @Override
+    public boolean onStart() {
+        return false;
+    }
+
+    @Override
+    public boolean onUpdate() {
+        return false;
     }
 
     public void setName(String n) {
@@ -113,10 +126,13 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
         return descriptionEdit.getText().toString();
     }
 
-
     @Override
     public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
-
+        if(set) {
+            setLocation(locationName);
+        } else {
+            setLocation("");
+        }
     }
 
     @Override
@@ -139,4 +155,5 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
         priceEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         descriptionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
     }
+
 }

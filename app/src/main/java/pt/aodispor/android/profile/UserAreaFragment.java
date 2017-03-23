@@ -6,10 +6,12 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -25,7 +27,7 @@ import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
 import pt.aodispor.android.dialogs.NewPriceDialog;
 
-public class UserAreaFragment extends Fragment implements HttpRequest{
+public class UserAreaFragment extends Fragment implements HttpRequest, Notification{
     private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
@@ -34,6 +36,8 @@ public class UserAreaFragment extends Fragment implements HttpRequest{
     private ListView listView;
     private LinearLayout loadingMessage;
     private CustomAdapter arrayAdapter;
+    private Button saveButton;
+    private boolean[] updatedItems;
     private View root;
 
     public static UserAreaFragment newInstance() {
@@ -46,8 +50,18 @@ public class UserAreaFragment extends Fragment implements HttpRequest{
         root = inflater.inflate(R.layout.new_profile, container, false);
         listView = (ListView) root.findViewById(R.id.list);
         loadingMessage = (LinearLayout) root.findViewById(R.id.loadingMessage);
+        saveButton = (Button) root.findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveButton.setEnabled(false);
+                startLoading();
+                updateListItems();
+            }
+        });
 
         List<ListItem> list = new ArrayList<>();
+        list.add(new Profile(getContext(), getActivity()));
         arrayAdapter = new CustomAdapter(getContext(), R.layout.profile, list);
         listView.setAdapter(arrayAdapter);
 
@@ -67,6 +81,24 @@ public class UserAreaFragment extends Fragment implements HttpRequest{
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         request.execute();
+    }
+
+    private void startListItems() {
+        for(int i = 0; i < arrayAdapter.getCount(); i++){
+            ListItem item = arrayAdapter.getItem(i);
+            if(item != null) {
+                item.onStart();
+            }
+        }
+    }
+
+    private void updateListItems() {
+        for(int i = 0; i < arrayAdapter.getCount(); i++){
+            ListItem item = arrayAdapter.getItem(i);
+            if(item != null) {
+                item.onUpdate();
+            }
+        }
     }
 
     private void startLoading() {
@@ -130,6 +162,11 @@ public class UserAreaFragment extends Fragment implements HttpRequest{
 
     @Override
     public void onHttpRequestFailed(ApiJSON errorData) {
+
+    }
+
+    @Override
+    public void notify(ListItem item) {
 
     }
 

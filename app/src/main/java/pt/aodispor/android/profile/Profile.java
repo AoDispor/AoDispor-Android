@@ -9,10 +9,15 @@ import android.widget.TextView;
 
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
+import pt.aodispor.android.api.ApiJSON;
+import pt.aodispor.android.api.HttpRequest;
+import pt.aodispor.android.api.HttpRequestTask;
+import pt.aodispor.android.api.Professional;
+import pt.aodispor.android.api.SearchQueryResult;
 import pt.aodispor.android.dialogs.LocationDialog;
 import pt.aodispor.android.dialogs.NewPriceDialog;
 
-public class Profile extends ListItem implements LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
+public class Profile extends ListItem implements HttpRequest, LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
     private final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
@@ -74,12 +79,46 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
 
     @Override
     public boolean onStart() {
+        getProfileInfo();
         return false;
     }
 
     @Override
     public boolean onUpdate() {
-        return false;
+        return true;
+    }
+
+    /**
+     * Makes a GET HTTP request to get user profile information.
+     */
+    public void getProfileInfo() {
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
+        request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.setType(HttpRequest.UPDATE_PROFILE);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        request.execute();
+    }
+
+    public void updateProfile(Professional professional) {
+        setName(professional.full_name);
+        setProfession(professional.title);
+        setLocation(professional.location);
+        int rate = Integer.parseInt(professional.rate);
+        boolean isFinal = Boolean.parseBoolean("true");
+        NewPriceDialog.PriceType type = NewPriceDialog.PriceType.ByDay;
+        switch (professional.type) {
+            case "H":
+                type = NewPriceDialog.PriceType.ByHour;
+                break;
+            case "D":
+                type = NewPriceDialog.PriceType.ByDay;
+                break;
+            case "S":
+                type = NewPriceDialog.PriceType.ByService;
+                break;
+        }
+        setPrice(rate, isFinal, type, professional.currency);
+        setDescription(professional.description);
     }
 
     public void setName(String n) {
@@ -156,4 +195,24 @@ public class Profile extends ListItem implements LocationDialog.LocationDialogLi
         descriptionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
     }
 
+    @Override
+    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+        Professional p = new Professional();
+        switch (type) {
+            case HttpRequest.GET_PROFILE:
+                SearchQueryResult getProfile = (SearchQueryResult) answer;
+                p = getProfile.data.get(0);
+                break;
+            case HttpRequest.UPDATE_PROFILE:
+                p = ((SearchQueryResult) answer).data.get(0);
+                break;
+        }
+        updateProfile(p);
+        notification.notify(this);
+    }
+
+    @Override
+    public void onHttpRequestFailed(ApiJSON errorData) {
+
+    }
 }

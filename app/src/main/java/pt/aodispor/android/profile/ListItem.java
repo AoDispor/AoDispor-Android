@@ -5,12 +5,10 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
 public abstract class ListItem {
-    private boolean updated;
     protected Notification notification;
     protected Context context;
 
     public ListItem(Context c) {
-        updated = false;
         context = c;
     }
 
@@ -20,10 +18,6 @@ public abstract class ListItem {
 
     public View getView() {
         return new View(context);
-    }
-
-    public boolean isUpdated() {
-        return updated;
     }
 
     public void notifyUpdate() {

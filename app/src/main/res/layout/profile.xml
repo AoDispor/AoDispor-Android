@@ -1,10 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey4"
     android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingTop="20dp">
+
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="175dp"
+            android:layout_height="175dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/aoDispor2"
+            app:srcCompat="@mipmap/ic_account_circle_white_48dp" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/imageText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingBottom="20dp"
+        android:paddingEnd="50dp"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:paddingStart="50dp"
+        android:text="Toque na imagem acima para alterar a sua imagem de perfil"
+        android:textAlignment="center"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/name"
@@ -103,6 +134,8 @@
         android:hint="Toque aqui para editar o seu valor"
         android:inputType="number"
         android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
         android:textSize="20sp" />
 
     <TextView

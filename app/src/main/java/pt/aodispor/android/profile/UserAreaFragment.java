@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
 import pt.aodispor.android.dialogs.NewPriceDialog;
 
-public class UserAreaFragment extends Fragment implements HttpRequest, Notification {
+public class UserAreaFragment extends Fragment implements Notification {
     private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
@@ -83,7 +84,6 @@ public class UserAreaFragment extends Fragment implements HttpRequest, Notificat
             }
         }
         if(checkAllUpdated()) {
-            updatedItems = new boolean[arrayAdapter.getCount()];
             endLoading();
         }
     }
@@ -96,8 +96,7 @@ public class UserAreaFragment extends Fragment implements HttpRequest, Notificat
             }
         }
         if(checkAllUpdated()) {
-            updatedItems = new boolean[arrayAdapter.getCount()];
-            endLoading();
+           endLoading();
         }
     }
 
@@ -117,33 +116,28 @@ public class UserAreaFragment extends Fragment implements HttpRequest, Notificat
     }
 
     private void endLoading() {
+        updatedItems = new boolean[arrayAdapter.getCount()];
         loadingMessage.setVisibility(View.INVISIBLE);
         listView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Started when the HTTP request has finished and succeeded. It then updates the views of the
-     * fragment in order to show profile information.
-     *
-     * @param answer the ApiJSON formatted answer.
-     */
-    @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
-
+        listView.scrollTo(0, 0);
+        saveButton.setEnabled(true);
     }
 
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
-
-    }
-
-    @Override
-    public void notify(ListItem item) {
-        updatedItems[arrayAdapter.getPosition(item)] = true;
-        if(checkAllUpdated()) {
-            updatedItems = new boolean[arrayAdapter.getCount()];
-            endLoading();
+    public void notify(ListItem item, boolean ok, String message) {
+        updatedItems[arrayAdapter.getPosition(item)] = ok;
+        if(ok) {
+            if(checkAllUpdated()) {
+                endLoading();
+            }
+        } else {
+            errorHandler(message);
         }
+    }
+
+    private void errorHandler(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+        endLoading();
     }
 
     /**

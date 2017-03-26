@@ -23,7 +23,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
     private FragmentActivity activity;
-    private TextView nameView, professionView, locationView, priceView, descriptionView;
+    private TextView imageView, nameView, professionView, locationView, priceView, descriptionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
     private View root;
     private int rate;
@@ -33,11 +33,13 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
     public Profile(Context c, FragmentActivity a) {
         super(c);
+        HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
         activity = a;
         root = LayoutInflater.from(context).inflate(R.layout.profile, null);
 
         // Get Text Views
+        imageView = (TextView) root.findViewById(R.id.imageText);
         nameView = (TextView) root.findViewById(R.id.name);
         professionView = (TextView) root.findViewById(R.id.profession);
         priceView = (TextView) root.findViewById(R.id.price);
@@ -85,7 +87,18 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
     @Override
     public boolean onUpdate() {
-        return true;
+        Professional p = new Professional();
+        p.full_name = nameEdit.getText().toString();
+        p.title = professionEdit.getText().toString();
+        p.location = locationEdit.getText().toString();
+        //TODO other fields
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
+        request.setMethod(HttpRequestTask.POST_REQUEST);
+        request.setType(HttpRequest.UPDATE_PROFILE);
+        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        request.setJSONBody(p);
+        request.execute();
+        return false;
     }
 
     /**
@@ -181,6 +194,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
     private void setFonts() {
         // Text Views
+        imageView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         nameView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         professionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
         priceView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
@@ -208,11 +222,11 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                 break;
         }
         updateProfile(p);
-        notification.notify(this);
+        notification.notify(this, true, "");
     }
 
     @Override
     public void onHttpRequestFailed(ApiJSON errorData) {
-
+        notification.notify(this, false, context.getString(R.string.timeout));
     }
 }

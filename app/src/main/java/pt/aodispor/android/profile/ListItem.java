@@ -22,7 +22,7 @@ public abstract class ListItem {
 
     public void notifyUpdate() {
         if(notification != null) {
-            notification.notify(this);
+            notification.notify(this, true, "");
         }
     }
 

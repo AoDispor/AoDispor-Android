@@ -74,7 +74,7 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
     }
 
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
         Log.v("debug", "Request completed");
         if(lastDigit) {
             if(type == HttpRequest.GET_LOCATION){

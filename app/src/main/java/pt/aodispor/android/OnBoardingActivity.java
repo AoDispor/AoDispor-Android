@@ -264,7 +264,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
     }
 
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
         switch (requestType) {
             case register:
                 //do things with the register field

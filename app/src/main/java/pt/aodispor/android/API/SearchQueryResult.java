@@ -8,6 +8,9 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SearchQueryResult extends ApiJSON {
+    /**
+     * list of professionals
+     * */
     @JsonDeserialize(using = ProfessionalListDeserializer.class)
     @JsonProperty("data")
     public List<Professional> data;

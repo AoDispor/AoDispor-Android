@@ -9,7 +9,7 @@ public interface HttpRequest {
     int UPDATE_PROFILE = 2;
     int GET_LOCATION = 3;
 
-    void onHttpRequestCompleted(ApiJSON answer, int type);
+    void onHttpRequestSuccessful(ApiJSON answer, int extra);
 
     void onHttpRequestFailed(ApiJSON errorData);
 }

@@ -169,7 +169,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * @param answer the ApiJSON formatted answer.
      */
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
         Professional p = new Professional();
         switch (type) {
             case HttpRequest.GET_PROFILE:

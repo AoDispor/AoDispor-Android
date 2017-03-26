@@ -1,6 +1,5 @@
 package pt.aodispor.android.api;
 
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Base64;
 
@@ -15,23 +14,71 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.R;
 
+//TODO 2b generic later
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     public static final int GET_REQUEST = 0;
     public static final int POST_REQUEST = 1;
     public static final int PUT_REQUEST = 2;
     private static String token = null;
 
+    /*public interface HttpRequest2<X> extends HttpRequest<X>{
+        void onHttpRequestComplete();
+    }*/
+
+    /**
+     * indicates that the task is using a new implementation that
+     * works as replacement for the new implementation to come later on
+     */
+    private boolean usingTransitionVersion = false;
+
+
+    public interface IOnHttpRequestCompleted {
+        void exec(ApiJSON answer);//TODO 2b generic later
+    }
+
+    private ArrayList<IOnHttpRequestCompleted> onEnd;
+    private ArrayList<IOnHttpRequestCompleted> onSuccess;
+    private ArrayList<IOnHttpRequestCompleted> onFail;
+
+    private void addHandlers(ArrayList<IOnHttpRequestCompleted> list, IOnHttpRequestCompleted[] array) {
+        usingTransitionVersion = true;
+        for (IOnHttpRequestCompleted handler : array) list.add(handler);
+    }
+
+    public void addOnEndHandlers(IOnHttpRequestCompleted... handlers) {
+        if (onEnd == null) {
+            onEnd = new ArrayList();
+        }
+        addHandlers(onEnd, handlers);
+    }
+
+    public void addOnSuccessHandlers(IOnHttpRequestCompleted... handlers) {
+        if (onSuccess == null) {
+            onSuccess = new ArrayList();
+        }
+        addHandlers(onSuccess, handlers);
+    }
+
+    public void addOnFailHandlers(IOnHttpRequestCompleted... handlers) {
+        if (onFail == null) {
+            onFail = new ArrayList();
+        }
+        addHandlers(onFail, handlers);
+    }
+
+
     public static void setToken(String token) {
-        if(HttpRequestTask.token==null) HttpRequestTask.token = token;
+        if (HttpRequestTask.token == null) HttpRequestTask.token = token;
     }
 
     //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
@@ -64,8 +111,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
      * <br>can be set to null
      */
     private HttpRequest postExecute;
+
     /**
-     * passed to postExecute method to identify what to do after a specific request
+     * passed to postExecute method to identify nuances or process certain data
      */
     private int type;
 
@@ -164,6 +212,20 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     @Override
     protected void onPostExecute(ApiJSON data) {
+        if (usingTransitionVersion) {
+            if (error) {
+                if (onFail != null)
+                    for (IOnHttpRequestCompleted handler : onFail) handler.exec(data);
+            } else {
+                if (onSuccess != null)
+                    for (IOnHttpRequestCompleted handler : onSuccess) handler.exec(data);
+            }
+            if (onEnd != null)
+                for (IOnHttpRequestCompleted handler : onEnd) handler.exec(data);
+            return;
+        }
+        //IF IS USING OLDER VERSION see code below
+
         if (postExecute == null)
             return;
         if (/*error || */error) {
@@ -173,8 +235,11 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         } else {
             if (data == null)
                 return;
-            postExecute.onHttpRequestCompleted(data, type);
+            postExecute.onHttpRequestSuccessful(data, type);
         }
+        /*if(postExecute.getClass()==HttpRequest2.class){
+            ((HttpRequest2)postExecute).onHttpRequestComplete();
+        }*/
     }
 
     private String getLocalDate() {
@@ -193,7 +258,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     }
 
     /**
-     * setting type allows HttpRequestHandler to implement different executions for different requests
+     * TODO refactor to extra or some other name
      */
     public void setType(int t) {
         type = t;
@@ -212,6 +277,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         }
     }
 
+    /**
+     * TODO refactor to extra or some other name
+     */
     public int getType() {
         return type;
     }

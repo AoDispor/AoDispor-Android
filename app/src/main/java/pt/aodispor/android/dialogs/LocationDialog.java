@@ -110,7 +110,7 @@ public class LocationDialog extends DialogFragment implements HttpRequest {
     }
 
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
         if(postalCodeSuffix.length() == 3 && postalCodePrefix.length() == 4) {
             if(type == HttpRequest.GET_LOCATION) {
                 CPPQueryResult result = (CPPQueryResult) answer;

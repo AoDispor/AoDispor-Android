@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -37,22 +38,26 @@ public class CardStack {
     @VisibleForTesting
     protected Professional[] cards_professional_data = null;
 
-    final public static int TOP=0;
-    final public static int BOTTOM=2;
+    final public static int TOP = 0;
+    final public static int BOTTOM = 2;
 
-    public boolean areCardViewsInitialized()
-    {
+    public boolean areCardViewsInitialized() {
         return cards != null;
     }
 
-    public RelativeLayout getCardAt(int index){
-        if (cards==null) return null;
+    public RelativeLayout getCardAt(int index) {
+        if (cards == null) return null;
         return cards[index];
     }
-    public Professional getCardProfessionalInfoAt(int index){return cards_professional_data[index];}
 
-    public CardStack(){}
-    public CardStack(CardStack cardStack){
+    public Professional getCardProfessionalInfoAt(int index) {
+        return cards_professional_data[index];
+    }
+
+    public CardStack() {
+    }
+
+    public CardStack(CardStack cardStack) {
         fragment = cardStack.fragment;
         inflater = cardStack.inflater;
         rootView = cardStack.rootView;
@@ -60,13 +65,13 @@ public class CardStack {
                 cardStack.getCardAt(0),
                 cardStack.getCardAt(1),
                 cardStack.getCardAt(2)};
-        cards_professional_data = new Professional[] {
+        cards_professional_data = new Professional[]{
                 cardStack.getCardProfessionalInfoAt(0),
                 cardStack.getCardProfessionalInfoAt(1),
                 cardStack.getCardProfessionalInfoAt(2)};
     }
 
-    public void initNewStack(){
+    public void initNewStack() {
         cards = new RelativeLayout[3];
         cards_professional_data = new Professional[3];
     }
@@ -101,10 +106,9 @@ public class CardStack {
                 .setInterpolator(new DecelerateInterpolator());
     }
 
-    public void updateAllCardsMargins()
-    {
-        for (int i = 0; i<3;++i)
-            if(cards[i]!=null) setCardMargin(i);
+    public void updateAllCardsMargins() {
+        for (int i = 0; i < 3; ++i)
+            if (cards[i] != null) setCardMargin(i);
     }
 
     /**
@@ -126,7 +130,6 @@ public class CardStack {
             if (cards[i] != null)
                 rootView.removeView(cards[i]);
     }*/
-
     public void removeAllCardViews() {
         for (int i = cards.length - 1; i >= 0; --i)
             if (cards[i] != null)
@@ -134,7 +137,6 @@ public class CardStack {
     }
 
     //endregion
-
 
     //region CARDS CREATION
 
@@ -162,7 +164,7 @@ public class CardStack {
     }
 
     public void clearCards(int... card_indexes) {
-        for(int i : card_indexes) clearCard(i);
+        for (int i : card_indexes) clearCard(i);
     }
 
     public void swapCardsOnStack(int source, int destination) {
@@ -181,13 +183,13 @@ public class CardStack {
     }
 
     protected RelativeLayout createProfessionalCard(//String fullname_text,
-                                                 String profession_text,
-                                                 String location_text,
-                                                 String description_text,
-                                                 String price_value,
-                                                 String currency_type,
-                                                 String payment_type,
-                                                 String avatar_scr) {
+                                                    String profession_text,
+                                                    String location_text,
+                                                    String description_text,
+                                                    String price_value,
+                                                    String currency_type,
+                                                    String payment_type,
+                                                    String avatar_scr) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
@@ -261,5 +263,27 @@ public class CardStack {
     }
 
     //endregion
+
+    public void replaceCardAt(Professional professional, int index) {
+        if (professional == null) {
+            throw new RuntimeException("Null Professional");
+        }
+        if (cards[index] != null) rootView.removeView(cards[index]);
+        cards_professional_data[index] = professional;
+        cards[index] = professionalCard(professional);
+    }
+
+    public void replaceTopCard(Professional professional) {
+        replaceCardAt(professional, CardStack.TOP);
+        updateAllCardsMargins();
+    }
+
+    public void replaceStack(Professional[] professionals) {
+        if (professionals == null || professionals.length != 3) {
+            throw new RuntimeException("Array of Professionals not Valid");
+        }
+        for (int i = 0; i<3;++i) replaceCardAt(professionals[i],i);
+        updateAllCardsMargins();
+    }
 
 }

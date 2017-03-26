@@ -43,7 +43,7 @@ import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
  * This class initializes the stack of cards in an array of RelativeLayout and iterates them.
  * </p>
  */
-public class CardFragment extends Fragment implements HttpRequest {
+public class CardFragment extends Fragment {
 
     static private boolean started = false;
 
@@ -57,9 +57,10 @@ public class CardFragment extends Fragment implements HttpRequest {
     private static final String queryProfilesURL = "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}";
 
     /**
-     * used by preparePage and onHttpRequestCompleted to know if the request is to get the previous or next page or an enterily new query
+     * used by preparePage and onHttpRequestSuccessful to know if the request is to get the previous or next page or an enterily new query
      */
     @VisibleForTesting
+    @Deprecated
     protected class RequestType {
         public int val = 0;
 
@@ -141,7 +142,7 @@ public class CardFragment extends Fragment implements HttpRequest {
 
     public LinearLayout getLoadingLayout() {
         //if (loadingLL == null)
-            loadingLL = (LinearLayout) rootView.findViewById(R.id.loadingWidgetLayout);
+        loadingLL = (LinearLayout) rootView.findViewById(R.id.loadingWidgetLayout);
 
         return loadingLL;
     }
@@ -313,7 +314,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      * to be called after receiving an answer (or not) from API
      */
     public void setupNewStack(QueryResult queryResult) {
-        this.queryResult=queryResult;
+        this.queryResult = queryResult;
 
         if (cardStack.areCardViewsInitialized()) cardStack.removeAllCardViews();
         else cardStack.initNewStack();
@@ -570,7 +571,7 @@ public class CardFragment extends Fragment implements HttpRequest {
      * <also> reponsable for requesting the loading of the previous page and updating the currentSet and nextSet
      */
     public void restorePreviousCard() {
-        if (blockAccess || queryResult!=QueryResult.successful) {
+        if (blockAccess || queryResult != QueryResult.successful) {
             return; //don't make anything while animation plays
         }
 
@@ -706,8 +707,17 @@ public class CardFragment extends Fragment implements HttpRequest {
      */
     public void prepareNewSearchQuery(boolean retry) {
         requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this,
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
                 queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
+        request.addOnSuccessHandlers(onNewQuery);
+        request.addOnSuccessHandlers(closeLoading);
+        if (retry) {
+            request.addOnFailHandlers(closeLoadingResetVisibility);
+        }
+        else{
+            request.addOnFailHandlers(setupErrorStack);
+            request.addOnFailHandlers(closeLoading);
+        }
         request.execute();
         /*
         SearchQueryResult result;
@@ -746,7 +756,13 @@ public class CardFragment extends Fragment implements HttpRequest {
         if (link == null)
             return;
         Log.d("LOAD NEXT BACKGROUND", "STARTED");
-        new HttpRequestTask(SearchQueryResult.class, this, link).execute();
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, link);
+        request.addOnSuccessHandlers(retry ? onPrevPageRetry : onNextPage);
+        if (retry) {
+            request.addOnSuccessHandlers(closeLoading);
+            request.addOnFailHandlers(closeLoadingResetVisibility);
+        }
+        request.execute();
     }
 
     /**
@@ -763,7 +779,10 @@ public class CardFragment extends Fragment implements HttpRequest {
         if (link == null)
             return;
         Log.d("LOAD PREV BACKGROUND", "STARTED");
-        new HttpRequestTask(SearchQueryResult.class, this, link).execute();
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, link);
+        request.addOnSuccessHandlers(onPrevPage);
+        //TODO implement retry later
+        request.execute();
     }
 
     /**
@@ -797,8 +816,87 @@ public class CardFragment extends Fragment implements HttpRequest {
         return QueryResult.emptySet;
     }
 
-    @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+
+    private final HttpRequestTask.IOnHttpRequestCompleted onPrevPage =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON answer) {
+                    previousSet = (SearchQueryResult) answer;
+                }
+            };
+
+    private final HttpRequestTask.IOnHttpRequestCompleted onPrevPageRetry =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON answer) {
+                    throw new RuntimeException("Not Implemented");
+                }
+            };
+
+    private final HttpRequestTask.IOnHttpRequestCompleted onNextPage =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON answer) {
+                    nextSet = (SearchQueryResult) answer;
+                }
+            };
+
+    private final HttpRequestTask.IOnHttpRequestCompleted onNextPageRetry =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON answer) {
+                    //TODO not yet tested
+                    previousSet = currentSet;
+                    currentSet = (SearchQueryResult) answer;
+                    nextSet = null;
+                    cardStack.replaceTopCard(currentSet.data.get(0));
+                }
+            };
+
+    private final HttpRequestTask.IOnHttpRequestCompleted onNewQuery =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON answer) {
+                    //TODO review this later
+                    if (answer != null) {
+                        SearchQueryResult result = (SearchQueryResult) answer;
+                        if (result.data != null && result.data.size() > 0) {
+                            CardFragment.this.currentSet = result;
+                            setupNewStack(QueryResult.successful);
+                        } else {
+                            setupNewStack(QueryResult.emptySet);
+                        }
+                    }
+                }
+            };
+
+    private final HttpRequestTask.IOnHttpRequestCompleted setupErrorStack =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON data) {
+                    setupNewStack(QueryResult.error);
+                }
+            };
+
+    private final HttpRequestTask.IOnHttpRequestCompleted closeLoadingResetVisibility =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON data) {
+                    loadingWidget.endLoading(true);
+                }
+            };
+
+    private final HttpRequestTask.IOnHttpRequestCompleted closeLoading =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON dta) {
+                    loadingWidget.endLoading(false);
+                }
+            };
+
+   /*
+   @Override
+   public void onHttpRequestSuccessful(ApiJSON answer, int type) {
         if (requestType.isNext()) {
             nextSet = (SearchQueryResult) answer;
         } else if (requestType.isPrev()) {
@@ -851,7 +949,7 @@ public class CardFragment extends Fragment implements HttpRequest {
             //TODO REMOVE LOADING animation
         }
 
-    }
+    }*/
 
     //endregion
 

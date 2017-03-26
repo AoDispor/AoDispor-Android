@@ -51,7 +51,7 @@ public class RegistrationIntentService extends IntentService implements HttpRequ
     }
 
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
 
     }
 

@@ -286,4 +286,8 @@ public class CardStack {
         updateAllCardsMargins();
     }
 
+    public boolean isAProfessionalCard(int index){
+        return cards_professional_data[index]==null;
+    }
+
 }

@@ -77,10 +77,12 @@ public class SwipeListener implements View.OnTouchListener {
                 view.setTranslationX(x - initialX);
                 view.setTranslationY(y - initialY);
                 view.setRotation(view.getX() * 0.05f);
-                discard.setRotation(-45);
-                discard.setAlpha(Math.max(
-                        3.8f * view.getX() * view.getX() / (view.getWidth() * view.getWidth()),
-                        3.6f * view.getY() * view.getY() / (view.getHeight() * view.getHeight())));
+                if(discard!=null) {
+                    discard.setRotation(-45);
+                    discard.setAlpha(Math.max(
+                            3.8f * view.getX() * view.getX() / (view.getWidth() * view.getWidth()),
+                            3.6f * view.getY() * view.getY() / (view.getHeight() * view.getHeight())));
+                }
                 break;
             case (MotionEvent.ACTION_UP):
                 /*if (enableCall) {
@@ -138,7 +140,7 @@ public class SwipeListener implements View.OnTouchListener {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
                                     view.setEnabled(true);
-                                    discard.setAlpha(0);
+                                    if(discard!=null) discard.setAlpha(0);
                                     viewPager.setSwipeEnabled(true);
                                 }
 

@@ -571,7 +571,7 @@ public class CardFragment extends Fragment {
      * <also> reponsable for requesting the loading of the previous page and updating the currentSet and nextSet
      */
     public void restorePreviousCard() {
-        if (blockAccess || queryResult != QueryResult.successful) {
+        if (blockAccess || queryResult != QueryResult.successful || cardStack.isAProfessionalCard(CardStack.TOP)) {
             return; //don't make anything while animation plays
         }
 
@@ -661,12 +661,12 @@ public class CardFragment extends Fragment {
         rootView.addView(cardStack.getCardAt(1));
         rootView.addView(topCard);
 
-        if (activity instanceof MainActivity
-                && cardStack.getCardProfessionalInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
-                ) {
+       // if (activity instanceof MainActivity
+         //       && cardStack.getCardProfessionalInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
+           //     ) {
             SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
             topCard.setOnTouchListener(listener);
-        }
+        //}
 
         cardStack.updateAllCardsMargins();
 
@@ -710,8 +710,13 @@ public class CardFragment extends Fragment {
         GeoLocation geoLocation = GeoLocation.getInstance();
 
         requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
+        //HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
+        //        queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
+        //TODO DEBUG!!!
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
-                queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
+               queryProfilesURL + "&page={page}", searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude(),"2");
+        currentSetCardIndex=10;
+
         request.addOnSuccessHandlers(onNewQuery);
         request.addOnSuccessHandlers(closeLoading);
         if (retry) {
@@ -722,22 +727,6 @@ public class CardFragment extends Fragment {
             request.addOnFailHandlers(closeLoading);
         }
         request.execute();
-        /*
-        SearchQueryResult result;
-        try {
-            result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            Log.e("prepareNewSearchQuery", "793:" + e.toString());
-            return QueryResult.error;
-        }
-        if (request.gotError()) {
-            return QueryResult.error;
-        }
-        if (result != null && result.data != null && result.data.size() > 0) {
-            this.currentSet = result;
-            return QueryResult.successful;
-        }
-        return QueryResult.emptySet;*/
     }
 
     public void prepareNextPage() {
@@ -897,62 +886,6 @@ public class CardFragment extends Fragment {
                 }
             };
 
-   /*
-   @Override
-   public void onHttpRequestSuccessful(ApiJSON answer, int type) {
-        if (requestType.isNext()) {
-            nextSet = (SearchQueryResult) answer;
-        } else if (requestType.isPrev()) {
-            previousSet = (SearchQueryResult) answer;
-        } else if (requestType.isNew()) {
-            loadingWidget.endLoading(false);
-            //TODO review this later
-            if (answer != null) {
-                SearchQueryResult result = (SearchQueryResult) answer;
-                if (result.data != null && result.data.size() > 0) {
-                    this.currentSet = result;
-                    setupNewStack(QueryResult.successful);
-                } else {
-                    setupNewStack(QueryResult.emptySet);
-                }
-            }
-        }
-
-        //reload top card
-        if (requestType.val == RequestType.retry_prevSet) {
-            loadingWidget.endLoading(false);
-        }
-        if (requestType.val == RequestType.retry_nextSet) {
-            loadingWidget.endLoading(false);
-        }
-
-        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-        //TODO REMOVE LOADING animation & ADD VIEW REFRESH
-
-    }
-
-    @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
-
-        if (requestType.val == RequestType.newSet) {
-            //TODO possibly inform user about some errors
-            //if (errorData!=null) do something...
-
-            loadingWidget.endLoading(false);
-            setupNewStack(QueryResult.error);
-        } else if (requestType.isRetry()) {
-            loadingWidget.endLoading(true);
-            //TODO REMOVE LOADING animation
-            //TODO REMOVE LOADING animation
-            //TODO REMOVE LOADING animation
-            //TODO REMOVE LOADING animation
-            //TODO REMOVE LOADING animation
-        }
-
-    }*/
 
     //endregion
 

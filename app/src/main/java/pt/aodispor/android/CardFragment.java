@@ -148,7 +148,7 @@ public class CardFragment extends Fragment {
     }
 
 
-    private static GeoLocation geoLocation = null;
+    /*private static GeoLocation geoLocation = null;
 
     public void updateGeoLocation() {
         updateGeoLocation(null);
@@ -159,7 +159,7 @@ public class CardFragment extends Fragment {
 
         if (context != null) geoLocation.updateLatLon(context);
         else geoLocation.updateLatLon(getContext());
-    }
+    }*/
 
     private String searchQuery = "";
 
@@ -201,7 +201,7 @@ public class CardFragment extends Fragment {
         activity = getActivity();
         cardStack.setBasicVariables(this, i, rootView);
 
-        updateGeoLocation();
+        GeoLocation.getInstance().updateLatLon(this.getContext());
 
         ImageButton returnButton = (ImageButton) rootView.findViewById(R.id.returnButton);
         returnButton.setOnClickListener(new View.OnClickListener() {
@@ -271,7 +271,7 @@ public class CardFragment extends Fragment {
             switch (resultCode) {
                 case PermissionActivity.PERMISSION_GRANTED:
                     //Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
-                    updateGeoLocation();//setupLocationManager();
+                    GeoLocation.getInstance().updateLatLon(this.getContext());//updateGeoLocation();//setupLocationManager();
                     prepareNewStack();//TODO consider also doing this in background
                     break;
                 case PermissionActivity.PERMISSION_DENIED:
@@ -706,6 +706,9 @@ public class CardFragment extends Fragment {
      * @return true if received query result on time
      */
     public void prepareNewSearchQuery(boolean retry) {
+
+        GeoLocation geoLocation = GeoLocation.getInstance();
+
         requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
                 queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());

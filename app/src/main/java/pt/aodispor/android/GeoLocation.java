@@ -12,6 +12,14 @@ import java.util.List;
 
 public class GeoLocation {
 
+    private static GeoLocation ourInstance = new GeoLocation();
+
+    public static GeoLocation getInstance() {
+        return ourInstance;
+    }
+
+    private GeoLocation() {}
+
     //TODO shouldn't always get a new position
     //TODO see http://stackoverflow.com/questions/10524381/gps-android-get-positioning-only-once
 

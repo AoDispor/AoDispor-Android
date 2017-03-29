@@ -1,8 +1,6 @@
 package pt.aodispor.android.view.base;
 
 import android.os.Bundle;
-import android.text.Html;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +17,6 @@ import pt.aodispor.android.api.Meta;
 import pt.aodispor.android.api.Pagination;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
-import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.CardFragment;
 import pt.aodispor.android.R;
 
@@ -27,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CardFragmentTestClass extends CardFragment {
-
+/*
     @Override
     public View onCreateView(LayoutInflater i, ViewGroup c, Bundle savedInstanceState) {
         currentSetCardIndex = 0;
@@ -91,21 +88,21 @@ public class CardFragmentTestClass extends CardFragment {
         switch (test) {
             case forward:
                 currentSetCardIndex = 0;
-                cardStack.addProfessionalCard(0,test_dataset.get(0));
-                cardStack.addProfessionalCard(1,test_dataset.get(1));
-                cardStack.addProfessionalCard(2,test_dataset.get(2));
+                cardStack.addCard(0,test_dataset.get(0));
+                cardStack.addCard(1,test_dataset.get(1));
+                cardStack.addCard(2,test_dataset.get(2));
                 break;
             case backward:
                 currentSetCardIndex = 85 - 64;
-                cardStack.addProfessionalCard(0,test_dataset.get(85));
-                cardStack.addProfessionalCard(1,test_dataset.get(86));
-                cardStack.addProfessionalCard(2,test_dataset.get(87));
+                cardStack.addCard(0,test_dataset.get(85));
+                cardStack.addCard(1,test_dataset.get(86));
+                cardStack.addCard(2,test_dataset.get(87));
                 break;
             case mix:
                 currentSetCardIndex = 50;
-                cardStack.addProfessionalCard(0,test_dataset.get(50));
-                cardStack.addProfessionalCard(1,test_dataset.get(51));
-                cardStack.addProfessionalCard(2,test_dataset.get(52));
+                cardStack.addCard(0,test_dataset.get(50));
+                cardStack.addCard(1,test_dataset.get(51));
+                cardStack.addCard(2,test_dataset.get(52));
                 break;
             default:
                 break;
@@ -113,5 +110,5 @@ public class CardFragmentTestClass extends CardFragment {
     }
 
 
-
+*/
 }

@@ -270,7 +270,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                 //do things with the register field
             case validate:
                 SearchQueryResult getProfile = (SearchQueryResult) answer;
-                Professional p = getProfile.data.get(0);
+                Professional p = (Professional) getProfile.data.get(0);
 
                 if (p == null) {
                     AppDefinitions.userPassword = "";

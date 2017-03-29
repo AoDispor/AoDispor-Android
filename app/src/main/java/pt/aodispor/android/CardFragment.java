@@ -3,9 +3,9 @@ package pt.aodispor.android;
 import android.Manifest;
 import android.animation.Animator;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,10 +28,10 @@ import com.github.karthyks.runtimepermissions.PermissionActivity;
 import java.util.concurrent.TimeUnit;
 
 import pt.aodispor.android.api.ApiJSON;
+import pt.aodispor.android.api.BasicCardFields;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.Links;
-import pt.aodispor.android.api.HttpRequest;
-import pt.aodispor.android.api.Professional;
+import pt.aodispor.android.api.UserRequest;
 import pt.aodispor.android.api.SearchQueryResult;
 
 import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
@@ -45,7 +45,15 @@ import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
  */
 public class CardFragment extends Fragment {
 
+    //region DEV_ONLY TESTING
+    static private boolean DEV_force2ndPage = false;
+    static private boolean DEV_injectPedidoMockup = false;
+    //endregion DEV_ONLY TESTING
+
+
     static private boolean started = false;
+
+    //MediaPlayer cardShuffleSound;
 
     public void setSearchQuery(String query) {
         searchQuery = query;
@@ -215,7 +223,7 @@ public class CardFragment extends Fragment {
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
+                if (cardStack.getCardInfoAt(CardStack.TOP) == null) return;
 
                 int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
                 if (permissionCheck == PackageManager.PERMISSION_DENIED) {
@@ -223,7 +231,7 @@ public class CardFragment extends Fragment {
                     return;
                 }
 
-                callProfessional();
+                phoneCallTopCard();
             }
         });
 
@@ -231,8 +239,8 @@ public class CardFragment extends Fragment {
         smsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
-                Professional p = cardStack.getCardProfessionalInfoAt(CardStack.TOP);
+                if (cardStack.getCardInfoAt(CardStack.TOP) == null) return;
+                BasicCardFields p = cardStack.getCardInfoAt(CardStack.TOP);
 
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + p.phone));
                 intent.putExtra("sms_body", getString(R.string.sms_text));
@@ -245,8 +253,8 @@ public class CardFragment extends Fragment {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (cardStack.getCardProfessionalInfoAt(CardStack.TOP) == null) return;
-                Professional p = cardStack.getCardProfessionalInfoAt(CardStack.TOP);
+                if (cardStack.getCardInfoAt(CardStack.TOP) == null) return;
+                BasicCardFields p = cardStack.getCardInfoAt(CardStack.TOP);
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -257,7 +265,7 @@ public class CardFragment extends Fragment {
             }
         });
 
-        prepareNewStack();//TODO consider also doing this in background
+        prepareNewStack();
 
         if (!started) {
             started = true;
@@ -272,7 +280,7 @@ public class CardFragment extends Fragment {
                 case PermissionActivity.PERMISSION_GRANTED:
                     //Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
                     GeoLocation.getInstance().updateLatLon(this.getContext());//updateGeoLocation();//setupLocationManager();
-                    prepareNewStack();//TODO consider also doing this in background
+                    prepareNewStack();
                     break;
                 case PermissionActivity.PERMISSION_DENIED:
                     //Toast.makeText(this, "Denied", Toast.LENGTH_SHORT).show();
@@ -321,17 +329,17 @@ public class CardFragment extends Fragment {
 
         switch (queryResult) {
             case successful://received answer and it has professionals
-                cardStack.addProfessionalCard(0, currentSet.data.get(0));
+                cardStack.addCard(0, currentSet.data.get(0));
                 if (currentSet.data.size() > 1) {
-                    cardStack.addProfessionalCard(1, currentSet.data.get(1));
+                    cardStack.addCard(1, currentSet.data.get(1));
                     if (currentSet.data.size() > 2) {
-                        cardStack.addProfessionalCard(2, currentSet.data.get(2));
+                        cardStack.addCard(2, currentSet.data.get(2));
                     } else {
                         cardStack.clearCard(2);
-                        cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                        cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));
                     }
                 } else {
-                    cardStack.addMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));//TODO missing button
+                    cardStack.addMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));
                     cardStack.clearCard(2);
                 }
 
@@ -435,7 +443,7 @@ public class CardFragment extends Fragment {
          */
         INSET {
             public void updateCardStack(final CardFragment cf) {
-                cf.cardStack.addProfessionalCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+                cf.cardStack.addCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -444,7 +452,7 @@ public class CardFragment extends Fragment {
          */
         LAST {
             public void updateCardStack(final CardFragment cf) {
-                cf.cardStack.addMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));//TODO missing button
+                cf.cardStack.addMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -459,7 +467,7 @@ public class CardFragment extends Fragment {
                 cf.previousSet = cf.currentSet;
                 cf.currentSet = cf.nextSet;
                 cf.nextSet = null;
-                cf.cardStack.addProfessionalCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+                cf.cardStack.addCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -501,7 +509,7 @@ public class CardFragment extends Fragment {
 
         //add listener to top card
         if (activity instanceof MainActivity
-                && cardStack.getCardProfessionalInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
+                && cardStack.getCardInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
                 ) {
             SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
             topCard.setOnTouchListener(listener);
@@ -571,7 +579,7 @@ public class CardFragment extends Fragment {
      * <also> reponsable for requesting the loading of the previous page and updating the currentSet and nextSet
      */
     public void restorePreviousCard() {
-        if (blockAccess || queryResult != QueryResult.successful || cardStack.isAProfessionalCard(CardStack.TOP)) {
+        if (blockAccess || queryResult != QueryResult.successful || cardStack.isAUserCard(CardStack.TOP)) {
             return; //don't make anything while animation plays
         }
 
@@ -596,7 +604,7 @@ public class CardFragment extends Fragment {
                 blockAccess = false;
                 return;
             }
-            cardStack.addProfessionalCard(0, currentSet.data.get(currentSetCardIndex));
+            cardStack.addCard(0, currentSet.data.get(currentSetCardIndex));
             if (currentSetCardIndex < AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD) {//load in background if possible
                 nextSet = null;
                 System.gc();//try to keep only 2 sets at maximum
@@ -610,7 +618,7 @@ public class CardFragment extends Fragment {
             currentSet = previousSet;
             previousSet = null;
             System.gc();// no need to keep 3 sets stored
-            cardStack.addProfessionalCard(0, currentSet.data.get(currentSetCardIndex));
+            cardStack.addCard(0, currentSet.data.get(currentSetCardIndex));
         } else {
             if (currentSetCardIndex < 0) {//needs to get card from previous set immediately.
                 nextSet = null;
@@ -649,7 +657,7 @@ public class CardFragment extends Fragment {
                     }
                 }
                 if (previousSet != null) {//if set was received or was already loaded
-                    cardStack.addProfessionalCard(0, previousSet.data.get(previousSet.data.size() + currentSetCardIndex));
+                    cardStack.addCard(0, previousSet.data.get(previousSet.data.size() + currentSetCardIndex));
                 }
             }
         }
@@ -661,11 +669,11 @@ public class CardFragment extends Fragment {
         rootView.addView(cardStack.getCardAt(1));
         rootView.addView(topCard);
 
-       // if (activity instanceof MainActivity
-         //       && cardStack.getCardProfessionalInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
-           //     ) {
-            SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
-            topCard.setOnTouchListener(listener);
+        // if (activity instanceof MainActivity
+        //       && cardStack.getCardInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
+        //     ) {
+        SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
+        topCard.setOnTouchListener(listener);
         //}
 
         cardStack.updateAllCardsMargins();
@@ -707,22 +715,24 @@ public class CardFragment extends Fragment {
      */
     public void prepareNewSearchQuery(boolean retry) {
 
-        GeoLocation geoLocation = GeoLocation.getInstance();
+        final GeoLocation geoLocation = GeoLocation.getInstance();
 
         requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
-        //HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
-        //        queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
-        //TODO DEBUG!!!
+
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
-               queryProfilesURL + "&page={page}", searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude(),"2");
-        currentSetCardIndex=10;
+                queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
+
+        if (DEV_force2ndPage) {
+            request = new HttpRequestTask(SearchQueryResult.class, null,
+                    queryProfilesURL + "&page={page}", searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude(), "2");
+            currentSetCardIndex = 10;
+        }
 
         request.addOnSuccessHandlers(onNewQuery);
         request.addOnSuccessHandlers(closeLoading);
         if (retry) {
             request.addOnFailHandlers(closeLoadingResetVisibility);
-        }
-        else{
+        } else {
             request.addOnFailHandlers(setupErrorStack);
             request.addOnFailHandlers(closeLoading);
         }
@@ -854,6 +864,19 @@ public class CardFragment extends Fragment {
                         SearchQueryResult result = (SearchQueryResult) answer;
                         if (result.data != null && result.data.size() > 0) {
                             CardFragment.this.currentSet = result;
+                            MediaPlayer.create(CardFragment.this.getContext(), R.raw.se_cardstackshuffle).start();
+                            //cardShuffleSound.start();
+
+                            if (DEV_injectPedidoMockup) {
+                                UserRequest p = new UserRequest();
+                                p.full_name="test name";
+                                p.title="test title";
+                                p.location="some place";
+                                p.description="blablabla";
+                                p.data_expiracao="test date";//new java.util.Date();
+                                CardFragment.this.currentSet.data.add(0, p);
+                            }
+
                             setupNewStack(QueryResult.successful);
                         } else {
                             setupNewStack(QueryResult.emptySet);
@@ -892,15 +915,15 @@ public class CardFragment extends Fragment {
 
     //region CARD ACTIONS
 
-    void callProfessional() {
-        Professional p = cardStack.getCardProfessionalInfoAt(cardStack.TOP);
+    void phoneCallTopCard() {
+        BasicCardFields p = cardStack.getCardInfoAt(cardStack.TOP);
         Answers.getInstance().logCustom(new CustomEvent("Telefonema").putCustomAttribute("string_id", p.string_id));
         startActivity(new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", p.phone, null)));
     }
 
-    //endregion
+//endregion
 
-    //region PERMISSIONS
+//region PERMISSIONS
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -908,7 +931,7 @@ public class CardFragment extends Fragment {
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    callProfessional();
+                    phoneCallTopCard();
                 }
 
                 break;

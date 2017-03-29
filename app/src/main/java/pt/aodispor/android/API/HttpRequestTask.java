@@ -46,6 +46,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         void exec(ApiJSON answer);//TODO 2b generic later
     }
 
+    //private Delegator el;
     private ArrayList<IOnHttpRequestCompleted> onEnd;
     private ArrayList<IOnHttpRequestCompleted> onSuccess;
     private ArrayList<IOnHttpRequestCompleted> onFail;

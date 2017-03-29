@@ -8,16 +8,16 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
+import pt.aodispor.android.api.BasicCardFields;
 import pt.aodispor.android.api.Professional;
+import pt.aodispor.android.api.UserRequest;
 
 
 public class CardStack {
@@ -36,7 +36,7 @@ public class CardStack {
     @VisibleForTesting
     protected RelativeLayout[] cards = null;
     @VisibleForTesting
-    protected Professional[] cards_professional_data = null;
+    protected BasicCardFields[] cards_data = null;
 
     final public static int TOP = 0;
     final public static int BOTTOM = 2;
@@ -50,8 +50,8 @@ public class CardStack {
         return cards[index];
     }
 
-    public Professional getCardProfessionalInfoAt(int index) {
-        return cards_professional_data[index];
+    public BasicCardFields getCardInfoAt(int index) {
+        return cards_data[index];
     }
 
     public CardStack() {
@@ -65,15 +65,15 @@ public class CardStack {
                 cardStack.getCardAt(0),
                 cardStack.getCardAt(1),
                 cardStack.getCardAt(2)};
-        cards_professional_data = new Professional[]{
-                cardStack.getCardProfessionalInfoAt(0),
-                cardStack.getCardProfessionalInfoAt(1),
-                cardStack.getCardProfessionalInfoAt(2)};
+        cards_data = new BasicCardFields[]{
+                cardStack.getCardInfoAt(0),
+                cardStack.getCardInfoAt(1),
+                cardStack.getCardInfoAt(2)};
     }
 
     public void initNewStack() {
         cards = new RelativeLayout[3];
-        cards_professional_data = new Professional[3];
+        cards_data = new BasicCardFields[3];
     }
 
 
@@ -145,22 +145,25 @@ public class CardStack {
      * to insert new professionals into the card stack
      *
      * @param stackIndex   0,1 or 2 (the higher the index the lower it is on the stack)
-     * @param professional
+     * @param cardData
      * @return
      */
-    public void addProfessionalCard(int stackIndex, Professional professional) {
+    public void addCard(int stackIndex, BasicCardFields cardData) {
         if (stackIndex < 0 || stackIndex > 2)
             return;
-        if (professional == null)
+        if (cardData == null)
             return;
-        cards_professional_data[stackIndex] = professional;
-        cards[stackIndex] = professionalCard(cards_professional_data[stackIndex]);
-    }
+        cards_data[stackIndex] = cardData;
+        cards[stackIndex] =
+                cards_data[stackIndex].getClass() == Professional.class ?
+                        professionalCard((Professional) cards_data[stackIndex]) :
+                        requestCard((UserRequest) cards_data[stackIndex]);
 
+    }
 
     public void clearCard(int card_index) {
         cards[card_index] = null;
-        cards_professional_data[card_index] = null;
+        cards_data[card_index] = null;
     }
 
     public void clearCards(int... card_indexes) {
@@ -172,13 +175,18 @@ public class CardStack {
             return;
         if (destination < 0 || destination > 2)
             return;
-        cards_professional_data[destination] = cards_professional_data[source];
+        cards_data[destination] = cards_data[source];
         cards[destination] = cards[source];
     }
 
 
     private RelativeLayout professionalCard(Professional professional) {
         RelativeLayout card = createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url);
+        return card;
+    }
+
+    private RelativeLayout requestCard(UserRequest request) {
+        RelativeLayout card = createRequestCard(request.location, request.description, request.title);
         return card;
     }
 
@@ -230,14 +238,40 @@ public class CardStack {
         return card;
     }
 
+    protected RelativeLayout createRequestCard(//String fullname_text,
+                                               //String profession_text,
+                                               String location_text,
+                                               String description_text,
+                                               String title
+    ) {
+        //TODO not yet complete
+
+        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
+
+        TextView profession = (TextView) card.findViewById(R.id.profession);
+        profession.setText(Html.fromHtml(title));
+        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+
+        TextView location = (TextView) card.findViewById(R.id.location);
+        location.setText(Html.fromHtml(location_text));
+        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+
+        TextView description = (TextView) card.findViewById(R.id.description);
+        description.setText(Html.fromHtml(description_text));
+        //description.setMovementMethod(new ScrollingMovementMethod());
+
+        return card;
+    }
+
     public RelativeLayout addMessageCard(int cardIndex, String title, String message) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
         ((TextView) card.findViewById(R.id.title)).setText(Html.fromHtml(title));
         ((TextView) card.findViewById(R.id.message)).setText(Html.fromHtml(message));
         cards[cardIndex] = card;
-        cards_professional_data[cardIndex] = null;
+        cards_data[cardIndex] = null;
         return card;
     }
+
 
     public void addNoConnectionCard(
             int cardIndex,
@@ -264,30 +298,37 @@ public class CardStack {
 
     //endregion
 
-    public void replaceCardAt(Professional professional, int index) {
+    public void replaceCardAt(BasicCardFields professional, int index) {
         if (professional == null) {
             throw new RuntimeException("Null Professional");
         }
         if (cards[index] != null) rootView.removeView(cards[index]);
-        cards_professional_data[index] = professional;
-        cards[index] = professionalCard(professional);
+        cards_data[index] = professional;
+        cards[index] =
+                cards_data[index].getClass() == Professional.class ?
+                        professionalCard((Professional) cards_data[index]) :
+                        requestCard((UserRequest) cards_data[index]);
     }
 
-    public void replaceTopCard(Professional professional) {
-        replaceCardAt(professional, CardStack.TOP);
+    public void replaceTopCard(BasicCardFields card) {
+        replaceCardAt(card, CardStack.TOP);
         updateAllCardsMargins();
     }
 
-    public void replaceStack(Professional[] professionals) {
-        if (professionals == null || professionals.length != 3) {
+    public void replaceStack(BasicCardFields[] cards) {
+        if (cards == null || cards.length != 3) {
             throw new RuntimeException("Array of Professionals not Valid");
         }
-        for (int i = 0; i<3;++i) replaceCardAt(professionals[i],i);
+        for (int i = 0; i < 3; ++i) replaceCardAt(cards[i], i);
         updateAllCardsMargins();
     }
 
-    public boolean isAProfessionalCard(int index){
-        return cards_professional_data[index]==null;
+    /**
+     * user cards = Professional Cards & User Requests Cards
+     * non user cards = message cards such as: No Connection ; No Results ; etc...
+     * */
+    public boolean isAUserCard(int index) {
+        return cards_data[index] == null;
     }
 
 }

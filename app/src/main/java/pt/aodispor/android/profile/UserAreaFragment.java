@@ -1,7 +1,9 @@
 package pt.aodispor.android.profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,21 +21,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
-import pt.aodispor.android.api.ApiJSON;
-import pt.aodispor.android.api.HttpRequest;
-import pt.aodispor.android.api.HttpRequestTask;
-import pt.aodispor.android.api.Professional;
-import pt.aodispor.android.api.SearchQueryResult;
-import pt.aodispor.android.dialogs.NewPriceDialog;
 
 public class UserAreaFragment extends Fragment implements Notification {
-    private static final String LOCATION_TAG = "location";
-    private static final String PRICE_DIALOG_TAG = "price-dialog";
-    private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
-    private static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
-    private static final int SELECT_PICTURE = 0;
     private ListView listView;
     private LinearLayout loadingMessage;
     private CustomAdapter arrayAdapter;
@@ -62,7 +52,7 @@ public class UserAreaFragment extends Fragment implements Notification {
         });
 
         List<ListItem> list = new ArrayList<>();
-        ListItem profile = new Profile(getContext(), getActivity());
+        ListItem profile = new Profile(getContext(), this);
         profile.setNotification(this);
         list.add(profile);
         updatedItems = new boolean[list.size()];
@@ -76,8 +66,19 @@ public class UserAreaFragment extends Fragment implements Notification {
         return root;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        for(int i = 0; i < arrayAdapter.getCount(); i++) {
+            ListItem item = arrayAdapter.getItem(i);
+            if(item != null) {
+                item.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void startListItems() {
-        for(int i = 0; i < arrayAdapter.getCount(); i++){
+        for(int i = 0; i < arrayAdapter.getCount(); i++) {
             ListItem item = arrayAdapter.getItem(i);
             if(item != null) {
                 updatedItems[i] = item.onStart();

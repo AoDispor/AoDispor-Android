@@ -1,7 +1,7 @@
 package pt.aodispor.android.profile;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
+import android.content.Intent;
 import android.view.View;
 
 public abstract class ListItem {
@@ -20,14 +20,12 @@ public abstract class ListItem {
         return new View(context);
     }
 
-    public void notifyUpdate() {
-        if(notification != null) {
-            notification.notify(this, true, "");
-        }
-    }
-
     public abstract boolean onStart();
 
     public abstract boolean onUpdate();
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    }
 
 }

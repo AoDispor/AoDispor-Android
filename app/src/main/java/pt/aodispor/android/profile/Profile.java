@@ -1,11 +1,23 @@
 package pt.aodispor.android.profile;
 
+import android.support.v4.app.Fragment;
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
@@ -17,25 +29,30 @@ import pt.aodispor.android.api.SearchQueryResult;
 import pt.aodispor.android.dialogs.LocationDialog;
 import pt.aodispor.android.dialogs.NewPriceDialog;
 
+import static android.app.Activity.RESULT_OK;
+
 public class Profile extends ListItem implements HttpRequest, LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
+    private static final int SELECT_PICTURE = 0;
     private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
     private final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
-    private FragmentActivity activity;
+    private Fragment parentFragment;
     private TextView imageView, nameView, professionView, locationView, priceView, descriptionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
+    private ImageView profileImage;
     private View root;
     private int rate;
     private boolean isFinal;
     private String currency;
     private NewPriceDialog.PriceType type;
+    private Uri tempUri;
 
-    public Profile(Context c, FragmentActivity a) {
+    public Profile(Context c, Fragment a) {
         super(c);
         HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
-        activity = a;
+        parentFragment = a;
         root = LayoutInflater.from(context).inflate(R.layout.profile, null);
 
         // Get Text Views
@@ -53,6 +70,9 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         priceEdit = (EditText) root.findViewById(R.id.priceEdit);
         descriptionEdit = (EditText) root.findViewById(R.id.descriptionEdit);
 
+        // Get image
+        profileImage = (ImageView) root.findViewById(R.id.profileImage);
+
         setFonts();
 
         locationEdit.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +80,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
             public void onClick(View view) {
                 LocationDialog dialog = new LocationDialog();
                 dialog.setListener(thisObject);
-                dialog.show(activity.getSupportFragmentManager(), LOCATION_TAG);
+                dialog.show(parentFragment.getFragmentManager(), LOCATION_TAG);
             }
         });
 
@@ -69,7 +89,31 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
             public void onClick(View view) {
                 NewPriceDialog dialog = NewPriceDialog.newInstance(rate, isFinal, type, currency);
                 dialog.setListener(thisObject);
-                dialog.show(activity.getSupportFragmentManager(), PRICE_DIALOG_TAG);
+                dialog.show(parentFragment.getFragmentManager(), PRICE_DIALOG_TAG);
+            }
+        });
+
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                try {
+                    File tempFile = File.createTempFile("crop", ".png", context.getCacheDir());
+                    tempFile.deleteOnExit();
+                    tempUri = Uri.fromFile(tempFile);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                intent.putExtra("crop", "true");
+                intent.putExtra("aspectX", 1);
+                intent.putExtra("aspectY", 1);
+                intent.putExtra("outputX", 200);
+                intent.putExtra("outputY", 200);
+                parentFragment.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
             }
         });
     }
@@ -99,6 +143,25 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         request.setJSONBody(p);
         request.execute();
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
+            try {
+                InputStream imageStream = context.getContentResolver().openInputStream(tempUri);
+                Bitmap originalImage = BitmapFactory.decodeStream(imageStream);
+                Bitmap image = Bitmap.createScaledBitmap(originalImage, 1024, 1024, true);
+                if(image != null) {
+                    int byteNum = image.getByteCount();
+                    ByteBuffer buffer = ByteBuffer.allocate(byteNum);
+                    image.copyPixelsToBuffer(buffer);
+                    profileImage.setImageBitmap(image);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

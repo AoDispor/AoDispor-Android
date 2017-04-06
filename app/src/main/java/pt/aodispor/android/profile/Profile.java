@@ -7,11 +7,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -99,20 +102,6 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                try {
-                    File tempFile = File.createTempFile("crop", ".png", context.getCacheDir());
-                    tempFile.deleteOnExit();
-                    tempUri = Uri.fromFile(tempFile);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                intent.putExtra("crop", "true");
-                intent.putExtra("aspectX", 1);
-                intent.putExtra("aspectY", 1);
-                intent.putExtra("outputX", 200);
-                intent.putExtra("outputY", 200);
                 parentFragment.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
             }
         });
@@ -147,19 +136,30 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data != null) {
-            try {
-                InputStream imageStream = context.getContentResolver().openInputStream(tempUri);
-                Bitmap originalImage = BitmapFactory.decodeStream(imageStream);
-                Bitmap image = Bitmap.createScaledBitmap(originalImage, 1024, 1024, true);
-                if(image != null) {
-                    int byteNum = image.getByteCount();
-                    ByteBuffer buffer = ByteBuffer.allocate(byteNum);
-                    image.copyPixelsToBuffer(buffer);
-                    profileImage.setImageBitmap(image);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+        if (resultCode == RESULT_OK && data != null) {
+            switch (requestCode) {
+                case SELECT_PICTURE:
+                   try {
+                       File tempFile = File.createTempFile("crop", "", context.getCacheDir());
+                       tempFile.deleteOnExit();
+                       tempUri = Uri.fromFile(tempFile);
+                       UCrop.of(data.getData(), tempUri).withAspectRatio(1, 1).start(context, parentFragment);
+                   } catch (IOException e) {
+                       e.printStackTrace();
+                   }
+                   break;
+                case UCrop.REQUEST_CROP:
+                    final Uri resultUri = UCrop.getOutput(data);
+                    if(resultUri != null) {
+                        try {
+                            InputStream imageStream = context.getContentResolver().openInputStream(resultUri);
+                            Bitmap image = BitmapFactory.decodeStream(imageStream);
+                            profileImage.setImageBitmap(image);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
             }
         }
     }

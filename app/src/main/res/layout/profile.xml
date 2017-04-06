@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:ems="10"
-        android:hint="escreva aqui o seu nome"
+        android:hint="Escreva aqui o seu nome"
         android:inputType="textPersonName"
         android:padding="20dp"
         android:textColor="@color/grey3"

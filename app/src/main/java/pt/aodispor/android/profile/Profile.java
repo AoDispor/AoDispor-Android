@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,7 +144,16 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                        File tempFile = File.createTempFile("crop", "", context.getCacheDir());
                        tempFile.deleteOnExit();
                        tempUri = Uri.fromFile(tempFile);
-                       UCrop.of(data.getData(), tempUri).withAspectRatio(1, 1).start(context, parentFragment);
+                       UCrop.Options options = new UCrop.Options();
+                       options.setLogoColor(ContextCompat.getColor(context, R.color.aoDispor2));
+                       options.setToolbarColor(ContextCompat.getColor(context, R.color.aoDispor));
+                       options.setCropFrameColor(ContextCompat.getColor(context, R.color.white));
+                       options.setCropGridColor(ContextCompat.getColor(context, R.color.white));
+                       options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.aoDispor));
+                       options.setDimmedLayerColor(ContextCompat.getColor(context, R.color.aoDispor));
+                       options.setStatusBarColor(ContextCompat.getColor(context, R.color.aoDispor));
+                       options.setToolbarWidgetColor(ContextCompat.getColor(context, R.color.white));
+                       UCrop.of(data.getData(), tempUri).withAspectRatio(1, 1).withOptions(options).start(context, parentFragment);
                    } catch (IOException e) {
                        e.printStackTrace();
                    }

@@ -2,6 +2,8 @@ package pt.aodispor.android;
 
 import android.graphics.Typeface;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Defines constans and globally used variables
  */
@@ -37,6 +39,10 @@ public class AppDefinitions {
     public static Typeface yanoneKaffeesatzRegular;
     public static Typeface yanoneKaffeesatzThin;
     //endregion
+
+    static final public String TIMEDATE_FORMAT= "yyyy-MM-dd HH:mm:ss";
+    static final public SimpleDateFormat TIMAEDATE_FORMATER =
+            new SimpleDateFormat(AppDefinitions.TIMEDATE_FORMAT);
 
     /**
      * phone number that sends password via SMS

@@ -17,6 +17,11 @@
     <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>
 
+    <!-- Request Card -->
+    <string name="request_expired_card_note">Última oportunidade para responder a este pedido</string>
+    <string name="left_to_expire"> até expirar</string>
+    <string name="days">dias</string>
+
     <!-- Price Dialog -->
     <string name="profile_price_final">O seu preço é final?</string>
     <string name="profile_price_method">O seu serviço é oferecido como?</string>

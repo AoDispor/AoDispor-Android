@@ -873,7 +873,7 @@ public class CardFragment extends Fragment {
                                 p.title="test title";
                                 p.location="some place";
                                 p.description="blablabla";
-                                p.data_expiracao="test date";//new java.util.Date();
+                                p.data_expiracao="2017-04-12 20:35:56";//new java.util.Date();
                                 CardFragment.this.currentSet.data.add(0, p);
                             }
 

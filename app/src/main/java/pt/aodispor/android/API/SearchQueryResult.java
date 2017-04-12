@@ -35,9 +35,11 @@ public class SearchQueryResult extends ApiJSON {
             if (node.isArray()) {
                 for (JsonNode elementNode : node) {
                     list.add(oc.treeToValue(elementNode, CardDeserializer.findClass(elementNode)));
+                    //TODO may use mapper later here
                 }
             } else {
                 list.add(oc.treeToValue(node, CardDeserializer.findClass(node)));
+                //TODO may use mapper later here
             }
             return list;
         }

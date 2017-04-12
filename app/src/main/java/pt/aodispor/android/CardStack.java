@@ -1,8 +1,11 @@
 package pt.aodispor.android;
 
+import android.content.res.Resources;
+import android.os.Handler;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -15,6 +18,15 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+import org.w3c.dom.Text;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import pt.aodispor.android.api.BasicCardFields;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.UserRequest;
@@ -22,6 +34,7 @@ import pt.aodispor.android.api.UserRequest;
 
 public class CardStack {
 
+    final static int delayBetweenLayoutUpdates = 1000;
 
     protected Fragment fragment;
     protected LayoutInflater inflater = null;
@@ -71,9 +84,25 @@ public class CardStack {
                 cardStack.getCardInfoAt(2)};
     }
 
+
+    static private Handler handler;
+    static private CardStack active;//TODO probably a bad solution but should work 4 now
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            active.updateCards();
+            handler.postDelayed(this, delayBetweenLayoutUpdates);
+        }
+    };
+
     public void initNewStack() {
         cards = new RelativeLayout[3];
         cards_data = new BasicCardFields[3];
+        //prepare card update thread
+        active = this;
+        if (handler == null) handler = new Handler();
+        handler.postDelayed(runnable, delayBetweenLayoutUpdates);
     }
 
 
@@ -144,7 +173,7 @@ public class CardStack {
      * Because a professional details are separated from the card display use this auxiliary method
      * to insert new professionals into the card stack
      *
-     * @param stackIndex   0,1 or 2 (the higher the index the lower it is on the stack)
+     * @param stackIndex 0,1 or 2 (the higher the index the lower it is on the stack)
      * @param cardData
      * @return
      */
@@ -198,7 +227,7 @@ public class CardStack {
                                                     String currency_type,
                                                     String payment_type,
                                                     String avatar_scr) {
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
+        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.professional_card, rootView, false);
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
         profession.setText(Html.fromHtml(profession_text));
@@ -246,7 +275,7 @@ public class CardStack {
     ) {
         //TODO not yet complete
 
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
+        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.request_card, rootView, false);
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
         profession.setText(Html.fromHtml(title));
@@ -326,9 +355,43 @@ public class CardStack {
     /**
      * user cards = Professional Cards & User Requests Cards
      * non user cards = message cards such as: No Connection ; No Results ; etc...
-     * */
+     */
     public boolean isAUserCard(int index) {
         return cards_data[index] == null;
     }
 
+
+    public void updateCards() {
+        //TODO NOT YET TESTED
+        Log.d("updateCards", "updating");
+        if (true) return;
+
+        //TODO maybe could also try to fetc image again in case its missing ???
+        //TODO separate server date related stuff from this and from HttpRequestTask and place it on some oter class
+
+        if (cards == null || cards_data == null) return;
+        //update requests time
+        //int timeNow = TimeZone.getTimeZone("UTC").getOffset(System.currentTimeMillis());
+        long timenow = new Date().getTime();
+        for (int i = 0; i < 2; ++i) {
+            if (cards[i] != null && cards_data[i] != null && cards_data[i].getClass() == UserRequest.class) {
+                Date carddate = ((UserRequest) cards_data[i]).getExpirationDate();
+                if (carddate == null) continue;
+                long cardTime = carddate.getTime(); //TODO get card date
+                Period p = new Period(timenow, cardTime, PeriodType.standard());
+                //TODO i dont actually want to change te descriptio, just 4 testing
+                ((TextView) cards[i].findViewById(R.id.description)).setText(
+                        cardTime - timenow < 0 ? Resources.getSystem().getString(R.string.request_expired_card_note)
+                                : (
+                                (p.getDays() > 0 ? "" : p.getDays() + " " + Resources.getSystem().getString(R.string.dash) + " ")
+                                        + p.getHours()
+                                        + ":" + p.getMinutes()
+                                        + ":" + p.getSeconds()
+                                        + Resources.getSystem().getString(R.string.left_to_expire)
+                        )
+                );
+            } else break;
+        }
+
+    }
 }

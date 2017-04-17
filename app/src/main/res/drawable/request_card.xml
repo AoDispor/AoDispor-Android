@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/washed_blue"/>
+    <stroke android:width="@dimen/card_border_width" android:color="@color/grey2" />
+    <corners android:radius="@dimen/card_border_radius"/>
+</shape>

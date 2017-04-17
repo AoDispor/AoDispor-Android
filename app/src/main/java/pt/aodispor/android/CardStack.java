@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.os.Handler;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,12 +21,8 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.w3c.dom.Text;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import pt.aodispor.android.api.BasicCardFields;
 import pt.aodispor.android.api.Professional;
@@ -183,11 +180,18 @@ public class CardStack {
         if (cardData == null)
             return;
         cards_data[stackIndex] = cardData;
-        cards[stackIndex] =
-                cards_data[stackIndex].getClass() == Professional.class ?
-                        professionalCard((Professional) cards_data[stackIndex]) :
-                        requestCard((UserRequest) cards_data[stackIndex]);
-
+        try {
+            cards[stackIndex] =
+                    cards_data[stackIndex].getClass() == Professional.class ?
+                            professionalCard((Professional) cards_data[stackIndex]) :
+                            requestCard((UserRequest) cards_data[stackIndex]);
+        } catch (Exception e) {
+            //Execepção aqui nunca deverá acontecer pk qnd a carta não está completa nem sequer é enviada
+            //Tipicamente só acontecerá em ambiete de desenvolvimento
+            addMessageCard(stackIndex,
+                    fragment.getString(R.string.invalid_card_title),
+                    fragment.getString(R.string.invalid_card_description));
+        }
     }
 
     public void clearCard(int card_index) {
@@ -208,14 +212,13 @@ public class CardStack {
         cards[destination] = cards[source];
     }
 
-
     private RelativeLayout professionalCard(Professional professional) {
         RelativeLayout card = createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url);
         return card;
     }
 
     private RelativeLayout requestCard(UserRequest request) {
-        RelativeLayout card = createRequestCard(request.location, request.description, request.title);
+        RelativeLayout card = createRequestCard(request.location, request.description, request.title, request.rate);
         return card;
     }
 
@@ -271,15 +274,18 @@ public class CardStack {
                                                //String profession_text,
                                                String location_text,
                                                String description_text,
-                                               String title
+                                               String job_text,
+                                               String price_value_text
     ) {
         //TODO not yet complete
 
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.request_card, rootView, false);
 
-        TextView profession = (TextView) card.findViewById(R.id.profession);
-        profession.setText(Html.fromHtml(title));
-        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        //expiration date is set on updateCards() method
+
+        TextView job = (TextView) card.findViewById(R.id.job);
+        job.setText(Html.fromHtml(job_text));
+        job.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView location = (TextView) card.findViewById(R.id.location);
         location.setText(Html.fromHtml(location_text));
@@ -288,6 +294,10 @@ public class CardStack {
         TextView description = (TextView) card.findViewById(R.id.description);
         description.setText(Html.fromHtml(description_text));
         //description.setMovementMethod(new ScrollingMovementMethod());
+
+        TextView price = (TextView) card.findViewById(R.id.price);
+        price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        price.setText(Html.fromHtml(price_value_text));
 
         return card;
     }
@@ -363,8 +373,8 @@ public class CardStack {
 
     public void updateCards() {
         //TODO NOT YET TESTED
-        Log.d("updateCards", "updating");
-        if (true) return;
+        //Log.d("updateCards", "updating");
+        //if (true) return;
 
         //TODO maybe could also try to fetc image again in case its missing ???
         //TODO separate server date related stuff from this and from HttpRequestTask and place it on some oter class
@@ -379,16 +389,22 @@ public class CardStack {
                 if (carddate == null) continue;
                 long cardTime = carddate.getTime(); //TODO get card date
                 Period p = new Period(timenow, cardTime, PeriodType.standard());
-                //TODO i dont actually want to change te descriptio, just 4 testing
-                ((TextView) cards[i].findViewById(R.id.description)).setText(
-                        cardTime - timenow < 0 ? Resources.getSystem().getString(R.string.request_expired_card_note)
-                                : (
-                                (p.getDays() > 0 ? "" : p.getDays() + " " + Resources.getSystem().getString(R.string.dash) + " ")
+                //Days are not supported =( it seems...
+                //must do calculations by "hand"
+                long diference = cardTime - timenow;
+                long days = diference / (24 * 60 * 60 * 1000);
+                String daysString = "";
+                if (days > 0) daysString = days + " ";
+                daysString += fragment.getString(days == 1 ? R.string.day : R.string.days) + " ";
+                ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
+                        diference < 0 ? fragment.getString(R.string.request_expired_card_note)
+                                :
+                                (daysString
                                         + p.getHours()
                                         + ":" + p.getMinutes()
-                                        + ":" + p.getSeconds()
-                                        + Resources.getSystem().getString(R.string.left_to_expire)
-                        )
+                                        + ":" + p.getSeconds() + " "
+                                        + fragment.getString(R.string.left_to_expire)
+                                )
                 );
             } else break;
         }

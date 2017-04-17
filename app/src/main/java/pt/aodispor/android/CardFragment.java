@@ -47,7 +47,7 @@ public class CardFragment extends Fragment {
 
     //region DEV_ONLY TESTING
     static private boolean DEV_force2ndPage = false;
-    static private boolean DEV_injectPedidoMockup = false;
+    static private boolean DEV_injectPedidoMockup = true;
     //endregion DEV_ONLY TESTING
 
 
@@ -873,7 +873,8 @@ public class CardFragment extends Fragment {
                                 p.title="test title";
                                 p.location="some place";
                                 p.description="blablabla";
-                                p.data_expiracao="2017-04-12 20:35:56";//new java.util.Date();
+                                p.rate="15";
+                                p.data_expiracao="2017-04-20 20:35:56";//new java.util.Date();
                                 CardFragment.this.currentSet.data.add(0, p);
                             }
 

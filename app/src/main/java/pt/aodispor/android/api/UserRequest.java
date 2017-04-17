@@ -30,7 +30,7 @@ public class UserRequest extends BasicCardFields {
     public Date getExpirationDate(){
         Date ret = null;
         try {
-            AppDefinitions.TIMAEDATE_FORMATER.format(data_expiracao);
+            ret = AppDefinitions.TIMAEDATE_FORMATER.parse(data_expiracao);
         } catch (Exception e){}
         return ret;
     }

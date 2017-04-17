@@ -10,12 +10,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 //@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class Professional extends BasicCardFields {
 
-
-
-
-
-    @JsonProperty("rate") public String rate;
-    @JsonProperty("currency") public String currency;
+    //@JsonProperty("rate") public String rate;
+    //@JsonProperty("currency") public String currency;
     @JsonProperty("type") public String type;
 
     @JsonProperty("avatar_url") public String avatar_url;

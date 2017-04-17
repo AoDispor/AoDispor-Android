@@ -21,6 +21,11 @@
     <string name="request_expired_card_note">Última oportunidade para responder a este pedido</string>
     <string name="left_to_expire"> até expirar</string>
     <string name="days">dias</string>
+    <string name="day">dia</string>
+
+    <!-- Invalid Card -->
+    <string name="invalid_card_title">Dados inválidos</string>
+    <string name="invalid_card_description">Esta carta apresenta dados corrompidos. Se possível, comunique à equipa AoDispor o sucedido.</string>
 
     <!-- Price Dialog -->
     <string name="profile_price_final">O seu preço é final?</string>

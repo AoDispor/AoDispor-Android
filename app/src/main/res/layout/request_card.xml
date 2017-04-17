@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:layout_centerInParent="true"
     android:layout_margin="5dp"
-    android:background="@drawable/card"
-    android:backgroundTint="@color/pf_grey_light"
+    android:background="@drawable/request_card"
     android:orientation="vertical"
     android:padding="0dp"
     tools:context="pt.aodispor.android.ProfessionalProfileActivity">
@@ -41,7 +40,7 @@
         android:textSize="20sp" />
 
     <ImageView
-        android:id="@+id/profile_image"
+        android:id="@+id/job_image"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_below="@+id/price"
@@ -50,28 +49,44 @@
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/profession"
+        android:id="@+id/job"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profile_image"
+        android:layout_below="@+id/job_image"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="5dp"
-        android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/expiration_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        android:layout_marginBottom="21dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/job"
+        android:layout_alignStart="@+id/job"
+        android:layout_alignRight="@+id/price"
+        android:layout_alignEnd="@+id/price" />
 
     <TextView
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/profession"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:layout_below="@+id/job"
+        android:layout_alignLeft="@+id/job"
+        android:layout_alignStart="@+id/job"
+        android:layout_alignRight="@+id/job"
+        android:layout_alignEnd="@+id/job"
+        android:layout_above="@+id/expiration_date"
+        android:textAlignment="center" />
 
 </RelativeLayout>

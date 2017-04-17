@@ -15,4 +15,5 @@
     <color name="highlight">#FFFF00</color>
     <color name="by_hour">#40C0CB</color>
     <color name="by_service">#8FBE00</color>
+    <color name="washed_blue">#e9fcff</color>
 </resources>

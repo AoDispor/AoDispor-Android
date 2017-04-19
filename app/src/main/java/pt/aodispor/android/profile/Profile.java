@@ -1,5 +1,6 @@
 package pt.aodispor.android.profile;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -8,23 +9,24 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
+import pt.aodispor.android.Utility;
 import pt.aodispor.android.api.ApiJSON;
 import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
@@ -37,8 +39,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class Profile extends ListItem implements HttpRequest, LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
     private static final int SELECT_PICTURE = 0;
-    private static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
-    private final String LOCATION_TAG = "location";
+    private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
     private Fragment parentFragment;
@@ -46,6 +47,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
     private ImageView profileImage;
     private View root;
+    private String prefix, suffix;
     private int rate;
     private boolean isFinal;
     private String currency;
@@ -122,17 +124,48 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     @Override
     public boolean onUpdate() {
         Professional p = new Professional();
-        p.full_name = nameEdit.getText().toString();
-        p.title = professionEdit.getText().toString();
-        p.location = locationEdit.getText().toString();
-        //TODO other fields
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
+        p.full_name = nameEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
+        p.title = professionEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
+        String location = locationEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
+        if(!location.isEmpty()) {
+            p.location = location;
+            p.cp4 = prefix;
+            p.cp3 = suffix;
+            // TODO Ask if there is something to do here that is done in the old profile
+        }
+        if(rate > 0) {
+            p.rate = Integer.toString(rate);
+        }
+        switch (type) {
+            case ByHour:
+                p.type = "H";
+                break;
+            case ByDay:
+                p.type = "D";
+                break;
+            case ByService:
+                p.type = "S";
+                break;
+        }
+        p.currency = currency;
+        p.description = descriptionEdit.getText().toString();
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         request.setJSONBody(p);
         request.execute();
-        return false;
+
+        // Upload Image
+        BitmapDrawable drawable = (BitmapDrawable) profileImage.getDrawable();
+        Bitmap image = drawable.getBitmap();
+        HttpRequestTask imageRequest = new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
+        imageRequest.setMethod(HttpRequestTask.PUT_REQUEST);
+        imageRequest.setType(HttpRequest.UPDATE_PROFILE);
+        imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
+        imageRequest.execute();
+        return true;
     }
 
     @Override
@@ -178,7 +211,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, URL_MY_PROFILE);
+        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
         request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
@@ -188,7 +221,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     public void updateProfile(Professional professional) {
         setName(professional.full_name);
         setProfession(professional.title);
-        setLocation(professional.location);
+        setLocation(professional.location, professional.cp4, professional.cp3);
         int rate = Integer.parseInt(professional.rate);
         boolean isFinal = Boolean.parseBoolean("true");
         NewPriceDialog.PriceType type = NewPriceDialog.PriceType.ByDay;
@@ -205,6 +238,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         }
         setPrice(rate, isFinal, type, professional.currency);
         setDescription(professional.description);
+        setProfileImageFromUrl(professional.avatar_url);
     }
 
     public void setName(String n) {
@@ -215,8 +249,10 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         professionEdit.setText(p);
     }
 
-    public void setLocation(String l) {
-        locationEdit.setText(l);
+    public void setLocation(String l, String p, String s) {
+        locationEdit.setText(l + " " + p + "-" + s);
+        prefix = p;
+        suffix = s;
     }
 
     public void setPrice(int p, boolean f, NewPriceDialog.PriceType t, String c) {
@@ -229,6 +265,18 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
     public void setDescription(String d) {
         descriptionEdit.setText(d);
+    }
+
+    public void setProfileImageFromUrl(String url) {
+        if (url != null) {
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            imageLoader.displayImage(url, profileImage, new SimpleImageLoadingListener(){
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    // TODO
+                }
+            });
+        }
     }
 
     public String getName() {
@@ -254,9 +302,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     @Override
     public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
         if(set) {
-            setLocation(locationName);
-        } else {
-            setLocation("");
+            setLocation(locationName, prefix, suffix);
         }
     }
 

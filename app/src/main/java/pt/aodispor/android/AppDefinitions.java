@@ -14,6 +14,7 @@ public class AppDefinitions {
     //region DEBUG/DEVELOPMENT ONLY
 
     public static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
+    public static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
 
     /**
      * set true to skip login related dialogs

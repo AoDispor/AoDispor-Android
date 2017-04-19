@@ -20,10 +20,17 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.RunnableFuture;
+import java.util.logging.Handler;
 
 import pt.aodispor.android.R;
 
 public class UserAreaFragment extends Fragment implements Notification {
+    private boolean minLoading;
+    private android.os.Handler loadingHandler;
+    private Runnable loadinghandlerRunnable;
     private ListView listView;
     private LinearLayout loadingMessage;
     private CustomAdapter arrayAdapter;
@@ -33,6 +40,12 @@ public class UserAreaFragment extends Fragment implements Notification {
 
     public static UserAreaFragment newInstance() {
         return new UserAreaFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        createHandler();
     }
 
     @Nullable
@@ -64,6 +77,17 @@ public class UserAreaFragment extends Fragment implements Notification {
         startLoading();
 
         return root;
+    }
+
+    private void createHandler() {
+        loadingHandler = new android.os.Handler();
+        loadinghandlerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                minLoading = false;
+                endLoading();
+            }
+        };
     }
 
     @Override
@@ -112,16 +136,20 @@ public class UserAreaFragment extends Fragment implements Notification {
     }
 
     private void startLoading() {
+        minLoading = true;
+        loadingHandler.postDelayed(loadinghandlerRunnable, 1000);
         listView.setVisibility(View.INVISIBLE);
         loadingMessage.setVisibility(View.VISIBLE);
     }
 
     private void endLoading() {
-        updatedItems = new boolean[arrayAdapter.getCount()];
-        loadingMessage.setVisibility(View.INVISIBLE);
-        listView.setVisibility(View.VISIBLE);
-        listView.scrollTo(0, 0);
-        saveButton.setEnabled(true);
+        if(!minLoading) {
+            updatedItems = new boolean[arrayAdapter.getCount()];
+            loadingMessage.setVisibility(View.INVISIBLE);
+            listView.setVisibility(View.VISIBLE);
+            listView.scrollTo(0, 0);
+            saveButton.setEnabled(true);
+        }
     }
 
     @Override

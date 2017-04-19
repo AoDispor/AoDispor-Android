@@ -15,6 +15,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     private final int NUMBER_OF_PAGES = 2;
     //TODO mudar se necessário private ProfileFragment profileFragment;
     private TabbedUserArea tabbedProfile;
+    private ProfileFragment profileFragment;
     private CardFragment cardFragment;
 
     /**
@@ -36,7 +37,9 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         switch (position){
             case 0:
                 f = TabbedUserArea.newInstance();
+                //f = ProfileFragment.newInstance();
                 //TODO mudar se necessário profileFragment = (ProfileFragment) f;
+                //profileFragment = (ProfileFragment) f;
                 tabbedProfile = (TabbedUserArea) f;
                 break;
             case 1:

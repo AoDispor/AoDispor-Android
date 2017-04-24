@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.yalantis.ucrop.UCrop;
@@ -270,12 +271,10 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     public void setProfileImageFromUrl(String url) {
         if (url != null) {
             ImageLoader imageLoader = ImageLoader.getInstance();
-            imageLoader.displayImage(url, profileImage, new SimpleImageLoadingListener(){
-                @Override
-                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                    // TODO
-                }
-            });
+            DisplayImageOptions options = new DisplayImageOptions.Builder()
+                    .cacheOnDisk(true)
+                    .build();
+            imageLoader.displayImage(url, profileImage, options);
         }
     }
 

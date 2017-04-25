@@ -198,7 +198,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Started when the HTTP request is unsuccessful. Shows an error message and ends loading.
      */
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
+    public void onHttpRequestFailed(ApiJSON errorData, int type) {
         //TODO -> this fragment shouldn't even be loaded in the first place.
         if(AppDefinitions.smsLoginDone) {
             Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();

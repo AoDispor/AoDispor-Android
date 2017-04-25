@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.yalantis.ucrop.UCrop;
 
@@ -54,6 +57,8 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     private String currency;
     private NewPriceDialog.PriceType type;
     private Uri tempUri;
+    private Bitmap lastImage;
+    private boolean changedImage;
 
     public Profile(Context c, Fragment a) {
         super(c);
@@ -119,6 +124,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     @Override
     public boolean onStart() {
         getProfileInfo();
+        changedImage = false;
         return false;
     }
 
@@ -162,7 +168,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         Bitmap image = drawable.getBitmap();
         HttpRequestTask imageRequest = new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
         imageRequest.setMethod(HttpRequestTask.PUT_REQUEST);
-        imageRequest.setType(HttpRequest.UPDATE_PROFILE);
+        imageRequest.setType(HttpRequest.UPDATE_IMAGE);
         imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
         imageRequest.execute();
@@ -199,6 +205,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                             InputStream imageStream = context.getContentResolver().openInputStream(resultUri);
                             Bitmap image = BitmapFactory.decodeStream(imageStream);
                             profileImage.setImageBitmap(image);
+                            changedImage = true;
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -239,7 +246,9 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         }
         setPrice(rate, isFinal, type, professional.currency);
         setDescription(professional.description);
-        setProfileImageFromUrl(professional.avatar_url);
+        if(!changedImage) {
+            setProfileImageFromUrl(professional.avatar_url);
+        }
     }
 
     public void setName(String n) {
@@ -274,7 +283,27 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
             DisplayImageOptions options = new DisplayImageOptions.Builder()
                     .cacheOnDisk(true)
                     .build();
-            imageLoader.displayImage(url, profileImage, options);
+            imageLoader.displayImage(url, profileImage, options, new ImageLoadingListener() {
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
+
+                }
+
+                @Override
+                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    lastImage = loadedImage;
+                }
+
+                @Override
+                public void onLoadingCancelled(String imageUri, View view) {
+
+                }
+            });
         }
     }
 
@@ -338,13 +367,26 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
             case HttpRequest.UPDATE_PROFILE:
                 p = ((SearchQueryResult) answer).data.get(0);
                 break;
+            case HttpRequest.UPDATE_IMAGE:
+                ImageLoader.getInstance().clearDiskCache();
+                break;
         }
-        updateProfile(p);
-        notification.notify(this, true, "");
+        if(type == HttpRequest.GET_PROFILE || type == HttpRequest.UPDATE_PROFILE) {
+            updateProfile(p);
+            notification.notify(this, true, "");
+        }
     }
 
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
+    public void onHttpRequestFailed(ApiJSON errorData, int type) {
+        switch(type) {
+            case HttpRequest.UPDATE_IMAGE:
+                profileImage.setImageBitmap(lastImage);
+                break;
+            default:
+                break;
+        }
         notification.notify(this, false, context.getString(R.string.timeout));
     }
+
 }

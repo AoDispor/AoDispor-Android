@@ -290,7 +290,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
     }
 
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
+    public void onHttpRequestFailed(ApiJSON errorData, int type) {
         Error error = (Error) errorData;
         Toast.makeText(this, error.message, Toast.LENGTH_LONG).show();
     }

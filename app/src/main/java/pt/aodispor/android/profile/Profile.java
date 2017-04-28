@@ -132,7 +132,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         p.full_name = nameEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
         p.title = professionEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
         String location = locationEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
-        if(!location.isEmpty()) {
+        if(!location.isEmpty() && prefix != null && suffix != null) {
             p.location = location;
             p.cp4 = prefix;
             p.cp3 = suffix;
@@ -258,7 +258,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     }
 
     public void setLocation(String l, String p, String s) {
-        locationEdit.setText(l + " " + p + "-" + s);
+        locationEdit.setText(l);
         prefix = p;
         suffix = s;
     }

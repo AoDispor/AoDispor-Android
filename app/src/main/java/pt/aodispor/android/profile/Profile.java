@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -20,7 +19,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -270,7 +268,28 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         isFinal = f;
         type = t;
         currency = c;
-        priceEdit.setText(rate + " " + currency);
+        String priceTag = rate + " ";
+        switch (currency) {
+            case "EUR":
+                priceTag += "€";
+                break;
+            case "DOL":
+                priceTag += "$";
+                break;
+        }
+        priceTag += "/";
+        switch (type) {
+            case ByDay:
+                priceTag += "dia";
+                break;
+            case ByHour:
+                priceTag += "hora";
+                break;
+            case ByService:
+                priceTag += "serviço";
+                break;
+        }
+        priceEdit.setText(priceTag);
     }
 
     public void setDescription(String d) {

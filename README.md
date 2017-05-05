@@ -1,5 +1,7 @@
 # AoDispor-Android
 
+[![Join the chat at https://gitter.im/AoDispor/AoDispor-Android](https://badges.gitter.im/AoDispor/AoDispor-Android.svg)](https://gitter.im/AoDispor/AoDispor-Android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Projeto desenvolvido em [**Android Studio**](https://developer.android.com/studio/index.html).
 
 [![CircleCI](https://circleci.com/gh/AoDispor/AoDispor-Android.svg?style=svg)](https://circleci.com/gh/AoDispor/AoDispor-Android)

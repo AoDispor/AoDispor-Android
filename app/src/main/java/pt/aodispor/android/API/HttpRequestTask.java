@@ -232,7 +232,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         if (/*error || */error) {
             //if (data == null)
             //    return;
-            postExecute.onHttpRequestFailed(data);
+            postExecute.onHttpRequestFailed(data, type);
         } else {
             if (data == null)
                 return;

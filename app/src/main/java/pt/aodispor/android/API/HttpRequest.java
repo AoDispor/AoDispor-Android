@@ -8,8 +8,9 @@ public interface HttpRequest {
     int GET_PROFILE = 1;
     int UPDATE_PROFILE = 2;
     int GET_LOCATION = 3;
+    int UPDATE_IMAGE = 4;
 
     void onHttpRequestSuccessful(ApiJSON answer, int extra);
 
-    void onHttpRequestFailed(ApiJSON errorData);
+    void onHttpRequestFailed(ApiJSON errorData, int type);
 }

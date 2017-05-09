@@ -173,4 +173,17 @@ public abstract class Utility {
         return matcher.group();
     }
 
+    /**
+     * Utility method to print the professional profile data.
+     * @param p The professional object to print.
+     */
+    public static void printProfessional(Professional p) {
+        Log.v("debug", "name:" + p.full_name);
+        Log.v("debug", "title:" + p.title);
+        Log.v("debug", "location:" + p.location);
+        Log.v("debug", "rate:" + p.rate);
+        Log.v("debug", "type:" + p.type);
+        Log.v("debug", "description:" + p.description);
+    }
+
 }

@@ -98,7 +98,6 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
 
         // Location
         locationView.setClickable(true);
-        //locationView.setOnClickListener(new LocationOnClickListener(this.getActivity(), this, locationView)); //TODO DECIDE
         locationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -199,7 +198,7 @@ public class ProfileFragment extends Fragment implements HttpRequest, DialogCall
      * Started when the HTTP request is unsuccessful. Shows an error message and ends loading.
      */
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
+    public void onHttpRequestFailed(ApiJSON errorData, int type) {
         //TODO -> this fragment shouldn't even be loaded in the first place.
         if(AppDefinitions.smsLoginDone) {
             Toast.makeText(getContext(), R.string.timeout, Toast.LENGTH_LONG).show();

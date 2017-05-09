@@ -21,4 +21,5 @@ public class Professional extends ApiJSON {
     @JsonProperty("phone") public String phone;
     @JsonProperty("cp4") public String cp4;
     @JsonProperty("cp3") public String cp3;
+    @JsonProperty("distance") public Double distance;
 }

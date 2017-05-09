@@ -1,8 +1,13 @@
 package pt.aodispor.android;
 
+import android.graphics.Color;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -173,7 +178,8 @@ public class CardStack {
 
 
     private RelativeLayout professionalCard(Professional professional) {
-        RelativeLayout card = createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url);
+        Integer distance = professional.distance.intValue();
+        RelativeLayout card = createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url, distance.toString());
         return card;
     }
 
@@ -184,7 +190,8 @@ public class CardStack {
                                                  String price_value,
                                                  String currency_type,
                                                  String payment_type,
-                                                 String avatar_scr) {
+                                                 String avatar_scr,
+                                                    String distance) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.card, rootView, false);
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
@@ -192,7 +199,21 @@ public class CardStack {
         profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView location = (TextView) card.findViewById(R.id.location);
-        location.setText(Html.fromHtml(location_text));
+
+        String text = "<font color='black'>"+location_text+"</font><font color='grey2'></font>";
+        location.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
+
+        int flag = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+        SpannableString s1 = new SpannableString(location_text);
+        SpannableString s2 = new SpannableString(" (a "+distance+" metros)");
+        s1.setSpan(new ForegroundColorSpan(Color.BLACK), 0, s1.length(), flag);
+        s2.setSpan(new ForegroundColorSpan(Color.LTGRAY), 0, s2.length(), flag);
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(s1);
+        builder.append(s2);
+        location.setText(builder);
+
+        //location.setText(Html.fromHtml(location_text));
         location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView description = (TextView) card.findViewById(R.id.description);

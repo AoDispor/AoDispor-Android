@@ -21,7 +21,7 @@ public class AppDefinitions {
      * <br>the phone number used is equal to the test phone number
      * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
-    public static final boolean SKIP_LOGIN = true;
+    public static final boolean SKIP_LOGIN = false;
 
     public static final String testPhoneNumber = "+351" + "912488434";
     public static final String testPassword = "123456";
@@ -80,8 +80,10 @@ public class AppDefinitions {
      * */
     public static String userPassword = "";
 
-    /** used to block certain features when user has not loggedin with the sms code */
-    public static boolean smsLoginDone = true;
+    /** used to block certain features when user has not loggedin with the sms code
+     *  deve estar a FALSE em release builds
+     * */
+    public static boolean smsLoginDone = false;
     /**
      * postal code to be sent to 'tokens' database
      */

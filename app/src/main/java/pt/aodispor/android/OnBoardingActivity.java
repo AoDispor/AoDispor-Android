@@ -72,8 +72,8 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
 
         if (AppDefinitions.SKIP_LOGIN) {
-            /*AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
-            AppDefinitions.userPassword = AppDefinitions.testPassword;*/
+            AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
+            AppDefinitions.userPassword = AppDefinitions.testPassword;
             showMainActivity();
             return;
         }
@@ -290,7 +290,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
     }
 
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
+    public void onHttpRequestFailed(ApiJSON errorData, int type) {
         Error error = (Error) errorData;
         Toast.makeText(this, error.message, Toast.LENGTH_LONG).show();
     }

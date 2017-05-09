@@ -13,6 +13,9 @@ public class AppDefinitions {
 
     //region DEBUG/DEVELOPMENT ONLY
 
+    public static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
+    public static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
+
     /**
      * set true to skip login related dialogs
      * <br>the phone number used is equal to the test phone number
@@ -20,8 +23,8 @@ public class AppDefinitions {
      */
     public static final boolean SKIP_LOGIN = false;
 
-    public static final String testPhoneNumber = "+351912488434";
-    public static final String testPassword = "123456";//"??????"
+    public static final String testPhoneNumber = "+351" + "912488434";
+    public static final String testPassword = "123456";
 
     //endregion
 
@@ -77,7 +80,9 @@ public class AppDefinitions {
      * */
     public static String userPassword = "";
 
-    /** used to block certain features when user has not loggedin with the sms code */
+    /** used to block certain features when user has not loggedin with the sms code
+     *  deve estar a FALSE em release builds
+     * */
     public static boolean smsLoginDone = false;
     /**
      * postal code to be sent to 'tokens' database

@@ -98,8 +98,7 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="@drawable/tabletop2" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.github.stkent.amplify.prompt.DefaultLayoutPromptView
         android:id="@+id/prompt_view"

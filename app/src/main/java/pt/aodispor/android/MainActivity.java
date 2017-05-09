@@ -1,12 +1,9 @@
 package pt.aodispor.android;
 
-import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
@@ -14,11 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,11 +23,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import pt.aodispor.android.api.HttpRequestTask;
-import pt.aodispor.android.api.Register;
-
-import static pt.aodispor.android.AppDefinitions.PASSWORD_SMS_PHONES;
-
-import pt.aodispor.android.Advanceable;
 
 /**
  * This class serves as the main activity for the application which extends AppCompatActivity.

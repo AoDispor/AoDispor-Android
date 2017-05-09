@@ -4,6 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import pt.aodispor.android.profile.TabbedUserArea;
+
 /**
  * Custom FragmentPagerAdapter class to control any sort of fragment class and to select the text
  * to be shown in the tabs.
@@ -11,6 +13,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class TabPagerAdapter extends FragmentPagerAdapter {
     /** Number of pages this adapter supports. */
     private final int NUMBER_OF_PAGES = 2;
+    //TODO mudar se necessário private ProfileFragment profileFragment;
+    private TabbedUserArea tabbedProfile;
     private ProfileFragment profileFragment;
     private CardFragment cardFragment;
 
@@ -32,8 +36,11 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         Fragment f = null;
         switch (position){
             case 0:
-                f = ProfileFragment.newInstance();
-                profileFragment = (ProfileFragment) f;
+                f = TabbedUserArea.newInstance();
+                //f = ProfileFragment.newInstance();
+                //TODO mudar se necessário profileFragment = (ProfileFragment) f;
+                //profileFragment = (ProfileFragment) f;
+                tabbedProfile = (TabbedUserArea) f;
                 break;
             case 1:
                 f = CardFragment.newInstance();
@@ -43,8 +50,14 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         return f;
     }
 
+    /* TODO mudar se necessário
     public ProfileFragment getProfileFragment() {
         return profileFragment;
+    }
+    */
+
+    public TabbedUserArea getTabbedProfile() {
+        return tabbedProfile;
     }
 
     public CardFragment getCardFragment() {

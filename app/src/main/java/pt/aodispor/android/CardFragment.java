@@ -781,7 +781,7 @@ public class CardFragment extends Fragment implements HttpRequest {
     }
 
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
+    public void onHttpRequestFailed(ApiJSON errorData, int type) {
 
         if (requestType == RequestType.retry_prevSet
                 || requestType == RequestType.retry_nextSet

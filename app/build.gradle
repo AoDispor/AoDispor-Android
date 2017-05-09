@@ -22,7 +22,7 @@ repositories {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "24.0.3"
+    buildToolsVersion '24.0.3'
     defaultConfig {
         applicationId "pt.aodispor.android"
         minSdkVersion 16
@@ -62,6 +62,7 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile 'com.google.android.gms:play-services-gcm:10.0.0'
+    compile 'com.yalantis:ucrop:2.2.0'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

@@ -90,7 +90,7 @@ public class ZipCodeOnEditText implements TextWatcher, HttpRequest {
     }
 
     @Override
-    public void onHttpRequestFailed(ApiJSON errorData) {
+    public void onHttpRequestFailed(ApiJSON errorData, int type) {
 
     }
 }

@@ -376,15 +376,15 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
     }
 
     @Override
-    public void onHttpRequestCompleted(ApiJSON answer, int type) {
+    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
         Professional p = new Professional();
         switch (type) {
             case HttpRequest.GET_PROFILE:
                 SearchQueryResult getProfile = (SearchQueryResult) answer;
-                p = getProfile.data.get(0);
+                p = (Professional) getProfile.data.get(0);
                 break;
             case HttpRequest.UPDATE_PROFILE:
-                p = ((SearchQueryResult) answer).data.get(0);
+                p = (Professional) ((SearchQueryResult) answer).data.get(0);
                 break;
             case HttpRequest.UPDATE_IMAGE:
                 ImageLoader.getInstance().clearDiskCache();

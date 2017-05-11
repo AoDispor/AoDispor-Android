@@ -15,7 +15,6 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     private final int NUMBER_OF_PAGES = 2;
     //TODO mudar se necessário private ProfileFragment profileFragment;
     private TabbedUserArea tabbedProfile;
-    private ProfileFragment profileFragment;
     private CardFragment cardFragment;
 
     /**

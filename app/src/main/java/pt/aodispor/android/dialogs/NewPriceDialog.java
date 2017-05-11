@@ -22,7 +22,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import pt.aodispor.android.ProfileFragment;
 import pt.aodispor.android.R;
 
 /**

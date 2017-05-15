@@ -154,8 +154,9 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         }
         p.currency = currency;
         p.description = descriptionEdit.getText().toString();
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
-        request.setMethod(HttpRequestTask.POST_REQUEST);
+        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
+                //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
+        //request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         request.setJSONBody(p);
@@ -164,8 +165,9 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         // Upload Image
         BitmapDrawable drawable = (BitmapDrawable) profileImage.getDrawable();
         Bitmap image = drawable.getBitmap();
-        HttpRequestTask imageRequest = new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
-        imageRequest.setMethod(HttpRequestTask.PUT_REQUEST);
+        HttpRequestTask imageRequest = HttpRequestTask.PUT(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
+                //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
+        //imageRequest.setMethod(HttpRequestTask.PUT_REQUEST);
         imageRequest.setType(HttpRequest.UPDATE_IMAGE);
         imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
@@ -217,8 +219,9 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
-        request.setMethod(HttpRequestTask.POST_REQUEST);
+        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
+        //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
+        //request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         request.execute();

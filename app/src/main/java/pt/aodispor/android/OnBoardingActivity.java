@@ -72,6 +72,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
 
         if (AppDefinitions.SKIP_LOGIN) {
+            AppDefinitions.smsLoginDone=true;
             AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
             AppDefinitions.userPassword = AppDefinitions.testPassword;
             showMainActivity();
@@ -227,8 +228,9 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
 
     private void sendRegistrationSMS() {
         requestType = RequestType.register;
-        HttpRequestTask request_register = new HttpRequestTask(String.class, null, REGISTER_URL);
-        request_register.setMethod(HttpRequestTask.POST_REQUEST);
+        HttpRequestTask request_register = HttpRequestTask.POST(String.class, null, REGISTER_URL);
+        //        new HttpRequestTask(String.class, null, REGISTER_URL);
+        //request_register.setMethod(HttpRequestTask.POST_REQUEST);
         request_register.setJSONBody(new Register(AppDefinitions.phoneNumber));
         request_register.execute();
     }

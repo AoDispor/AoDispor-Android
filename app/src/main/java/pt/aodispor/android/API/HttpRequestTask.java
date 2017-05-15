@@ -53,26 +53,27 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     private void addHandlers(ArrayList<IOnHttpRequestCompleted> list, IOnHttpRequestCompleted[] array) {
         usingTransitionVersion = true;
-        for (IOnHttpRequestCompleted handler : array) list.add(handler);
+        list.addAll(Arrays.asList(array));
+        //for (IOnHttpRequestCompleted handler : array) list.add(handler);
     }
 
     public void addOnEndHandlers(IOnHttpRequestCompleted... handlers) {
         if (onEnd == null) {
-            onEnd = new ArrayList();
+            onEnd = new ArrayList<IOnHttpRequestCompleted>();
         }
         addHandlers(onEnd, handlers);
     }
 
     public void addOnSuccessHandlers(IOnHttpRequestCompleted... handlers) {
         if (onSuccess == null) {
-            onSuccess = new ArrayList();
+            onSuccess = new ArrayList<IOnHttpRequestCompleted>();
         }
         addHandlers(onSuccess, handlers);
     }
 
     public void addOnFailHandlers(IOnHttpRequestCompleted... handlers) {
         if (onFail == null) {
-            onFail = new ArrayList();
+            onFail = new ArrayList<IOnHttpRequestCompleted>();
         }
         addHandlers(onFail, handlers);
     }
@@ -157,6 +158,29 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         urlVariables = uv;
         method = HttpMethod.GET;
         httpHeaders = new HttpHeaders();
+    }
+
+    private HttpRequestTask(){}
+    static public HttpRequestTask POST(Class answer, HttpRequest executor, String url, String... uv){
+        HttpRequestTask request = new HttpRequestTask();
+        request.method = HttpMethod.POST;
+        request.answerType = answer;
+        request.postExecute = executor;
+        request.url = url;
+        request.urlVariables = uv;
+        request.httpHeaders = new HttpHeaders();
+        return request;
+    }
+
+    static public HttpRequestTask PUT(Class answer, HttpRequest executor, String url, String... uv){
+        HttpRequestTask request = new HttpRequestTask();
+        request.method = HttpMethod.PUT;
+        request.answerType = answer;
+        request.postExecute = executor;
+        request.url = url;
+        request.urlVariables = uv;
+        request.httpHeaders = new HttpHeaders();
+        return request;
     }
 
     @Override
@@ -265,7 +289,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         type = t;
     }
 
-    public void setMethod(int m) {
+    /*public void setMethod(int m) {
         switch (m) {
             case POST_REQUEST:
                 method = HttpMethod.POST;
@@ -276,7 +300,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
             case PUT_REQUEST:
                 method = HttpMethod.PUT;
         }
-    }
+    }*/
 
     /**
      * TODO refactor to extra or some other name

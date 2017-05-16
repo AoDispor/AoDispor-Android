@@ -4,13 +4,22 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.CoordinatorLayout;
+
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,6 +31,8 @@ import com.github.stkent.amplify.tracking.Amplify;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.util.Arrays;
+
 import pt.aodispor.android.api.HttpRequestTask;
 
 /**
@@ -32,7 +43,8 @@ import pt.aodispor.android.api.HttpRequestTask;
  * the page switching for the tabbed pages.
  * </p>
  */
-public class MainActivity extends AppCompatActivity implements Advanceable {
+public class MainActivity extends AppCompatActivity
+        implements Advanceable, NavigationView.OnNavigationItemSelectedListener  {
     private MyViewPager mViewPager;
     private SearchView searchView;
     private ImageView profileView, stackView;
@@ -78,7 +90,38 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
                 //FIXME isto precisa de ter uma maneira para limpar a string pesquisada
             }
         });
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        setNavState(navigationView);
     }
+
+    private void setNavState(NavigationView navigationView)
+    {
+        //hide specific options
+        final int[] logged_features_only = new int[]{R.id.nav_profile,R.id.nav_requests};
+        final int[] not_logged_features_only = new int[]{R.id.nav_login};
+        final int[] features_to_hide = AppDefinitions.smsLoginDone ? not_logged_features_only:logged_features_only;
+
+        Menu menu = navigationView.getMenu();
+
+        for (int menuItemIndex = 0; menuItemIndex < menu.size(); menuItemIndex++) {
+            MenuItem menuItem= menu.getItem(menuItemIndex);
+            if(Arrays.binarySearch(features_to_hide,menuItem.getItemId())>=0 ) {
+                menuItem.setVisible(false);
+            }
+        }
+
+        //had hamburger menu
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+    }
+
 
     /*protected void onPostCreate (Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -143,17 +186,18 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         TabPagerAdapter mSectionsPagerAdapter;
         mSectionsPagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
 
+        //android.support.v4.view.ViewPager cannot be cast to pt.aodispor.android.MyViewPager
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(1);
 
-        profileView = ((ImageView) findViewById(R.id.profile_icon));
+        /*profileView = ((ImageView) findViewById(R.id.profile_icon));
         stackView = ((ImageView) findViewById(R.id.stack_icon));
 
         stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
-        profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+        profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));*/
 
-        if(AppDefinitions.smsLoginDone) {
+        /*if(AppDefinitions.smsLoginDone) {
             stackView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
             profileView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
             mViewPager.setCurrentItem(0);
@@ -176,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
 
                 }
             });
-        }
+        }*/
 
         searchView = (SearchView) findViewById(R.id.searchView);
         EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -311,4 +355,25 @@ public class MainActivity extends AppCompatActivity implements Advanceable {
         searchView.setIconified(true);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_search) {
+            mViewPager.setCurrentItem(1);
+        } else if (id == R.id.nav_profile) {
+            mViewPager.setCurrentItem(0);
+        } else if (id == R.id.nav_requests) {
+
+        } else if (id == R.id.nav_about) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+        //java.lang.ClassCastException: android.support.design.widget.CoordinatorLayout cannot be cast to android.support.v4.widget.DrawerLayout
+    }
 }

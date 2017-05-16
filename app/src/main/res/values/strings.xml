@@ -2,8 +2,10 @@
     <string name="app_name">Ao Dispor</string>
 
     <!-- Navbar -->
-    <string name="profile_icon">Ir para o seu perfil</string>
-    <string name="stack_icon">Ir para a pilha de cartões</string>
+    <!--string name="profile_icon">Ir para o seu perfil</string>
+    <string name="stack_icon">Ir para a pilha de cartões</string-->
+    <string name="navigation_drawer_open">abrir menu de navegação</string>
+    <string name="navigation_drawer_close">fechar menu de navegação</string>
 
     <!-- Register Card -->
     <string name="register_name">O seu nome</string>

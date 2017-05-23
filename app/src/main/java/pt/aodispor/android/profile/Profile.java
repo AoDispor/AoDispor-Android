@@ -132,13 +132,13 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         p.full_name = nameEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
         p.title = professionEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
         String location = locationEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
-        if(!location.isEmpty() && prefix != null && suffix != null) {
+        if (!location.isEmpty() && prefix != null && suffix != null) {
             p.location = location;
             p.cp4 = prefix;
             p.cp3 = suffix;
             // TODO Ask if there is something to do here that is done in the old profile
         }
-        if(rate > 0) {
+        if (rate > 0) {
             p.rate = Integer.toString(rate);
         }
         switch (type) {
@@ -155,7 +155,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         p.currency = currency;
         p.description = descriptionEdit.getText().toString();
         HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
-                //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
+        //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
         //request.setMethod(HttpRequestTask.POST_REQUEST);
         request.setType(HttpRequest.UPDATE_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
@@ -163,15 +163,18 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         request.execute();
 
         // Upload Image
-        BitmapDrawable drawable = (BitmapDrawable) profileImage.getDrawable();
-        Bitmap image = drawable.getBitmap();
-        HttpRequestTask imageRequest = HttpRequestTask.PUT(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
-                //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
-        //imageRequest.setMethod(HttpRequestTask.PUT_REQUEST);
-        imageRequest.setType(HttpRequest.UPDATE_IMAGE);
-        imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-        imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
-        imageRequest.execute();
+        if (changedImage) {
+            BitmapDrawable drawable = (BitmapDrawable) profileImage.getDrawable();
+            Bitmap image = drawable.getBitmap();
+            HttpRequestTask imageRequest = HttpRequestTask.PUT(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
+            //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
+            //imageRequest.setMethod(HttpRequestTask.PUT_REQUEST);
+            imageRequest.setType(HttpRequest.UPDATE_IMAGE);
+            imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+            imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
+            imageRequest.execute();
+            changedImage = false;
+        }
         return true;
     }
 
@@ -180,27 +183,27 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         if (resultCode == RESULT_OK && data != null) {
             switch (requestCode) {
                 case SELECT_PICTURE:
-                   try {
-                       File tempFile = File.createTempFile("crop", "", context.getCacheDir());
-                       tempFile.deleteOnExit();
-                       tempUri = Uri.fromFile(tempFile);
-                       UCrop.Options options = new UCrop.Options();
-                       options.setLogoColor(ContextCompat.getColor(context, R.color.aoDispor2));
-                       options.setToolbarColor(ContextCompat.getColor(context, R.color.aoDispor));
-                       options.setCropFrameColor(ContextCompat.getColor(context, R.color.white));
-                       options.setCropGridColor(ContextCompat.getColor(context, R.color.white));
-                       options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.aoDispor));
-                       options.setDimmedLayerColor(ContextCompat.getColor(context, R.color.aoDispor));
-                       options.setStatusBarColor(ContextCompat.getColor(context, R.color.aoDispor));
-                       options.setToolbarWidgetColor(ContextCompat.getColor(context, R.color.white));
-                       UCrop.of(data.getData(), tempUri).withAspectRatio(1, 1).withOptions(options).start(context, parentFragment);
-                   } catch (IOException e) {
-                       e.printStackTrace();
-                   }
-                   break;
+                    try {
+                        File tempFile = File.createTempFile("crop", "", context.getCacheDir());
+                        tempFile.deleteOnExit();
+                        tempUri = Uri.fromFile(tempFile);
+                        UCrop.Options options = new UCrop.Options();
+                        options.setLogoColor(ContextCompat.getColor(context, R.color.aoDispor2));
+                        options.setToolbarColor(ContextCompat.getColor(context, R.color.aoDispor));
+                        options.setCropFrameColor(ContextCompat.getColor(context, R.color.white));
+                        options.setCropGridColor(ContextCompat.getColor(context, R.color.white));
+                        options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.aoDispor));
+                        options.setDimmedLayerColor(ContextCompat.getColor(context, R.color.aoDispor));
+                        options.setStatusBarColor(ContextCompat.getColor(context, R.color.aoDispor));
+                        options.setToolbarWidgetColor(ContextCompat.getColor(context, R.color.white));
+                        UCrop.of(data.getData(), tempUri).withAspectRatio(1, 1).withOptions(options).start(context, parentFragment);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
                 case UCrop.REQUEST_CROP:
                     final Uri resultUri = UCrop.getOutput(data);
-                    if(resultUri != null) {
+                    if (resultUri != null) {
                         try {
                             InputStream imageStream = context.getContentResolver().openInputStream(resultUri);
                             Bitmap image = BitmapFactory.decodeStream(imageStream);
@@ -247,7 +250,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         }
         setPrice(rate, isFinal, type, professional.currency);
         setDescription(professional.description);
-        if(!changedImage) {
+        if (!changedImage) {
             setProfileImageFromUrl(professional.avatar_url);
         }
     }
@@ -351,7 +354,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
     @Override
     public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
-        if(set) {
+        if (set) {
             setLocation(locationName, prefix, suffix);
         }
     }
@@ -393,7 +396,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                 ImageLoader.getInstance().clearDiskCache();
                 break;
         }
-        if(type == HttpRequest.GET_PROFILE || type == HttpRequest.UPDATE_PROFILE) {
+        if (type == HttpRequest.GET_PROFILE || type == HttpRequest.UPDATE_PROFILE) {
             updateProfile(p);
             notification.notify(this, true, "");
         }
@@ -401,7 +404,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
     @Override
     public void onHttpRequestFailed(ApiJSON errorData, int type) {
-        switch(type) {
+        switch (type) {
             case HttpRequest.UPDATE_IMAGE:
                 profileImage.setImageBitmap(lastImage);
                 break;

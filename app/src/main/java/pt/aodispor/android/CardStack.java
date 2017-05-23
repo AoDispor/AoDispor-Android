@@ -1,12 +1,9 @@
 package pt.aodispor.android;
 
-import android.content.res.Resources;
 import android.os.Handler;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -31,6 +28,34 @@ import pt.aodispor.android.api.UserRequest;
 
 public class CardStack {
 
+    private static class CardMetaData {
+        /**
+         * indicates that the card at this position doesn't allow restoration on previous cards
+         */
+        boolean blocks_backward_iteration;
+        BasicCardFields basicCardFields;
+
+        private CardMetaData() {
+            basicCardFields = null;
+            blocks_backward_iteration = false;
+        }
+
+        static public CardMetaData createBlockingCardWithNoInfo() {
+            CardMetaData metadata = new CardMetaData();
+            metadata.blocks_backward_iteration = true;
+            return metadata;
+        }
+
+        static public CardMetaData createNONBlockingCardWithNoInfo() {
+            return new CardMetaData();
+        }
+
+        CardMetaData(BasicCardFields info) {
+            basicCardFields = info;
+            blocks_backward_iteration = false;
+        }
+    }
+
     final static int delayBetweenLayoutUpdates = 1000;
 
     protected Fragment fragment;
@@ -46,7 +71,7 @@ public class CardStack {
     @VisibleForTesting
     protected RelativeLayout[] cards = null;
     @VisibleForTesting
-    protected BasicCardFields[] cards_data = null;
+    protected CardMetaData[] cards_data = null;
 
     final public static int TOP = 0;
     final public static int BOTTOM = 2;
@@ -61,6 +86,10 @@ public class CardStack {
     }
 
     public BasicCardFields getCardInfoAt(int index) {
+        return cards_data[index].basicCardFields;
+    }
+
+    public CardMetaData getCardMetaDataAt(int index) {
         return cards_data[index];
     }
 
@@ -75,10 +104,10 @@ public class CardStack {
                 cardStack.getCardAt(0),
                 cardStack.getCardAt(1),
                 cardStack.getCardAt(2)};
-        cards_data = new BasicCardFields[]{
-                cardStack.getCardInfoAt(0),
-                cardStack.getCardInfoAt(1),
-                cardStack.getCardInfoAt(2)};
+        cards_data = new CardMetaData[]{
+                cardStack.getCardMetaDataAt(0),
+                cardStack.getCardMetaDataAt(1),
+                cardStack.getCardMetaDataAt(2)};
     }
 
 
@@ -95,7 +124,7 @@ public class CardStack {
 
     public void initNewStack() {
         cards = new RelativeLayout[3];
-        cards_data = new BasicCardFields[3];
+        cards_data = new CardMetaData[3];
         //prepare card update thread
         active = this;
         if (handler == null) handler = new Handler();
@@ -179,18 +208,19 @@ public class CardStack {
             return;
         if (cardData == null)
             return;
-        cards_data[stackIndex] = cardData;
+        cards_data[stackIndex] = new CardMetaData(cardData);
         try {
             cards[stackIndex] =
-                    cards_data[stackIndex].getClass() == Professional.class ?
-                            professionalCard((Professional) cards_data[stackIndex]) :
-                            requestCard((UserRequest) cards_data[stackIndex]);
+                    cards_data[stackIndex].basicCardFields.getClass() == Professional.class ?
+                            professionalCard((Professional) cards_data[stackIndex].basicCardFields) :
+                            requestCard((UserRequest) cards_data[stackIndex].basicCardFields);
         } catch (Exception e) {
             //Execepção aqui nunca deverá acontecer pk qnd a carta não está completa nem sequer é enviada
             //Tipicamente só acontecerá em ambiete de desenvolvimento
             addMessageCard(stackIndex,
                     fragment.getString(R.string.invalid_card_title),
-                    fragment.getString(R.string.invalid_card_description));
+                    fragment.getString(R.string.invalid_card_description),
+                    false);
         }
     }
 
@@ -303,17 +333,32 @@ public class CardStack {
     }
 
     public RelativeLayout addMessageCard(int cardIndex, String title, String message) {
+        return addMessageCard(cardIndex, title, message, false);
+    }
+
+    public RelativeLayout addMessageCard(int cardIndex, String title, String message, boolean block_backward_iteration) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
         ((TextView) card.findViewById(R.id.title)).setText(Html.fromHtml(title));
         ((TextView) card.findViewById(R.id.message)).setText(Html.fromHtml(message));
         cards[cardIndex] = card;
-        cards_data[cardIndex] = null;
+        //cards_data[cardIndex] = null;
+        cards_data[cardIndex] = block_backward_iteration ?
+                CardMetaData.createBlockingCardWithNoInfo() :
+                CardMetaData.createNONBlockingCardWithNoInfo();
         return card;
     }
 
 
     public void addNoConnectionCard(
             int cardIndex,
+            //final CardFragment.RequestType retryType,
+            View.OnClickListener listener) {
+        addNoConnectionCard(cardIndex, false, listener);
+    }
+
+    public void addNoConnectionCard(
+            int cardIndex,
+            boolean block_backwards_iteration,
             //final CardFragment.RequestType retryType,
             View.OnClickListener listener
     ) {
@@ -322,7 +367,7 @@ public class CardStack {
         //TODO WORKING NOW
         //TODO WORKING NOW
         //TODO WORKING NOW
-        RelativeLayout card = addMessageCard(cardIndex, fragment.getString(R.string.no_conection_title), fragment.getString(R.string.no_conection_msg));
+        RelativeLayout card = addMessageCard(cardIndex, fragment.getString(R.string.no_conection_title), fragment.getString(R.string.no_conection_msg), block_backwards_iteration);
         //LinearLayout loadingLL = (LinearLayout) card.findViewById(R.id.loadingMessage);
         Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
         retryButton.setText(R.string.retry);
@@ -342,11 +387,11 @@ public class CardStack {
             throw new RuntimeException("Null Professional");
         }
         if (cards[index] != null) rootView.removeView(cards[index]);
-        cards_data[index] = professional;
+        cards_data[index].basicCardFields = professional;
         cards[index] =
-                cards_data[index].getClass() == Professional.class ?
-                        professionalCard((Professional) cards_data[index]) :
-                        requestCard((UserRequest) cards_data[index]);
+                cards_data[index].basicCardFields.getClass() == Professional.class ?
+                        professionalCard((Professional) cards_data[index].basicCardFields) :
+                        requestCard((UserRequest) cards_data[index].basicCardFields);
     }
 
     public void replaceTopCard(BasicCardFields card) {
@@ -366,8 +411,16 @@ public class CardStack {
      * user cards = Professional Cards & User Requests Cards
      * non user cards = message cards such as: No Connection ; No Results ; etc...
      */
-    public boolean isAUserCard(int index) {
-        return cards_data[index] == null;
+    public boolean isUserCard(int index) {
+        return cards[index] != null && cards_data[index] != null && cards_data[index].basicCardFields != null;
+    }
+
+    public boolean isRequestCard(int index) {
+        return isUserCard(index) && cards_data[index].basicCardFields.getClass() == UserRequest.class;
+    }
+
+    public boolean canIterateBackwards() {
+        return !cards_data[0].blocks_backward_iteration;
     }
 
 
@@ -384,20 +437,20 @@ public class CardStack {
         //int timeNow = TimeZone.getTimeZone("UTC").getOffset(System.currentTimeMillis());
         long timenow = new Date().getTime();
         for (int i = 0; i < 2; ++i) {
-            if (cards[i] != null && cards_data[i] != null && cards_data[i].getClass() == UserRequest.class) {
-                Date carddate = ((UserRequest) cards_data[i]).getExpirationDate();
+            if (isRequestCard(i)) {
+                Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
                 if (carddate == null) continue;
                 long cardTime = carddate.getTime(); //TODO get card date
                 Period p = new Period(timenow, cardTime, PeriodType.standard());
                 //Days are not supported =( it seems...
                 //must do calculations by "hand"
-                long diference = cardTime - timenow;
-                long days = diference / (24 * 60 * 60 * 1000);
+                long difference = cardTime - timenow;
+                long days = difference / (24 * 60 * 60 * 1000);
                 String daysString = "";
                 if (days > 0) daysString = days + " ";
                 daysString += fragment.getString(days == 1 ? R.string.day : R.string.days) + " ";
                 ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
-                        diference < 0 ? fragment.getString(R.string.request_expired_card_note)
+                        difference < 0 ? fragment.getString(R.string.request_expired_card_note)
                                 :
                                 (daysString
                                         + p.getHours()

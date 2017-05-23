@@ -157,23 +157,27 @@ public class CardFragment extends Fragment {
     }
 
 
+    /**
+     * used to check in BLOCKING and UNBLOCKING is done properly
+     */
+    private boolean NUMB = false;
 
-    /**used to check in BLOCKING and UNBLOCKING is done properly*/
-    private boolean NUMB=false;
-    public void BLOCK_INTERACTIONS(){
-        if(NUMB) throw new RuntimeException("NUMB=TRUE NOT EXPECTED");
-        cardStack.cards[cardStack.TOP].dispatchTouchEvent(MotionEvent.obtain(
-                0,0,
-                MotionEvent.ACTION_UP,
-                0,0,0
-        ));
+    public void BLOCK_INTERACTIONS() {
+        if (NUMB) throw new RuntimeException("NUMB=TRUE NOT EXPECTED");
+        if (cardStack != null && cardStack.cards[cardStack.TOP] != null)
+            cardStack.cards[cardStack.TOP].dispatchTouchEvent(MotionEvent.obtain(
+                    0, 0,
+                    MotionEvent.ACTION_UP,
+                    0, 0, 0
+            ));
         blockAccess = true;
-        NUMB=true;
+        NUMB = true;
     }
-    public void UNBLOCK_INTERACTIONS(){
-        if(!NUMB) throw new RuntimeException("NUMB=FALSE NOT EXPECTED");
+
+    public void UNBLOCK_INTERACTIONS() {
+        if (!NUMB) throw new RuntimeException("NUMB=FALSE NOT EXPECTED");
         blockAccess = false;
-        NUMB=false;
+        NUMB = false;
     }
 
     /*private static GeoLocation geoLocation = null;
@@ -599,7 +603,9 @@ public class CardFragment extends Fragment {
      * <also> reponsable for requesting the loading of the previous page and updating the currentSet and nextSet
      */
     public void restorePreviousCard() {
-        if (blockAccess || queryResult != QueryResult.successful || cardStack.isAUserCard(CardStack.TOP)) {
+        if (blockAccess || queryResult != QueryResult.successful ||
+                !cardStack.canIterateBackwards()
+                ) {
             return; //don't make anything while animation plays
         }
 
@@ -661,7 +667,7 @@ public class CardFragment extends Fragment {
                             blockAccess = false;
                             return;
                         case error: //did not receive answer
-                            cardStack.addNoConnectionCard(0,
+                            cardStack.addNoConnectionCard(0, true,
                                     new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
@@ -739,6 +745,8 @@ public class CardFragment extends Fragment {
 
         requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
 
+        //if (searchQuery==null) searchQuery = "geografo"
+        //searchQuery = "geografo";
         HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
                 queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
 
@@ -889,12 +897,12 @@ public class CardFragment extends Fragment {
 
                             if (DEV_injectPedidoMockup) {
                                 UserRequest p = new UserRequest();
-                                p.full_name="test name";
-                                p.title="test title";
-                                p.location="some place";
-                                p.description="blablabla";
-                                p.rate="15";
-                                p.data_expiracao="2017-04-20 20:35:56";//new java.util.Date();
+                                p.full_name = "test name";
+                                p.title = "test title";
+                                p.location = "some place";
+                                p.description = "blablabla";
+                                p.rate = "15";
+                                p.data_expiracao = "2017-04-20 20:35:56";//new java.util.Date();
                                 CardFragment.this.currentSet.data.add(0, p);
                             }
 

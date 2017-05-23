@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 //@JsonInclude(JsonInclude.Include.NON_NULL)
-//@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class Professional extends BasicCardFields implements Cloneable {
 
     @JsonProperty("type") public String type;
@@ -30,6 +30,7 @@ public class Professional extends BasicCardFields implements Cloneable {
         professional.phone = this.phone;
         professional.rate = this.rate;
         professional.string_id = this.string_id;
+        professional.distance = this.distance;
         return professional;
     }
 }

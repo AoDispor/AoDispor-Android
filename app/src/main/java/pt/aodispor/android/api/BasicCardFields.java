@@ -33,4 +33,6 @@ public abstract class BasicCardFields extends ApiJSON {
 
     @JsonProperty("rate") public String rate;
     @JsonProperty("currency") public String currency;
+
+    @JsonProperty("distance") public String distance;
 }

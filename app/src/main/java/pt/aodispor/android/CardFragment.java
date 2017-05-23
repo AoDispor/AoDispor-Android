@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -155,6 +156,25 @@ public class CardFragment extends Fragment {
         return loadingLL;
     }
 
+
+
+    /**used to check in BLOCKING and UNBLOCKING is done properly*/
+    private boolean NUMB=false;
+    public void BLOCK_INTERACTIONS(){
+        if(NUMB) throw new RuntimeException("NUMB=TRUE NOT EXPECTED");
+        cardStack.cards[cardStack.TOP].dispatchTouchEvent(MotionEvent.obtain(
+                0,0,
+                MotionEvent.ACTION_UP,
+                0,0,0
+        ));
+        blockAccess = true;
+        NUMB=true;
+    }
+    public void UNBLOCK_INTERACTIONS(){
+        if(!NUMB) throw new RuntimeException("NUMB=FALSE NOT EXPECTED");
+        blockAccess = false;
+        NUMB=false;
+    }
 
     /*private static GeoLocation geoLocation = null;
 

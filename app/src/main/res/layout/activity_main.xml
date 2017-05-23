@@ -36,31 +36,44 @@
                     app:layout_scrollFlags="enterAlways"
                     app:popupTheme="@style/AppTheme.PopupOverlay">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
                         <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="28dp"
-                            android:orientation="horizontal">
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            >
+
+                            <Button
+
+                                android:layout_width="35sp"
+                                android:layout_height="35sp"
+                                android:textSize="14sp"
+                                android:padding="0dp"
+                                android:id="@+id/menu_button"
+                                android:background="@drawable/ic_menu_white_24dp"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignParentEnd="true"
+                                android:layout_marginRight="13dp"
+                                android:layout_marginEnd="13dp" />
 
                             <TextView
                                 android:id="@+id/app_title"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:clickable="true"
                                 android:gravity="start"
                                 android:text="@string/app_name"
                                 android:textAlignment="textStart"
                                 android:textColor="@color/white"
-                                android:textSize="24sp" />
+                                android:textSize="27sp"
+                                android:layout_marginLeft="18dp"
+                                android:layout_marginStart="18dp"
+                                android:layout_alignBaseline="@+id/menu_button"
+                                android:layout_alignBottom="@+id/menu_button"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true" />
 
                         </RelativeLayout>
 
-
-                    </LinearLayout>
 
                 </android.support.v7.widget.Toolbar>
 

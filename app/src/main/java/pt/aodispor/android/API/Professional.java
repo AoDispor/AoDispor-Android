@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 //@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+//@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class Professional extends BasicCardFields implements Cloneable {
 
     @JsonProperty("type") public String type;

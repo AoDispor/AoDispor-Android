@@ -4,23 +4,20 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.CoordinatorLayout;
 
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,7 +41,7 @@ import pt.aodispor.android.api.HttpRequestTask;
  * </p>
  */
 public class MainActivity extends AppCompatActivity
-        implements Advanceable, NavigationView.OnNavigationItemSelectedListener  {
+        implements Advanceable, NavigationView.OnNavigationItemSelectedListener {
     private MyViewPager mViewPager;
     private SearchView searchView;
     private ImageView profileView, stackView;
@@ -97,31 +94,65 @@ public class MainActivity extends AppCompatActivity
         setNavState(navigationView);
     }
 
-    private void setNavState(NavigationView navigationView)
-    {
+    private void setNavState(NavigationView navigationView) {
         //hide specific options
-        final int[] logged_features_only = new int[]{R.id.nav_profile,R.id.nav_requests};
+        final int[] logged_features_only = new int[]{R.id.nav_profile, R.id.nav_requests};
         final int[] not_logged_features_only = new int[]{R.id.nav_login};
-        final int[] features_to_hide = AppDefinitions.smsLoginDone ? not_logged_features_only:logged_features_only;
+        final int[] features_to_hide = AppDefinitions.smsLoginDone ? not_logged_features_only : logged_features_only;
 
         Menu menu = navigationView.getMenu();
 
         for (int menuItemIndex = 0; menuItemIndex < menu.size(); menuItemIndex++) {
-            MenuItem menuItem= menu.getItem(menuItemIndex);
-            if(Arrays.binarySearch(features_to_hide,menuItem.getItemId())>=0 ) {
+            MenuItem menuItem = menu.getItem(menuItemIndex);
+            if (Arrays.binarySearch(features_to_hide, menuItem.getItemId()) >= 0) {
                 menuItem.setVisible(false);
             }
         }
 
         //had hamburger menu
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);//LOCK_MODE_LOCKED_CLOSED
+
+        Button drawer_btn = (Button) findViewById(R.id.menu_button) ;
+        drawer_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
+                //avoid freezing the card before opening drawer
+                ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment().BLOCK_INTERACTIONS();
+                drawer.openDrawer(Gravity.LEFT);
+                //drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
+            }
+        });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
+                drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment().UNBLOCK_INTERACTIONS();
+            }
+            public void onDrawerOpened(View view) {
+                super.onDrawerOpened(view);
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
+                drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            }
+        };
         drawer.setDrawerListener(toggle);
-        toggle.syncState();
-    }
+        //toggle.syncState();
+        /*toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("XXX","clicked");
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
+                drawer.findViewById(DrawerLayout.LOCK_MODE_UNLOCKED);
+                drawer.openDrawer(Gravity.LEFT);
+            }
+        });*/
 
+    }
 
     /*protected void onPostCreate (Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -227,7 +258,7 @@ public class MainActivity extends AppCompatActivity
         searchEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
-                if(!hasFocus) {
+                if (!hasFocus) {
                     closeSearchView();
                 }
             }
@@ -251,18 +282,18 @@ public class MainActivity extends AppCompatActivity
                 String newQuery = "";
                 for (int i = 0; i < words.length; i++) {
                     newQuery += words[i];
-                    if(i < words.length - 1) {
+                    if (i < words.length - 1) {
                         newQuery += " ";
                     }
                 }
-                if(newQuery.length() >= 5) {
+                if (newQuery.length() >= 5) {
                     CardFragment cardFrag = null;
-                    for(Object frag : getSupportFragmentManager().getFragments()) {
+                    for (Object frag : getSupportFragmentManager().getFragments()) {
                         if (frag instanceof CardFragment) {
                             cardFrag = (CardFragment) frag;
                         }
                     }
-                    if(cardFrag != null) {
+                    if (cardFrag != null) {
                         cardFrag.setSearchQuery(query);
                         cardFrag.prepareNewStack();
                     }
@@ -275,7 +306,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        if(!AppDefinitions.smsLoginDone) {
+        if (!AppDefinitions.smsLoginDone) {
             profileView.setVisibility(View.INVISIBLE);
             stackView.setVisibility(View.INVISIBLE);
             mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador não estiver loggado
@@ -300,7 +331,7 @@ public class MainActivity extends AppCompatActivity
         //Realizado dependendo do tipo de permissao
         switch (requestCode) {
             case AppDefinitions.PERMISSIONS_REQUEST_GPS:
-                CardFragment cardFragment =  ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
+                CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
                 ///cardFragment.updateGeoLocation();
                 GeoLocation.getInstance().updateLatLon(this);
                 cardFragment.prepareNewSearchQuery(false);
@@ -319,9 +350,9 @@ public class MainActivity extends AppCompatActivity
         /**
          * Close the search view if its already open.
          *
-        if(!searchView.isIconified()) {
-            closeSearchView();
-        }*/
+         if(!searchView.isIconified()) {
+         closeSearchView();
+         }*/
         searchView.setIconified(true);
         if (mViewPager.getCurrentItem() == 1) {
             CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
@@ -331,16 +362,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void launchSearch(String query)
-    {
-        if(query.length()<AppDefinitions.QUERY_MIN_LENGTH)
-        {
+    private void launchSearch(String query) {
+        if (query.length() < AppDefinitions.QUERY_MIN_LENGTH) {
             Toast.makeText(this, R.string.query_too_short, Toast.LENGTH_SHORT).show();
             return;
         }
         CardFragment cardFrag = null;
-        for(Object frag : getSupportFragmentManager().getFragments())
-            if(frag instanceof CardFragment) cardFrag = (CardFragment) frag;
+        for (Object frag : getSupportFragmentManager().getFragments())
+            if (frag instanceof CardFragment) cardFrag = (CardFragment) frag;
         SearchView searchView = (SearchView) findViewById(R.id.searchView);
         searchView.setQuery(query, false);
         cardFrag.setSearchQuery(query);
@@ -366,7 +395,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_profile) {
             mViewPager.setCurrentItem(0);
         } else if (id == R.id.nav_requests) {
-
+            mViewPager.setCurrentItem(2);
         } else if (id == R.id.nav_about) {
 
         }

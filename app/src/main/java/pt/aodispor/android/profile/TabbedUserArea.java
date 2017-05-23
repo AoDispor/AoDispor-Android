@@ -32,6 +32,7 @@ public class TabbedUserArea extends Fragment {
         viewPager = (MyViewPager) profileView.findViewById(R.id.tabbedProfileViewPager);
         viewPager.setAdapter(new TabbedProfilePagerAdapter(getActivity().getSupportFragmentManager()));
         viewPager.setCurrentItem(PROFILE);
+        viewPager.setSwipeEnabled(false);
         return profileView;
     }
 

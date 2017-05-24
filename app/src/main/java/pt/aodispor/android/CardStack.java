@@ -113,12 +113,33 @@ public class CardStack {
 
     static private Handler handler;
     static private CardStack active;//TODO probably a bad solution but should work 4 now
+    static Boolean running_stuff;
+
+    //TODO not sure this s best solution ... =/
+    public static void stopCardStackActivities() {
+        active = null;
+        try {
+            while (running_stuff) {
+                running_stuff.wait();
+
+            }
+        } catch (Exception e) {
+        }
+    }
 
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            synchronized (running_stuff) {
+                if (active == null) {
+                    running_stuff.notify();
+                    running_stuff = false;
+                    return;
+                }
+            }
             active.updateCards();
             handler.postDelayed(this, delayBetweenLayoutUpdates);
+            //notify();
         }
     };
 
@@ -127,6 +148,7 @@ public class CardStack {
         cards_data = new CardMetaData[3];
         //prepare card update thread
         active = this;
+        running_stuff = Boolean.TRUE;
         if (handler == null) handler = new Handler();
         handler.postDelayed(runnable, delayBetweenLayoutUpdates);
     }

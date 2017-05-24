@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         implements Advanceable, NavigationView.OnNavigationItemSelectedListener {
     private MyViewPager mViewPager;
     private SearchView searchView;
-    private ImageView profileView, stackView;
+   // private ImageView profileView, stackView;
 
     int mLastPage = 0;
 
@@ -307,8 +307,8 @@ public class MainActivity extends AppCompatActivity
         });
 
         if (!AppDefinitions.smsLoginDone) {
-            profileView.setVisibility(View.INVISIBLE);
-            stackView.setVisibility(View.INVISIBLE);
+            //profileView.setVisibility(View.INVISIBLE);
+            //stackView.setVisibility(View.INVISIBLE);
             mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador não estiver loggado
             mViewPager.setEnabled(false);
         }
@@ -398,6 +398,11 @@ public class MainActivity extends AppCompatActivity
             mViewPager.setCurrentItem(2);
         } else if (id == R.id.nav_about) {
 
+        } else if (id == R.id.nav_login){
+            CardStack.stopCardStackActivities();//TODO not sure this s best solution ... =/
+            Intent showSplitActivityActivity = new Intent(MainActivity.this, SplitActivity.class);
+            showSplitActivityActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(showSplitActivityActivity);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);

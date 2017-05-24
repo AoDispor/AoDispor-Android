@@ -126,4 +126,9 @@
     <string name="amplify_thanks">Obrigado por nos ajudar a servi-lo!</string>
     <string name="label_select_picture">Selecionar imagem</string>
     <string name="request_permission_read_storage">O Ao Dispor pretender aceder às suas fotografias.</string>
+    <string name="nav_search">Procurar</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_requests">Pedidos</string>
+    <string name="nav_login">Login/Inscrição</string>
+    <string name="nav_aboutus">Sobre o AoDispor</string>
 </resources>

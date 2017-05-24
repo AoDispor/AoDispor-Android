@@ -60,7 +60,9 @@
         android:padding="20dp"
         android:textColor="@color/grey3"
         android:textColorHint="@color/grey3"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:maxLength="@string/name_maxsize"
+        />
 
     <TextView
         android:id="@+id/profession"
@@ -71,7 +73,8 @@
         android:paddingStart="20dp"
         android:text="@string/register_profession"
         android:textColor="@color/black2"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        />
 
     <EditText
         android:id="@+id/professionEdit"
@@ -84,7 +87,9 @@
         android:padding="20dp"
         android:textColor="@color/grey3"
         android:textColorHint="@color/grey3"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:maxLength="@string/profession_maxsize"
+        />
 
     <TextView
         android:id="@+id/location"
@@ -160,6 +165,8 @@
         android:padding="20dp"
         android:textColor="@color/grey3"
         android:textColorHint="@color/grey3"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:maxLength="@string/description_maxsize"
+        />
 
 </LinearLayout>

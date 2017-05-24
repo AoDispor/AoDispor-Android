@@ -164,7 +164,7 @@ public class CardFragment extends Fragment {
 
     public void BLOCK_INTERACTIONS() {
         if (NUMB) throw new RuntimeException("NUMB=TRUE NOT EXPECTED");
-        if (cardStack != null && cardStack.cards[cardStack.TOP] != null)
+        if (cardStack != null && cardStack.cards!=null && cardStack.cards[cardStack.TOP] != null)
             cardStack.cards[cardStack.TOP].dispatchTouchEvent(MotionEvent.obtain(
                     0, 0,
                     MotionEvent.ACTION_UP,
@@ -745,9 +745,12 @@ public class CardFragment extends Fragment {
 
         requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
 
-        //if (searchQuery==null) searchQuery = "geografo"
-        //searchQuery = "geografo";
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null,
+        HttpRequestTask request;
+
+        if (searchQuery == null || searchQuery == "") {
+            request = new HttpRequestTask(SearchQueryResult.class, null,
+                    "https://api.aodispor.pt/profiles/?query=&lat={lat}&lon={lon}", geoLocation.getLatitude(), geoLocation.getLongitude());
+        } else request = new HttpRequestTask(SearchQueryResult.class, null,
                 queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
 
         if (DEV_force2ndPage) {

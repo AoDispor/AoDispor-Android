@@ -74,8 +74,18 @@
 
                         </RelativeLayout>
 
-
                 </android.support.v7.widget.Toolbar>
+
+                <android.support.v7.widget.SearchView
+                    android:id="@+id/searchView"
+                    android:layout_width="match_parent"
+                    android:layout_height="33dp"
+                    android:background="@color/aoDispor"
+                    android:queryHint="@string/search_bar_hint"
+                    android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
 
             </android.support.design.widget.AppBarLayout>
 
@@ -109,25 +119,12 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/tabletop2"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                android:layout_above="@+id/searchView"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/appbar">
 
                 <include layout="@layout/loading_indicator" />
             </pt.aodispor.android.MyViewPager>
-
-            <android.support.v7.widget.SearchView
-                android:id="@+id/searchView"
-                android:layout_width="match_parent"
-                android:layout_height="33dp"
-                android:gravity="bottom"
-                android:background="@color/aoDispor"
-                android:queryHint="@string/search_bar_hint"
-                android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
 
         </RelativeLayout>
 

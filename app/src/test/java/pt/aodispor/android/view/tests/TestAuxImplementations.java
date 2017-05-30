@@ -12,8 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.Delegator;
-import pt.aodispor.android.Utility;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
 import pt.aodispor.android.api.UserRequest;
@@ -22,48 +20,6 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 public class TestAuxImplementations {
-
-    @Test
-    public void testMyDelegator() throws IllegalAccessException, InstantiationException {
-
-        Delegator testme = new Delegator(String.class, int.class);
-
-        //try {
-        //    testme.addMethod(true, TestMe.class /*Class.forName("TestMe")*/, "privateStaticMethod");
-        //}catch (Exception e){
-       //     e.printStackTrace();
-        //}
-        //testme.addMethod(true, TestAuxImplementations.class, "protectedStaticMethod");
-        //testme.addMethod(false, TestAuxImplementations.class, "publicStaticMethod");
-        testme.addMethod(true, this, "privateMethod");
-        testme.addMethod(true, this, "protectedMethod");
-        testme.addMethod(false, this, "publicMethod");
-        testme.execute("some text..." , 4145);
-    }
-
-    static private void privateStaticMethod(String text, int value) {
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName() + text + value);
-    }
-
-    static protected void protectedStaticMethod(String text, int value) {
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName() + text + value);
-    }
-
-    static public void publicStaticMethod(String text, int value) {
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName() + text + value);
-    }
-
-    private void privateMethod(String text, int value) {
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName() + text + value);
-    }
-
-    protected void protectedMethod(String text, int value) {
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName() + text + value);
-    }
-
-    public void publicMethod(String text, int value) {
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName() + text + value);
-    }
 
     @Test
     public void testDeserializer(){

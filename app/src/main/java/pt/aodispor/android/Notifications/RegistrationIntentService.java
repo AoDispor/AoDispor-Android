@@ -14,7 +14,7 @@ import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 
-public class RegistrationIntentService extends IntentService implements HttpRequest {
+public class RegistrationIntentService extends IntentService {
     private static final String TAG = "RegIntentService";
     private static final String URL = "http://notificacoes.aodispor.pt/store_gcm_token.php";
 
@@ -39,7 +39,7 @@ public class RegistrationIntentService extends IntentService implements HttpRequ
         }
     }
     private void sendRegistrationToServer(String token) {
-        HttpRequestTask request = HttpRequestTask.POST(String.class,this,URL);
+        HttpRequestTask request = HttpRequestTask.POST(String.class,URL);
         // new HttpRequestTask(String.class, this, URL);
         //request.setMethod(HttpRequestTask.POST_REQUEST);
 
@@ -51,7 +51,7 @@ public class RegistrationIntentService extends IntentService implements HttpRequ
         request.execute();
     }
 
-    @Override
+   /* @Override
     public void onHttpRequestSuccessful(ApiJSON answer, int type) {
 
     }
@@ -59,5 +59,5 @@ public class RegistrationIntentService extends IntentService implements HttpRequ
     @Override
     public void onHttpRequestFailed(ApiJSON errorData, int type) {
 
-    }
+    }*/
 }

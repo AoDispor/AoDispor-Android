@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -24,7 +25,9 @@ import org.joda.time.Interval;
 import org.joda.time.Period;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -184,6 +187,29 @@ public abstract class Utility {
         Log.v("debug", "rate:" + p.rate);
         Log.v("debug", "type:" + p.type);
         Log.v("debug", "description:" + p.description);
+    }
+
+
+    public interface IViewModifier{
+        public void apply(View v);
+    }
+
+    static public void apply2AllChildrenBFS(View v, IViewModifier mod) {
+        List<View> visited = new ArrayList<View>();
+        List<View> unvisited = new ArrayList<View>();
+        unvisited.add(v);
+
+        while (!unvisited.isEmpty()) {
+            View child = unvisited.remove(0);
+            visited.add(child);
+            if (!(child instanceof ViewGroup)) {
+                mod.apply(child);
+                continue;
+            }
+            ViewGroup group = (ViewGroup) child;
+            final int childCount = group.getChildCount();
+            for (int i=0; i<childCount; i++) unvisited.add(group.getChildAt(i));
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package pt.aodispor.android.api;
 
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -160,23 +161,25 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         httpHeaders = new HttpHeaders();
     }
 
-    private HttpRequestTask(){}
-    static public HttpRequestTask POST(Class answer, HttpRequest executor, String url, String... uv){
+    private HttpRequestTask() {
+    }
+
+    static public HttpRequestTask POST(Class answer, String url, String... uv) {
         HttpRequestTask request = new HttpRequestTask();
         request.method = HttpMethod.POST;
         request.answerType = answer;
-        request.postExecute = executor;
+        //request.postExecute = executor;
         request.url = url;
         request.urlVariables = uv;
         request.httpHeaders = new HttpHeaders();
         return request;
     }
 
-    static public HttpRequestTask PUT(Class answer, HttpRequest executor, String url, String... uv){
+    static public HttpRequestTask PUT(Class answer, String url, String... uv) {
         HttpRequestTask request = new HttpRequestTask();
         request.method = HttpMethod.PUT;
         request.answerType = answer;
-        request.postExecute = executor;
+        //request.postExecute = executor;
         request.url = url;
         request.urlVariables = uv;
         request.httpHeaders = new HttpHeaders();
@@ -185,6 +188,19 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
 
     @Override
     protected ApiJSON doInBackground(Void... params) {
+
+        //TODO JUST A REMAINDER WHILE THE CODE HASN'T BEEN CLEANED
+        //TODO remove these logs later
+        boolean newCallIsUsed = !(onSuccess == null && onFail == null && onEnd == null);
+        boolean oldCallIsUsed = postExecute != null;
+        if (!newCallIsUsed && !oldCallIsUsed)
+            Log.d("", "no action after request");
+        if (oldCallIsUsed) {
+            Log.w("", "using old implementation");
+            if (newCallIsUsed)
+                Log.w("", "using both old and new implementation");
+        }
+
         Object answer;//temp before assigning response: may not return ApiJSON
         try {
             prepareHeaders();

@@ -9,13 +9,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -65,12 +69,27 @@ public class UserAreaFragment extends Fragment implements Notification {
         });
 
         List<ListItem> list = new ArrayList<>();
-        ListItem profile = new Profile(getContext(), this);
+        ListItem profile = null;//TODO new Profile(getContext(), this);
         profile.setNotification(this);
         list.add(profile);
         updatedItems = new boolean[list.size()];
         arrayAdapter = new CustomAdapter(getContext(), R.layout.profile, list);
         listView.setAdapter(arrayAdapter);
+
+        /*arrayAdapter.getView(0,,listView).getOnFocusChangeListener(
+                new View.OnFocusChangeListener(){
+                    @Override
+                    public void onFocusChange(View view, boolean b) {
+
+                    }
+                }
+        );*/
+
+/*        EditText edit_name = (EditText) root.findViewById(R.id.nameEdit);
+        EditText edit_profession = (EditText) root.findViewById(R.id.professionEdit);
+        EditText edit_description = (EditText) root.findViewById(R.id.nameEdit);
+*/
+
 
         startListItems();
 
@@ -180,11 +199,23 @@ public class UserAreaFragment extends Fragment implements Notification {
             listItems = objects;
         }
 
-
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             ListItem item = listItems.get(position);
+
+            /*EditText edit_name = (EditText) convertView.findViewById(R.id.nameEdit);
+            EditText edit_profession = (EditText) convertView.findViewById(R.id.professionEdit);
+            EditText edit_description = (EditText) convertView.findViewById(R.id.nameEdit);
+
+            edit_name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+
+                }
+            });*/
+
+
             return item.getView();
         }
     }

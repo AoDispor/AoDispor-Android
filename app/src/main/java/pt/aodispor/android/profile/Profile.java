@@ -1,6 +1,10 @@
 package pt.aodispor.android.profile;
 
+import android.app.DownloadManager;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +13,16 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -27,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import pt.aodispor.android.AppDefinitions;
+import pt.aodispor.android.LoginDataPreferences;
 import pt.aodispor.android.R;
 import pt.aodispor.android.Utility;
 import pt.aodispor.android.api.ApiJSON;
@@ -34,36 +44,45 @@ import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
+import pt.aodispor.android.appdata.UserData;
 import pt.aodispor.android.dialogs.LocationDialog;
 import pt.aodispor.android.dialogs.NewPriceDialog;
 
 import static android.app.Activity.RESULT_OK;
 
-public class Profile extends ListItem implements HttpRequest, LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
+public class Profile extends Fragment implements LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
     private static final int SELECT_PICTURE = 0;
     private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
-    private Fragment parentFragment;
-    private TextView imageView, nameView, professionView, locationView, priceView, descriptionView;
+    private TextView imageView, nameView, professionView, locationView, priceView, descriptionView,noConnectionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
-    private ImageView profileImage;
+    private ImageView profileImage, noConnectionImg;
     private View root;
-    private String prefix, suffix;
-    private int rate;
+    private String prefix, suffix; //cp4 & cp3
+    private int rate = -1;
     private boolean isFinal;
-    private String currency;
+    private String currency = null;
     private NewPriceDialog.PriceType type;
     private Uri tempUri;
-    private Bitmap lastImage;
-    private boolean changedImage;
 
-    public Profile(Context c, Fragment a) {
-        super(c);
+    //static boolean profileLoaded = false;
+    static final int WAIT_4RETRY_GET_PROFILE = 5000;
+    Professional previous;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //createHandler();
+    }
+
+    Context context;
+
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        context = this.getContext();
         HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
-        parentFragment = a;
-        root = LayoutInflater.from(context).inflate(R.layout.profile, null);
+        root = inflater.inflate(R.layout.profile, container, false);
 
         // Get Text Views
         imageView = (TextView) root.findViewById(R.id.imageText);
@@ -72,6 +91,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         priceView = (TextView) root.findViewById(R.id.price);
         locationView = (TextView) root.findViewById(R.id.location);
         descriptionView = (TextView) root.findViewById(R.id.description);
+        noConnectionView = (TextView) root.findViewById(R.id.profile_not_loaded_text);
 
         // Get Edit Text Views
         nameEdit = (EditText) root.findViewById(R.id.nameEdit);
@@ -82,15 +102,17 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
         // Get image
         profileImage = (ImageView) root.findViewById(R.id.profileImage);
+        noConnectionImg = (ImageView) root.findViewById(R.id.profile_not_loaded_img);
 
         setFonts();
 
+        //Set Listeners
         locationEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 LocationDialog dialog = new LocationDialog();
                 dialog.setListener(thisObject);
-                dialog.show(parentFragment.getFragmentManager(), LOCATION_TAG);
+                dialog.show(Profile.this.getFragmentManager(), LOCATION_TAG);
             }
         });
 
@@ -99,7 +121,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
             public void onClick(View view) {
                 NewPriceDialog dialog = NewPriceDialog.newInstance(rate, isFinal, type, currency);
                 dialog.setListener(thisObject);
-                dialog.show(parentFragment.getFragmentManager(), PRICE_DIALOG_TAG);
+                dialog.show(Profile.this.getFragmentManager(), PRICE_DIALOG_TAG);
             }
         });
 
@@ -109,9 +131,35 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                parentFragment.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+                Profile.this.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
             }
         });
+
+        ProfileEditText.setUpdateFragment(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        POST_Profile();
+                    }
+                }
+        );
+
+        //hide stuff until page is loaded
+        Utility.apply2AllChildrenBFS(getView(), new Utility.IViewModifier() {
+            @Override
+            public void apply(View v) {
+                if (v instanceof EditText
+                        || v instanceof TextView
+                        || v instanceof ImageView
+                        ) v.setVisibility(View.GONE);
+            }
+        });
+        noConnectionView.setVisibility(View.VISIBLE);
+        noConnectionImg.setVisibility(View.VISIBLE);
+
+        getProfileInfo();
+
+        return root;
     }
 
     @Override
@@ -119,16 +167,12 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         return root;
     }
 
-    @Override
-    public boolean onStart() {
-        getProfileInfo();
-        changedImage = false;
-        return false;
-    }
+    //@Override
+    public void POST_Profile() {
+        previous = UserData.getInstance().getProfileState();
+        Professional p = UserData.getInstance().getProfileState();
+        if (p == null) Log.e("POST_Profile", "NULL OBJECT!");
 
-    @Override
-    public boolean onUpdate() {
-        Professional p = new Professional();
         p.full_name = nameEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
         p.title = professionEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
         String location = locationEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
@@ -136,9 +180,9 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
             p.location = location;
             p.cp4 = prefix;
             p.cp3 = suffix;
-            // TODO Ask if there is something to do here that is done in the old profile
-        }
-        if (rate > 0) {
+        } else p.location = null; //must not be sent if cp3 and cp4 not defined!
+
+        if (rate >= 0) {
             p.rate = Integer.toString(rate);
         }
         switch (type) {
@@ -152,30 +196,48 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                 p.type = "S";
                 break;
         }
-        p.currency = currency;
+        if (currency != null) p.currency = currency;
         p.description = descriptionEdit.getText().toString();
-        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
-        //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
-        //request.setMethod(HttpRequestTask.POST_REQUEST);
-        request.setType(HttpRequest.UPDATE_PROFILE);
+
+        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, AppDefinitions.URL_MY_PROFILE);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
         request.setJSONBody(p);
+        request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+            @Override
+            public void exec(ApiJSON answer) {
+                UserData.getInstance().updateProfileState(
+                        (Professional) ((SearchQueryResult) answer).data.get(0)
+                )
+                ;
+            }
+        });
+        request.addOnFailHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+            @Override
+            public void exec(ApiJSON answer) {
+                updateView(previous);
+                Toast.makeText(getContext(),"Não foi possível atualizar dados...",Toast.LENGTH_SHORT).show();
+            }
+        });
         request.execute();
+    }
 
-        // Upload Image
-        if (changedImage) {
-            BitmapDrawable drawable = (BitmapDrawable) profileImage.getDrawable();
-            Bitmap image = drawable.getBitmap();
-            HttpRequestTask imageRequest = HttpRequestTask.PUT(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
-            //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_UPLOAD_IMAGE);
-            //imageRequest.setMethod(HttpRequestTask.PUT_REQUEST);
-            imageRequest.setType(HttpRequest.UPDATE_IMAGE);
-            imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-            imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
-            imageRequest.execute();
-            changedImage = false;
-        }
-        return true;
+    void PUT_Image(final Bitmap image) {
+        HttpRequestTask imageRequest = HttpRequestTask.PUT(SearchQueryResult.class, AppDefinitions.URL_UPLOAD_IMAGE);
+        imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
+        imageRequest.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+            @Override
+            public void exec(ApiJSON answer) {
+                profileImage.setImageBitmap(image);
+            }
+        });
+        imageRequest.addOnEndHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+            @Override
+            public void exec(ApiJSON answer) {
+                ImageLoader.getInstance().clearDiskCache();
+            }
+        });
+        imageRequest.execute();
     }
 
     @Override
@@ -196,7 +258,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                         options.setDimmedLayerColor(ContextCompat.getColor(context, R.color.aoDispor));
                         options.setStatusBarColor(ContextCompat.getColor(context, R.color.aoDispor));
                         options.setToolbarWidgetColor(ContextCompat.getColor(context, R.color.white));
-                        UCrop.of(data.getData(), tempUri).withAspectRatio(1, 1).withOptions(options).start(context, parentFragment);
+                        UCrop.of(data.getData(), tempUri).withAspectRatio(1, 1).withOptions(options).start(context, this);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -207,8 +269,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
                         try {
                             InputStream imageStream = context.getContentResolver().openInputStream(resultUri);
                             Bitmap image = BitmapFactory.decodeStream(imageStream);
-                            profileImage.setImageBitmap(image);
-                            changedImage = true;
+                            PUT_Image(image);
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -222,41 +283,45 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
-        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
-        //new HttpRequestTask(SearchQueryResult.class, this, AppDefinitions.URL_MY_PROFILE);
-        //request.setMethod(HttpRequestTask.POST_REQUEST);
-        request.setType(HttpRequest.UPDATE_PROFILE);
+        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, AppDefinitions.URL_MY_PROFILE);
+        request.addOnSuccessHandlers(updateLocalUserProfile);
         request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+            @Override
+            public void exec(ApiJSON answer) {
+                //show stuff
+                Utility.apply2AllChildrenBFS(getView(), new Utility.IViewModifier() {
+                    @Override
+                    public void apply(View v) {
+                        if (v instanceof EditText
+                                || v instanceof TextView
+                                || v instanceof ImageView
+                                ) v.setVisibility(View.VISIBLE);
+                    }
+                });
+                noConnectionView.setVisibility(View.GONE);
+                noConnectionImg.setVisibility(View.GONE);
+            }
+        });
+        request.addOnFailHandlers(
+                new HttpRequestTask.IOnHttpRequestCompleted() {
+                    @Override
+                    public void exec(ApiJSON answer) {
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getProfileInfo();
+                            }
+                        }, WAIT_4RETRY_GET_PROFILE);
+                    }
+                }
+        );
         request.execute();
     }
 
-    public void updateProfile(Professional professional) {
-        setName(professional.full_name);
-        setProfession(professional.title);
-        setLocation(professional.location, professional.cp4, professional.cp3);
-        int rate = Integer.parseInt(professional.rate);
-        boolean isFinal = Boolean.parseBoolean("true");
-        NewPriceDialog.PriceType type = NewPriceDialog.PriceType.ByDay;
-        switch (professional.type) {
-            case "H":
-                type = NewPriceDialog.PriceType.ByHour;
-                break;
-            case "D":
-                type = NewPriceDialog.PriceType.ByDay;
-                break;
-            case "S":
-                type = NewPriceDialog.PriceType.ByService;
-                break;
-        }
-        setPrice(rate, isFinal, type, professional.currency);
-        setDescription(professional.description);
-        if (!changedImage) {
-            setProfileImageFromUrl(professional.avatar_url);
-        }
-    }
-
     public void setName(String n) {
-        nameEdit.setText(n);
+        nameEdit.setText(new String(n));
     }
 
     public void setProfession(String p) {
@@ -321,7 +386,7 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
 
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                    lastImage = loadedImage;
+                    //lastImage = loadedImage;
                 }
 
                 @Override
@@ -332,36 +397,18 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         }
     }
 
-    public String getName() {
-        return nameEdit.getText().toString();
-    }
-
-    public String getProfession() {
-        return professionEdit.getText().toString();
-    }
-
-    public String getLocation() {
-        return locationEdit.getText().toString();
-    }
-
-    public String getPrice() {
-        return priceEdit.getText().toString();
-    }
-
-    public String getDescription() {
-        return descriptionEdit.getText().toString();
-    }
-
     @Override
     public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
         if (set) {
             setLocation(locationName, prefix, suffix);
+            ProfileEditText.runHandler();
         }
     }
 
     @Override
     public void onPriceChanged(int rate, boolean isFinal, NewPriceDialog.PriceType type, String currency) {
         setPrice(rate, isFinal, type, currency);
+        ProfileEditText.runHandler();
     }
 
     private void setFonts() {
@@ -381,37 +428,39 @@ public class Profile extends ListItem implements HttpRequest, LocationDialog.Loc
         descriptionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
     }
 
-    @Override
-    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
-        Professional p = new Professional();
-        switch (type) {
-            case HttpRequest.GET_PROFILE:
-                SearchQueryResult getProfile = (SearchQueryResult) answer;
-                p = (Professional) getProfile.data.get(0);
-                break;
-            case HttpRequest.UPDATE_PROFILE:
-                p = (Professional) ((SearchQueryResult) answer).data.get(0);
-                break;
-            case HttpRequest.UPDATE_IMAGE:
-                ImageLoader.getInstance().clearDiskCache();
-                break;
-        }
-        if (type == HttpRequest.GET_PROFILE || type == HttpRequest.UPDATE_PROFILE) {
-            updateProfile(p);
-            notification.notify(this, true, "");
-        }
-    }
+    /**
+     * updates UserData and Profile View
+     */
+    private final HttpRequestTask.IOnHttpRequestCompleted updateLocalUserProfile =
+            new HttpRequestTask.IOnHttpRequestCompleted() {
+                @Override
+                public void exec(ApiJSON answer) {
+                    Professional professional = (Professional) ((SearchQueryResult) answer).data.get(0);
+                    UserData.getInstance().updateProfileState(professional);
+                    updateView(professional);
+                    setProfileImageFromUrl(professional.avatar_url);
+                }
+            };
 
-    @Override
-    public void onHttpRequestFailed(ApiJSON errorData, int type) {
-        switch (type) {
-            case HttpRequest.UPDATE_IMAGE:
-                profileImage.setImageBitmap(lastImage);
+    private void updateView(Professional professional) {
+        setName(professional.full_name);
+        setProfession(professional.title);
+        setLocation(professional.location, professional.cp4, professional.cp3);
+        int rate = Integer.parseInt(professional.rate);
+        boolean isFinal = Boolean.parseBoolean("true");
+        NewPriceDialog.PriceType type = NewPriceDialog.PriceType.ByDay;
+        switch (professional.type) {
+            case "H":
+                type = NewPriceDialog.PriceType.ByHour;
                 break;
-            default:
+            case "D":
+                type = NewPriceDialog.PriceType.ByDay;
+                break;
+            case "S":
+                type = NewPriceDialog.PriceType.ByService;
                 break;
         }
-        notification.notify(this, false, context.getString(R.string.timeout));
+        setPrice(rate, isFinal, type, professional.currency);
+        setDescription(professional.description);
     }
-
 }

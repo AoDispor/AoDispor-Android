@@ -31,6 +31,7 @@ public class Professional extends BasicCardFields implements Cloneable {
         professional.rate = this.rate;
         professional.string_id = this.string_id;
         professional.distance = this.distance;
+        professional.title = this.title;
         return professional;
     }
 }

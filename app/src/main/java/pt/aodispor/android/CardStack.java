@@ -447,42 +447,43 @@ public class CardStack {
 
 
     public void updateCards() {
-        //TODO NOT YET TESTED
-        //Log.d("updateCards", "updating");
-        //if (true) return;
+        try {
+            //TODO NOT YET TESTED
+            //Log.d("updateCards", "updating");
+            //if (true) return;
 
-        //TODO maybe could also try to fetc image again in case its missing ???
-        //TODO separate server date related stuff from this and from HttpRequestTask and place it on some oter class
+            //TODO maybe could also try to fetc image again in case its missing ???
+            //TODO separate server date related stuff from this and from HttpRequestTask and place it on some oter class
 
-        if (cards == null || cards_data == null) return;
-        //update requests time
-        //int timeNow = TimeZone.getTimeZone("UTC").getOffset(System.currentTimeMillis());
-        long timenow = new Date().getTime();
-        for (int i = 0; i < 2; ++i) {
-            if (isRequestCard(i)) {
-                Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
-                if (carddate == null) continue;
-                long cardTime = carddate.getTime(); //TODO get card date
-                Period p = new Period(timenow, cardTime, PeriodType.standard());
-                //Days are not supported =( it seems...
-                //must do calculations by "hand"
-                long difference = cardTime - timenow;
-                long days = difference / (24 * 60 * 60 * 1000);
-                String daysString = "";
-                if (days > 0) daysString = days + " ";
-                daysString += fragment.getString(days == 1 ? R.string.day : R.string.days) + " ";
-                ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
-                        difference < 0 ? fragment.getString(R.string.request_expired_card_note)
-                                :
-                                (daysString
-                                        + p.getHours()
-                                        + ":" + p.getMinutes()
-                                        + ":" + p.getSeconds() + " "
-                                        + fragment.getString(R.string.left_to_expire)
-                                )
-                );
-            } else break;
-        }
-
+            if (cards == null || cards_data == null) return;
+            //update requests time
+            //int timeNow = TimeZone.getTimeZone("UTC").getOffset(System.currentTimeMillis());
+            long timenow = new Date().getTime();
+            for (int i = 0; i < 2; ++i) {
+                if (isRequestCard(i)) {
+                    Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
+                    if (carddate == null) continue;
+                    long cardTime = carddate.getTime(); //TODO get card date
+                    Period p = new Period(timenow, cardTime, PeriodType.standard());
+                    //Days are not supported =( it seems...
+                    //must do calculations by "hand"
+                    long difference = cardTime - timenow;
+                    long days = difference / (24 * 60 * 60 * 1000);
+                    String daysString = "";
+                    if (days > 0) daysString = days + " ";
+                    daysString += fragment.getString(days == 1 ? R.string.day : R.string.days) + " ";
+                    ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
+                            difference < 0 ? fragment.getString(R.string.request_expired_card_note)
+                                    :
+                                    (daysString
+                                            + p.getHours()
+                                            + ":" + p.getMinutes()
+                                            + ":" + p.getSeconds() + " "
+                                            + fragment.getString(R.string.left_to_expire)
+                                    )
+                    );
+                } else break;
+            }
+        }catch (Exception e){e.printStackTrace();} //TODO maybe this is more of a workaround than a solution!
     }
 }

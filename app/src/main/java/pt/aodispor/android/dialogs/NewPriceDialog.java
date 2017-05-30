@@ -36,13 +36,14 @@ public class NewPriceDialog extends DialogFragment {
     private int rate;
     private Switch priceSwitch;
     private Spinner currencySpinner;
+
     public enum PriceType {
         ByHour,
         ByDay,
         ByService
     }
 
-    public static NewPriceDialog newInstance(int r, boolean f, PriceType pt, String c){
+    public static NewPriceDialog newInstance(int r, boolean f, PriceType pt, String c) {
         NewPriceDialog pd = new NewPriceDialog();
         Bundle args = new Bundle();
         args.putInt("rate", r);
@@ -92,7 +93,7 @@ public class NewPriceDialog extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editable.length() == 1 && editable.toString().equals("0")){
+                if (editable.length() == 1 && editable.toString().equals("0")) {
                     editable.clear();
                 }
             }
@@ -104,7 +105,7 @@ public class NewPriceDialog extends DialogFragment {
         currencySpinner = (Spinner) root.findViewById(R.id.currency_spinner);
 
         // Radio Buttons
-        buttons = new Button[]{ byHour, byDay, byService };
+        buttons = new Button[]{byHour, byDay, byService};
         for (Button button : buttons) {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -140,8 +141,12 @@ public class NewPriceDialog extends DialogFragment {
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        if(listener != null) {
-            int newRate = Integer.parseInt(priceView.getText().toString());
+        if (listener != null) {
+            int newRate = 0;
+            try {
+                newRate = Integer.parseInt(priceView.getText().toString());
+            } catch (Exception e) {
+            }
             boolean isFinal = priceSwitch.isChecked();
             PriceType newPriceType = PriceType.values()[buttonChosen];
             String newCurrency = currencySpinner.getSelectedItem().toString();

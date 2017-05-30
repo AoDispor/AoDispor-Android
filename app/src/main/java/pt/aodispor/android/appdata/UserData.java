@@ -35,7 +35,7 @@ public class UserData {
         try {
             return (Professional) profile_state.clone();
         }catch (Exception e){
-            Log.e("",e.getMessage());
+            Log.e("XXX",e.getMessage());
         }
         return null;
     }

@@ -36,6 +36,8 @@
     <string name="profile_price_type_day">Por dia</string>
     <string name="profile_price_type_service">Por serviço</string>
     <string name="dialog_price">%1$d</string>
+    <string name="hour">hora</string>
+    <string name="service">serviço</string>
 
     <!-- Location Dialog -->
     <string name="zip_dialog">Insira o seu código postal</string>

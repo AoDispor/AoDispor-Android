@@ -1,4 +1,4 @@
-package pt.aodispor.android.dialogs;
+package pt.aodispor.android.profile;
 
 import android.content.DialogInterface;
 import android.graphics.drawable.GradientDrawable;
@@ -8,6 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +19,18 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import java.util.HashMap;
+
+import pt.aodispor.android.EnumSpinner;
 import pt.aodispor.android.R;
+import pt.aodispor.android.professional.CurrencyType;
+import pt.aodispor.android.professional.PaymentType;
 
 /**
  * Custom Dialog Fragment for editing price information.
@@ -32,24 +40,19 @@ public class NewPriceDialog extends DialogFragment {
     private int buttonChosen;
     private Button[] buttons;
     private EditText priceView;
-    private PriceType priceType;
+    private PaymentType priceType;
     private int rate;
     private Switch priceSwitch;
-    private Spinner currencySpinner;
+    //private Spinner currencySpinner;
+    private EnumSpinner<CurrencyType> currencySpinner;
 
-    public enum PriceType {
-        ByHour,
-        ByDay,
-        ByService
-    }
-
-    public static NewPriceDialog newInstance(int r, boolean f, PriceType pt, String c) {
+    public static NewPriceDialog newInstance(int r, boolean f, PaymentType pt, CurrencyType c) {
         NewPriceDialog pd = new NewPriceDialog();
         Bundle args = new Bundle();
         args.putInt("rate", r);
         args.putBoolean("final", f);
         args.putInt("type", pt.ordinal());
-        args.putString("currency", c);
+        args.putString("currency", c.getAPICode());
         pd.setArguments(args);
         return pd;
     }
@@ -65,7 +68,7 @@ public class NewPriceDialog extends DialogFragment {
 
         // Set variables
         rate = getArguments().getInt("rate");
-        priceType = PriceType.values()[getArguments().getInt("type")];
+        priceType = PaymentType.values()[getArguments().getInt("type")];
         // TODO currency spinner
 
         // Get Views
@@ -102,7 +105,7 @@ public class NewPriceDialog extends DialogFragment {
         Button byDay = (Button) root.findViewById(R.id.type2);
         Button byService = (Button) root.findViewById(R.id.type3);
         priceSwitch = (Switch) root.findViewById(R.id.priceSwitch);
-        currencySpinner = (Spinner) root.findViewById(R.id.currency_spinner);
+        //currencySpinner = (Spinner) root.findViewById(R.id.currency_spinner);
 
         // Radio Buttons
         buttons = new Button[]{byHour, byDay, byService};
@@ -115,7 +118,7 @@ public class NewPriceDialog extends DialogFragment {
                             buttonChosen = j;
                         }
                     }
-                    priceType = PriceType.values()[buttonChosen];
+                    priceType = PaymentType.values()[buttonChosen];
                     LayerDrawable drawable = (LayerDrawable) view.getBackground();
                     GradientDrawable shapeDrawable = (GradientDrawable) drawable.getDrawable(1);
                     shapeDrawable.setColor(ContextCompat.getColor(getContext(), R.color.aoDispor2));
@@ -130,9 +133,13 @@ public class NewPriceDialog extends DialogFragment {
             });
         }
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(root.getContext(), R.array.allowed_currencies, R.layout.currency_spinner_layout);
+        /*ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(root.getContext(), R.array.allowed_currencies, R.layout.currency_spinner_layout);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         currencySpinner.setAdapter(adapter);
+        currencySpinner.setAdapter(spa);*/
+        currencySpinner = new EnumSpinner<CurrencyType>(root.getContext(),
+                (Spinner) root.findViewById(R.id.currency_spinner),
+                CurrencyType.values());
 
         updateViews();
         return root;
@@ -148,8 +155,8 @@ public class NewPriceDialog extends DialogFragment {
             } catch (Exception e) {
             }
             boolean isFinal = priceSwitch.isChecked();
-            PriceType newPriceType = PriceType.values()[buttonChosen];
-            String newCurrency = currencySpinner.getSelectedItem().toString();
+            PaymentType newPriceType = PaymentType.values()[buttonChosen];
+            CurrencyType newCurrency = (CurrencyType) currencySpinner.getSelectedItem();
             listener.onPriceChanged(newRate, isFinal, newPriceType, newCurrency);
         }
     }
@@ -187,7 +194,7 @@ public class NewPriceDialog extends DialogFragment {
     }
 
     public interface PriceDialogListener {
-        void onPriceChanged(int rate, boolean isFinal, PriceType type, String currency);
+        void onPriceChanged(int rate, boolean isFinal, PaymentType type, CurrencyType currency);
     }
 
 }

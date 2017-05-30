@@ -1,6 +1,7 @@
 package pt.aodispor.android;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Intent;
 
 import android.os.Bundle;
@@ -12,8 +13,7 @@ import com.github.stkent.amplify.tracking.Amplify;
 
 import io.fabric.sdk.android.Fabric;
 
-public class SplitActivity extends Activity
-{
+public class SplitActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +27,7 @@ public class SplitActivity extends Activity
         Log.d("PREFERENCES", preferences.get().telephone());
         Log.d("PREFERENCES", preferences.get().password());
 
-        if(preferences.get().hasValidPair()) {
+        if (preferences.get().hasValidPair()) {
             // Guardar username e password no AppDefinitions para a API poder usar
             // FIXME devia ser qualquer coisa mais segura...
             AppDefinitions.phoneNumber = preferences.get().telephone();

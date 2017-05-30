@@ -7,10 +7,10 @@ import org.springframework.http.HttpHeaders;
 import pt.aodispor.android.api.Professional;
 
 public class UserData {
-    private static UserData ourInstance = new UserData();
+    private static UserData singleton = new UserData();
 
     public static UserData getInstance() {
-        return ourInstance;
+        return singleton;
     }
 
     private UserData() {

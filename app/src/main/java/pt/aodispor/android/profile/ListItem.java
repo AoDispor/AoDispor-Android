@@ -5,16 +5,16 @@ import android.content.Intent;
 import android.view.View;
 
 public abstract class ListItem {
-    protected Notification notification;
+    //protected Notification notification;
     protected Context context;
 
     public ListItem(Context c) {
         context = c;
     }
 
-    public void setNotification(Notification n) {
+    /*public void setNotification(Notification n) {
         notification = n;
-    }
+    }*/
 
     public View getView() {
         return new View(context);

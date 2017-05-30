@@ -1,7 +1,5 @@
 package pt.aodispor.android.profile;
 
-import android.app.DownloadManager;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -14,11 +12,9 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,17 +32,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.LoginDataPreferences;
 import pt.aodispor.android.R;
 import pt.aodispor.android.Utility;
 import pt.aodispor.android.api.ApiJSON;
-import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.api.SearchQueryResult;
 import pt.aodispor.android.appdata.UserData;
-import pt.aodispor.android.dialogs.LocationDialog;
-import pt.aodispor.android.dialogs.NewPriceDialog;
+import pt.aodispor.android.professional.CurrencyType;
+import pt.aodispor.android.professional.PaymentType;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -55,15 +49,15 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
-    private TextView imageView, nameView, professionView, locationView, priceView, descriptionView,noConnectionView;
+    private TextView imageView, nameView, professionView, locationView, priceView, descriptionView, noConnectionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
     private ImageView profileImage, noConnectionImg;
     private View root;
     private String prefix, suffix; //cp4 & cp3
     private int rate = -1;
     private boolean isFinal;
-    private String currency = null;
-    private NewPriceDialog.PriceType type;
+    private CurrencyType currency = null;
+    private PaymentType type =null;
     private Uri tempUri;
 
     //static boolean profileLoaded = false;
@@ -185,18 +179,8 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         if (rate >= 0) {
             p.rate = Integer.toString(rate);
         }
-        switch (type) {
-            case ByHour:
-                p.type = "H";
-                break;
-            case ByDay:
-                p.type = "D";
-                break;
-            case ByService:
-                p.type = "S";
-                break;
-        }
-        if (currency != null) p.currency = currency;
+        p.type = type.getAPICode();
+        if (currency != null) p.currency = currency.getAPICode();
         p.description = descriptionEdit.getText().toString();
 
         HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, AppDefinitions.URL_MY_PROFILE);
@@ -215,7 +199,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
             @Override
             public void exec(ApiJSON answer) {
                 updateView(previous);
-                Toast.makeText(getContext(),"Não foi possível atualizar dados...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Não foi possível atualizar dados...", Toast.LENGTH_SHORT).show();
             }
         });
         request.execute();
@@ -334,32 +318,14 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         suffix = s;
     }
 
-    public void setPrice(int p, boolean f, NewPriceDialog.PriceType t, String c) {
+    public void setPrice(int p, boolean f, PaymentType t, CurrencyType c) {
         rate = p;
         isFinal = f;
         type = t;
-        currency = c;
-        String priceTag = rate + " ";
-        switch (currency) {
-            case "EUR":
-                priceTag += "€";
-                break;
-            case "DOL":
-                priceTag += "$";
-                break;
-        }
-        priceTag += "/";
-        switch (type) {
-            case ByDay:
-                priceTag += "dia";
-                break;
-            case ByHour:
-                priceTag += "hora";
-                break;
-            case ByService:
-                priceTag += "serviço";
-                break;
-        }
+        currency = c ;
+        String priceTag = rate + " " + currency.getSymbol();
+        priceTag += "/" + type.convertToStringToDisplay();
+
         priceEdit.setText(priceTag);
     }
 
@@ -406,7 +372,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     }
 
     @Override
-    public void onPriceChanged(int rate, boolean isFinal, NewPriceDialog.PriceType type, String currency) {
+    public void onPriceChanged(int rate, boolean isFinal, PaymentType type, CurrencyType currency) {
         setPrice(rate, isFinal, type, currency);
         ProfileEditText.runHandler();
     }
@@ -448,19 +414,9 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         setLocation(professional.location, professional.cp4, professional.cp3);
         int rate = Integer.parseInt(professional.rate);
         boolean isFinal = Boolean.parseBoolean("true");
-        NewPriceDialog.PriceType type = NewPriceDialog.PriceType.ByDay;
-        switch (professional.type) {
-            case "H":
-                type = NewPriceDialog.PriceType.ByHour;
-                break;
-            case "D":
-                type = NewPriceDialog.PriceType.ByDay;
-                break;
-            case "S":
-                type = NewPriceDialog.PriceType.ByService;
-                break;
-        }
-        setPrice(rate, isFinal, type, professional.currency);
+        PaymentType type = PaymentType.parsePayment(professional.type);
+        CurrencyType curr = CurrencyType.parseCurrency(professional.currency);
+        setPrice(rate, isFinal, type, curr);
         setDescription(professional.description);
     }
 }

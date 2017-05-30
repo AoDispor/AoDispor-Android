@@ -1,5 +1,6 @@
 package pt.aodispor.android;
 
+import android.app.Application;
 import android.graphics.Typeface;
 
 import java.text.SimpleDateFormat;
@@ -43,14 +44,14 @@ public class AppDefinitions {
     public static Typeface yanoneKaffeesatzThin;
     //endregion
 
-    static final public String TIMEDATE_FORMAT= "yyyy-MM-dd HH:mm:ss";
+    static final public String TIMEDATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     static final public SimpleDateFormat TIMAEDATE_FORMATER =
             new SimpleDateFormat(AppDefinitions.TIMEDATE_FORMAT);
 
     /**
      * phone number that sends password via SMS
      */
-    public static final String[] PASSWORD_SMS_PHONES= new String[]{
+    public static final String[] PASSWORD_SMS_PHONES = new String[]{
             "+351911793861",     //TODO remove my phone later (used for testing)
             "+320335320002",
             "+447903571480"
@@ -83,12 +84,13 @@ public class AppDefinitions {
 
     /**
      * Password used to login. Professional profile editing is blocked without the correct password.
-     * */
+     */
     public static String userPassword = "";
 
-    /** used to block certain features when user has not loggedin with the sms code
-     *  deve estar a FALSE em release builds
-     * */
+    /**
+     * used to block certain features when user has not loggedin with the sms code
+     * deve estar a FALSE em release builds
+     */
     public static boolean smsLoginDone = false;
     /**
      * postal code to be sent to 'tokens' database

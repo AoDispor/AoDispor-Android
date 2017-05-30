@@ -1,4 +1,4 @@
-package pt.aodispor.android.dialogs;
+package pt.aodispor.android.profile;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

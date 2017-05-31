@@ -44,6 +44,11 @@ public class CardFragmentTest {
      */
 /*
     @Test
+    public void testIrrelevant() {
+        return;
+    }
+
+    /*@Test
     public void testSwipeCardOrder1() {
         CardFragmentTestClass fragment = new CardFragmentTestClass();
         SupportFragmentTestUtil.startFragment(fragment, EmptyActivity.class);

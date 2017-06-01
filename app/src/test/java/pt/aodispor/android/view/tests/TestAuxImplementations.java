@@ -2,7 +2,6 @@ package pt.aodispor.android.view.tests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.junit.Assert;
@@ -12,9 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.api.Professional;
-import pt.aodispor.android.api.SearchQueryResult;
-import pt.aodispor.android.api.UserRequest;
+import pt.aodispor.android.data.models.aodispor.Professional;
+import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
+import pt.aodispor.android.data.models.aodispor.UserRequest;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;

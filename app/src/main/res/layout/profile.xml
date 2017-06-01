@@ -8,8 +8,8 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
             <TextView
@@ -18,17 +18,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="20dp"
-                android:text="Sem resposta de AoDispor"
+                android:text="@string/no_response_from_AoDispo"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
             <ImageView
                 android:id="@+id/profile_not_loaded_img"
-                android:layout_below="@id/profile_not_loaded_text"
                 android:layout_marginTop="50dp"
                 android:layout_width="wrap_content"
                 android:layout_height="350dp"
-                android:src="@drawable/fimdebusca" />
+                android:src="@drawable/fimdebusca"
+                tools:ignore="ContentDescription" />
 
 
         <RelativeLayout
@@ -43,7 +43,8 @@
                 android:layout_height="175dp"
                 android:layout_centerHorizontal="true"
                 android:background="@color/aoDispor2"
-                app:srcCompat="@mipmap/ic_account_circle_white_48dp" />
+                app:srcCompat="@mipmap/ic_account_circle_white_48dp"
+                android:contentDescription="@string/profile_image_contentdescription" />
 
         </RelativeLayout>
 
@@ -57,7 +58,7 @@
             android:paddingLeft="50dp"
             android:paddingRight="50dp"
             android:paddingStart="50dp"
-            android:text="Toque na imagem acima para alterar a sua imagem de perfil"
+            android:text="@string/profile_image_label"
             android:textAlignment="center"
             android:textSize="18sp" />
 
@@ -68,18 +69,19 @@
             android:layout_marginBottom="5dp"
             android:layout_marginTop="20dp"
             android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:paddingStart="20dp"
             android:text="@string/register_name"
             android:textColor="@color/white"
             android:textSize="20sp" />
 
-        <pt.aodispor.android.profile.ProfileEditText
+        <pt.aodispor.android.features.profile.ProfileEditText
             android:id="@+id/nameEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:ems="10"
-            android:hint="Escreva aqui o seu nome"
+            android:hint="@string/profile_name_edit_hint"
             android:imeOptions="actionDone"
             android:inputType="textPersonName"
             android:maxLength="@string/name_maxsize"
@@ -95,18 +97,19 @@
             android:layout_marginBottom="5dp"
             android:layout_marginTop="20dp"
             android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:paddingStart="20dp"
             android:text="@string/register_profession"
             android:textColor="@color/white"
             android:textSize="20sp" />
 
-        <pt.aodispor.android.profile.ProfileEditText
+        <pt.aodispor.android.features.profile.ProfileEditText
             android:id="@+id/professionEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:ems="10"
-            android:hint="Escreva aqui a sua profissão"
+            android:hint="@string/profile_profession_edit_hint"
             android:inputType="text"
             android:maxLength="@string/profession_maxsize"
             android:padding="20dp"
@@ -121,6 +124,7 @@
             android:layout_marginBottom="5dp"
             android:layout_marginTop="20dp"
             android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:paddingStart="20dp"
             android:text="@string/register_location"
             android:textColor="@color/white"
@@ -133,7 +137,7 @@
             android:background="@color/white"
             android:ems="10"
             android:focusable="false"
-            android:hint="Escreva aqui a sua localização"
+            android:hint="@string/profile_location_edit_hint"
             android:inputType="text"
             android:padding="20dp"
             android:textColor="@color/grey3"
@@ -160,7 +164,7 @@
             android:background="@color/white"
             android:ems="10"
             android:focusable="false"
-            android:hint="Toque aqui para editar o seu valor"
+            android:hint="@string/profile_price_edit_hint"
             android:inputType="number"
             android:padding="20dp"
             android:textColor="@color/grey3"
@@ -174,18 +178,19 @@
             android:layout_marginBottom="5dp"
             android:layout_marginTop="20dp"
             android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:paddingStart="20dp"
             android:text="@string/register_description"
             android:textColor="@color/white"
             android:textSize="20sp" />
 
-        <pt.aodispor.android.profile.ProfileEditText
+        <pt.aodispor.android.features.profile.ProfileEditText
             android:id="@+id/descriptionEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:ems="10"
-            android:hint="Escreva aqui a descrição"
+            android:hint="@string/profile_professionaldescription_edt_hint"
             android:inputType="textMultiLine"
             android:maxLength="@string/description_maxsize"
             android:padding="20dp"

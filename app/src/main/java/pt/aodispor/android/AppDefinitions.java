@@ -72,8 +72,8 @@ public class AppDefinitions {
      */
     public static final int MIN_NUMBER_OFCARDS_2LOAD = 5;
 
-    static final int DISCARD_ANIMATION_MILLISECONDS = 300;
-    static final int RESTORE_ANIMATION_MILLISECONDS = 300;
+    public static final int DISCARD_ANIMATION_MILLISECONDS = 300;
+    public static final int RESTORE_ANIMATION_MILLISECONDS = 300;
 
     //region USER RELATED DATA
 

@@ -15,9 +15,20 @@
     <string name="register_description">Descreva aqui o que faz&#8230;</string>
     <string name="register_completion">Inscrição como profissional completa</string>
     <string name="profile_registered_note_msg">Inscrito</string>
+    <string name="profile_image_contentdescription">imagem de perfil</string>
+    <string name="profile_image_label">Toque na imagem acima para alterar a sua imagem de perfil</string>
+    <string name="profile_name_edit_hint">Escreva aqui o seu nome</string>
+    <string name="profile_profession_edit_hint">Escreva aqui a sua profissão</string>
+    <string name="profile_location_edit_hint">Escreva aqui a sua localização</string>
+    <string name="profile_price_edit_hint">Toque aqui para editar o seu valor</string>
+    <string name="profile_professionaldescription_edt_hint">Escreva aqui a descrição</string>
 
     <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>
+
+    <!--user request from-->
+    <string name="userrequest_requestdescription_label">Explique aqui o que precisa que seja feito…</string>
+    <string name="userrequest_requestdescription_edit_hint">Escreva aqui a descrição do pedido</string>
 
     <!-- Request Card -->
     <string name="request_expired_card_note">Última oportunidade para responder a este pedido</string>
@@ -133,4 +144,6 @@
     <string name="nav_requests">Pedidos</string>
     <string name="nav_login">Login/Inscrição</string>
     <string name="nav_aboutus">Sobre o AoDispor</string>
+    <string name="no_response_from_AoDispo">Sem resposta de AoDispor</string>
+
 </resources>

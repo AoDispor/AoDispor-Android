@@ -22,6 +22,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
+import pt.aodispor.android.features.main.SplitActivity;
 import tools.fastlane.screengrab.Screengrab;
 
 @LargeTest

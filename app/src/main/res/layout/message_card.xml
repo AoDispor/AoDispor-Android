@@ -1,7 +1,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pt.aodispor.android.MainActivity"
+    tools:context="pt.aodispor.android.features.main.MainActivity"
     android:id="@+id/message_card"
     android:tag="msg"
     android:orientation="vertical"

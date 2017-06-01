@@ -1,5 +1,7 @@
 package pt.aodispor.android.api;
 
+import pt.aodispor.android.data.models.aodispor.ApiJSON;
+
 /**
  * Interface for classes that want to send am HTTP request and want to do something when the
  * request is finished.

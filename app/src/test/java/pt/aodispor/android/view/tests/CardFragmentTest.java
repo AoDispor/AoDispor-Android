@@ -1,23 +1,13 @@
 package pt.aodispor.android.view.tests;
 
 import android.os.Build;
-import android.text.Html;
 
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowLog;
-import org.robolectric.shadows.support.v4.SupportFragmentTestUtil;
 
-import java.util.ArrayList;
-import pt.aodispor.android.api.Professional;
 import pt.aodispor.android.BuildConfig;
-import pt.aodispor.android.view.base.CardFragmentTestClass;
-import pt.aodispor.android.view.base.EmptyActivity;
-import pt.aodispor.android.view.base.ProfessionalTestClass;
 
 @RunWith(RobolectricTestRunner.class)
 //@RunWith(AndroidJUnit4.class)

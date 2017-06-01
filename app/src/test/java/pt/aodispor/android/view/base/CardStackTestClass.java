@@ -6,7 +6,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.CardStack;
+import pt.aodispor.android.features.cardstack.CardStack;
 import pt.aodispor.android.R;
 
 

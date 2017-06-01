@@ -6,7 +6,7 @@
     android:id="@+id/activity_on_boarding"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pt.aodispor.android.OnBoardingActivity">
+    tools:context="pt.aodispor.android.features.login.OnBoardingActivity">
 
     <com.redbooth.WelcomeCoordinatorLayout
         android:id="@+id/coordinator"

@@ -1,27 +1,8 @@
 package pt.aodispor.android.view.base;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import org.mockito.Mock;
-
-import java.util.ArrayList;
-
-import pt.aodispor.android.CardStack;
-import pt.aodispor.android.api.Links;
-import pt.aodispor.android.api.Meta;
-import pt.aodispor.android.api.Pagination;
-import pt.aodispor.android.api.Professional;
-import pt.aodispor.android.api.SearchQueryResult;
-import pt.aodispor.android.CardFragment;
-import pt.aodispor.android.R;
+import pt.aodispor.android.features.cardstack.CardFragment;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class CardFragmentTestClass extends CardFragment {
 /*

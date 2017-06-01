@@ -12,8 +12,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import pt.aodispor.android.appdata.UserData;
+import pt.aodispor.android.data.local.UserData;
 
+//TODO IMPLEMENTAR E FAZER HTTP REQUEST TASK GENERICO
 public class AoDisporHttpsRequestsBuilder {
     private static AoDisporHttpsRequestsBuilder ourInstance = new AoDisporHttpsRequestsBuilder();
 

@@ -15,7 +15,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +23,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import pt.aodispor.android.AppDefinitions;
+import pt.aodispor.android.data.models.aodispor.ApiJSON;
+import pt.aodispor.android.data.models.aodispor.Error;
 
 //TODO 2b generic later
 public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {

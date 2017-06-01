@@ -1,102 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="@string/register_price"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="20dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <TextView
-            android:text="@string/register_price"
+        <EditText
+            android:id="@+id/price_input"
             android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="2"
+            android:background="@drawable/line_input"
+            android:inputType="number"
+            android:maxLength="3"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:textAlignment="center"
+            android:textSize="30sp" />
+
+        <Spinner
+            android:id="@+id/currency_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="3" />
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/priceSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="@string/profile_price_final"
+        android:textOff="@string/no"
+        android:textOn="@string/yes"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="@string/profile_price_method"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/type1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:layout_marginBottom="10dp" />
+            android:layout_weight="1"
+            android:background="@drawable/left_option_horizontal"
+            android:text="@string/profile_price_type_hour"
+            android:textAllCaps="false"
+            tools:ignore="ButtonStyle" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/price_input"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="2"
-                android:background="@drawable/line_input"
-                android:inputType="number"
-                android:maxLength="3"
-                android:paddingLeft="50dp"
-                android:paddingRight="50dp"
-                android:textAlignment="center"
-                android:textSize="30sp" />
-
-            <Spinner
-                android:id="@+id/currency_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="3" />
-        </LinearLayout>
-
-        <Switch
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/type2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/priceSwitch"
-            android:textSize="18sp"
-            android:textOn="@string/yes"
-            android:textOff="@string/no"
-            android:text="@string/profile_price_final"
-            android:layout_marginBottom="10dp" />
+            android:layout_weight="1"
+            android:background="@drawable/center_option_horizontal"
+            android:text="@string/profile_price_type_day"
+            android:textAllCaps="false"
+            tools:ignore="ButtonStyle" />
 
-        <TextView
-            android:text="@string/profile_price_method"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/type3"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:id="@+id/textView3"
-            android:textSize="18sp"
-            android:layout_marginBottom="10dp" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp">
-
-            <Button
-                android:text="@string/profile_price_type_hour"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/type1"
-                android:layout_weight="1"
-                android:background="@drawable/left_option_horizontal"
-                android:textAllCaps="false" />
-
-            <Button
-                android:text="@string/profile_price_type_day"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/type2"
-                android:layout_weight="1"
-                android:background="@drawable/center_option_horizontal"
-                android:textAllCaps="false" />
-
-            <Button
-                android:text="@string/profile_price_type_service"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/type3"
-                android:layout_weight="1"
-                android:background="@drawable/right_option_horizontal"
-                android:textAllCaps="false" />
-        </LinearLayout>
-
+            android:layout_weight="1"
+            android:background="@drawable/right_option_horizontal"
+            android:text="@string/profile_price_type_service"
+            android:textAllCaps="false"
+            tools:ignore="ButtonStyle" />
     </LinearLayout>
 
 </LinearLayout>

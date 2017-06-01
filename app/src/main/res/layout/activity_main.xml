@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="pt.aodispor.android.MainActivity">
+    tools:context="pt.aodispor.android.features.main.MainActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/main_content_coordinator_layout"
@@ -113,7 +113,7 @@
                 app:prompt_view_user_opinion_question_title="@string/amplify_question_title" />
 
 
-            <pt.aodispor.android.MyViewPager
+            <pt.aodispor.android.features.main.MyViewPager
                 android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
                 android:layout_below="@+id/appbar">
 
                 <include layout="@layout/loading_indicator" />
-            </pt.aodispor.android.MyViewPager>
+            </pt.aodispor.android.features.main.MyViewPager>
 
         </RelativeLayout>
 

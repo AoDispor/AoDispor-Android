@@ -34,7 +34,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".SplitActivity"
+            android:name=".features.main.SplitActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:launchMode="singleTask"
@@ -46,7 +46,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".OnBoardingActivity"
+            android:name=".features.login.OnBoardingActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -54,7 +54,7 @@
             android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".features.main.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -85,21 +85,21 @@
         </receiver>
 
         <service
-            android:name=".notifications.MyGcmListenerService"
+            android:name=".features.notifications.MyGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name=".notifications.MyInstanceIDListenerService"
+            android:name=".features.notifications.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
         <service
-            android:name=".notifications.RegistrationIntentService"
+            android:name=".features.notifications.RegistrationIntentService"
             android:exported="false" />
     </application>
 

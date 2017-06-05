@@ -73,6 +73,8 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     Context context;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(!AppDefinitions.smsLoginDone) return null;//TODO quick fix, might not be the best solution
+
         context = this.getContext();
         HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
@@ -306,7 +308,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     }
 
     public void setName(String n) {
-        nameEdit.setText(new String(n));
+        nameEdit.setText(n);
     }
 
     public void setProfession(String p) {

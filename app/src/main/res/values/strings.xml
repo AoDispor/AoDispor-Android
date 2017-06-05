@@ -139,11 +139,22 @@
     <string name="amplify_thanks">Obrigado por nos ajudar a servi-lo!</string>
     <string name="label_select_picture">Selecionar imagem</string>
     <string name="request_permission_read_storage">O Ao Dispor pretender aceder às suas fotografias.</string>
+
+    <!-- navigation -->
     <string name="nav_search">Procurar</string>
     <string name="nav_profile">Perfil</string>
-    <string name="nav_requests">Pedidos</string>
+    <string name="nav_requests">brevemente - Pedidos</string>
     <string name="nav_login">Login/Inscrição</string>
     <string name="nav_aboutus">Sobre o AoDispor</string>
+
+
     <string name="no_response_from_AoDispo">Sem resposta de AoDispor</string>
+    <string name="professional_image_contentdescription">Imagem do profissional</string>
+
+    <string name="about_aodispor_text">
+\nSem intermediários, o Ao Dispor coloca-o em contacto directo com os profissionais perto da sua área.
+\n\nVeja quem oferece os seus serviços profissionais perto de si, e com um simples toque no ecrã telefone-lhes sem compromisso.
+\n\nO Ao Dispor é o serviço inteiramente gratuito que tem vindo a fazer com que milhares de portugueses aumentem os seus rendimentos ao oferecer os seus serviços à hora! Ganhe dinheiro trabalhando para as pessoas da sua região.
+</string>
 
 </resources>

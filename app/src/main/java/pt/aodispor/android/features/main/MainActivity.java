@@ -187,12 +187,14 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         TabPagerAdapter mSectionsPagerAdapter;
-        mSectionsPagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new TabPagerAdapter(getSupportFragmentManager()
+        //, AppDefinitions.smsLoginDone? 4 : 2
+        );
 
         //android.support.v4.view.ViewPager cannot be cast to pt.aodispor.android.MyViewPager
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem);
 
         searchView = (SearchView) findViewById(R.id.searchView);
         EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -238,7 +240,7 @@ public class MainActivity extends AppCompatActivity
                         cardFrag.setSearchQuery(query);
                         cardFrag.prepareNewStack();
                     }
-                    mViewPager.setCurrentItem(1, true);
+                    mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem, true);
                     closeSearchView();
                 } else {
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_bar_toast), Toast.LENGTH_SHORT).show();
@@ -295,7 +297,7 @@ public class MainActivity extends AppCompatActivity
          closeSearchView();
          }*/
         searchView.setIconified(true);
-        if (mViewPager.getCurrentItem() == 1) {
+        if (mViewPager.getCurrentItem() == TabPagerAdapter.cardStackItem) {
             CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
             cardFragment.restorePreviousCard();
         } else {
@@ -315,7 +317,7 @@ public class MainActivity extends AppCompatActivity
         searchView.setQuery(query, false);
         cardFrag.setSearchQuery(query);
         cardFrag.prepareNewStack();
-        mViewPager.setCurrentItem(1, true);
+        mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem, true);
         searchView.clearFocus();
     }
 
@@ -332,15 +334,15 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_search) {
-            mViewPager.setCurrentItem(1);
-        } else if (id == R.id.nav_profile) {
-            mViewPager.setCurrentItem(0);
-        } else if (id == R.id.nav_requests) {
-            mViewPager.setCurrentItem(2);
+            mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem);
         } else if (id == R.id.nav_about) {
-
+            mViewPager.setCurrentItem(TabPagerAdapter.AboutItem);
+        } else if (id == R.id.nav_profile) {
+            mViewPager.setCurrentItem(TabPagerAdapter.ProfileItem);
+        } else if (id == R.id.nav_requests) {
+            //TODO ADD LATER -> mViewPager.setCurrentItem(TabPagerAdapter.);
+            return false;
         } else if (id == R.id.nav_login) {
-            //CardStack.stopCardStackActivities();//TODO not sure this s best solution ... =/
             Intent showSplitActivityActivity = new Intent(MainActivity.this, SplitActivity.class);
             showSplitActivityActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(showSplitActivityActivity);
@@ -349,6 +351,5 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-        //java.lang.ClassCastException: android.support.design.widget.CoordinatorLayout cannot be cast to android.support.v4.widget.DrawerLayout
     }
 }

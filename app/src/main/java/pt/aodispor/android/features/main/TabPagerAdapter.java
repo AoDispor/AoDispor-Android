@@ -11,13 +11,21 @@ import pt.aodispor.android.features.profile.Profile;
  * Custom FragmentPagerAdapter class to control any sort of fragment class and to select the text
  * to be shown in the tabs.
  */
-public class TabPagerAdapter extends FragmentPagerAdapter {
+class TabPagerAdapter extends FragmentPagerAdapter {
     /**
      * Number of pages this adapter supports.
      */
-    private final int NUMBER_OF_PAGES = 2;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int NUMBER_OF_PAGES = 3;
+
+    static final int cardStackItem = 1;
+    static final int AboutItem = 0;
+    static final int ProfileItem = 2;
+    static final int RequestsItem = 3;
+
     //TODO mudar se necessário private ProfileFragment profileFragment;
     private Profile userProfileFragment;
+    private AboutAoDisporFragment aboutAoDisporFragment;
     private CardFragment cardFragment;
     //private UserRequestFragment requestFormFragment;
 
@@ -26,8 +34,9 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
      *
      * @param fm the fragment adapter.
      */
-    public TabPagerAdapter(FragmentManager fm) {
+    public TabPagerAdapter(FragmentManager fm/*, int numb_pages*/) {
         super(fm);
+        //NUMBER_OF_PAGES = numb_pages;
     }
 
     /**
@@ -40,18 +49,22 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         Fragment f = null;
         switch (position) {
+            case 1:
+                f = CardFragment.newInstance();
+                cardFragment = (CardFragment) f;
+                break;
             case 0:
+                f = new AboutAoDisporFragment();
+                aboutAoDisporFragment = (AboutAoDisporFragment) f;
+                break;
+            case 2:
                 f = new Profile();
                 //f = ProfileFragment.newInstance();
                 //TODO mudar se necessário profileFragment = (ProfileFragment) f;
                 //profileFragment = (ProfileFragment) f;
                 userProfileFragment = (Profile) f;
                 break;
-            case 1:
-                f = CardFragment.newInstance();
-                cardFragment = (CardFragment) f;
-                break;
-            case 2:
+            case 3:
                 // f = requestFormFragment.newInstance();
                 // requestFormFragment = (UserRequestFragment) f;
                 break;
@@ -92,11 +105,13 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {
-            case 0:
-                return "Perfil";
             case 1:
                 return "Encontrar";
+            case 0:
+                return "Sobre";
             case 2:
+                return "Perfil";
+            case 3:
                 return "Pedido";
         }
         return null;

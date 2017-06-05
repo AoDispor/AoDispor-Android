@@ -53,7 +53,7 @@ public class CardFragment extends Fragment {
 
     //region DEV_ONLY TESTING
     static private boolean DEV_force2ndPage = false;
-    static private boolean DEV_injectPedidoMockup = true;
+    static private boolean DEV_injectPedidoMockup = false;
     //endregion DEV_ONLY TESTING
 
 
@@ -117,16 +117,14 @@ public class CardFragment extends Fragment {
     @VisibleForTesting
     protected Activity activity;
 
-    static private LoadingWidget loadingWidget;
+    private LoadingWidget loadingWidget;
     private LinearLayout loadingLL;
 
 
     ViewsRefresher viewsRefresher;
 
     public LinearLayout getLoadingLayout() {
-        //if (loadingLL == null)
         loadingLL = (LinearLayout) rootView.findViewById(R.id.loadingWidgetLayout);
-
         return loadingLL;
     }
 
@@ -873,7 +871,7 @@ public class CardFragment extends Fragment {
                         SearchQueryResult result = (SearchQueryResult) answer;
                         if (result.data != null && result.data.size() > 0) {
                             CardFragment.this.currentSet = result;
-                            MediaPlayer.create(CardFragment.this.getContext(), R.raw.se_cardstackshuffle).start();
+                            //TODO ADD LATER -> MediaPlayer.create(CardFragment.this.getContext(), R.raw.se_cardstackshuffle).start();
                             //cardShuffleSound.start();
 
                             if (DEV_injectPedidoMockup) {

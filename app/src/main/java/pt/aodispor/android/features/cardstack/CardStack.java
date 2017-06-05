@@ -351,13 +351,13 @@ public class CardStack {
         //TODO WORKING NOW
         RelativeLayout card = addMessageCard(cardIndex, fragment.getString(R.string.no_conection_title), fragment.getString(R.string.no_conection_msg), block_backwards_iteration);
         //LinearLayout loadingLL = (LinearLayout) card.findViewById(R.id.loadingMessage);
-        Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
+       /* Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
         retryButton.setText(R.string.retry);
 
         //TODO REMOVED BUTTON... will only be added when completed
         retryButton.setVisibility(View.VISIBLE);
 
-        retryButton.setOnClickListener(listener);
+        retryButton.setOnClickListener(listener);*/
 
         //return loadingLL;
     }

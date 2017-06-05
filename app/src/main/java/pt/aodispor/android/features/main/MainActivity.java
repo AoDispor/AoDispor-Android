@@ -340,7 +340,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
 
         } else if (id == R.id.nav_login) {
-            CardStack.stopCardStackActivities();//TODO not sure this s best solution ... =/
+            //CardStack.stopCardStackActivities();//TODO not sure this s best solution ... =/
             Intent showSplitActivityActivity = new Intent(MainActivity.this, SplitActivity.class);
             showSplitActivityActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(showSplitActivityActivity);

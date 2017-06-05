@@ -1,6 +1,5 @@
 package pt.aodispor.android.features.cardstack;
 
-import android.os.Handler;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -58,13 +57,11 @@ public class CardStack {
         }
     }
 
-    final static int delayBetweenLayoutUpdates = 1000;
-
     protected Fragment fragment;
     protected LayoutInflater inflater = null;
     protected RelativeLayout rootView;
 
-    public void setBasicVariables(Fragment fragment, LayoutInflater inflater, RelativeLayout rootView) {
+    void setBasicVariables(Fragment fragment, LayoutInflater inflater, RelativeLayout rootView) {
         if (this.fragment == null) this.fragment = fragment;
         if (this.inflater == null) this.inflater = inflater;
         if (this.rootView == null) this.rootView = rootView;
@@ -75,30 +72,30 @@ public class CardStack {
     @VisibleForTesting
     protected CardMetaData[] cards_data = null;
 
-    final public static int TOP = 0;
-    final public static int BOTTOM = 2;
+    final static int TOP = 0;
+    final static int BOTTOM = 2;
 
-    public boolean areCardViewsInitialized() {
+    boolean areCardViewsInitialized() {
         return cards != null;
     }
 
-    public RelativeLayout getCardAt(int index) {
+    RelativeLayout getCardAt(int index) {
         if (cards == null) return null;
         return cards[index];
     }
 
-    public BasicCardFields getCardInfoAt(int index) {
+    BasicCardFields getCardInfoAt(int index) {
         return cards_data[index].basicCardFields;
     }
 
-    public CardMetaData getCardMetaDataAt(int index) {
+    private CardMetaData getCardMetaDataAt(int index) {
         return cards_data[index];
     }
 
     public CardStack() {
     }
 
-    public CardStack(CardStack cardStack) {
+    CardStack(CardStack cardStack) {
         fragment = cardStack.fragment;
         inflater = cardStack.inflater;
         rootView = cardStack.rootView;
@@ -113,46 +110,9 @@ public class CardStack {
     }
 
 
-    static private Handler handler;
-    static private CardStack active;//TODO probably a bad solution but should work 4 now
-    static Boolean running_stuff;
-
-    //TODO not sure this s best solution ... =/
-    public static void stopCardStackActivities() {
-        active = null;
-        try {
-            while (running_stuff) {
-                running_stuff.wait();
-
-            }
-        } catch (Exception e) {
-        }
-    }
-
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            synchronized (running_stuff) {
-                if (active == null) {
-                    running_stuff.notify();
-                    running_stuff = false;
-                    return;
-                }
-            }
-            active.updateCards();
-            handler.postDelayed(this, delayBetweenLayoutUpdates);
-            //notify();
-        }
-    };
-
-    public void initNewStack() {
+    void initNewStack() {
         cards = new RelativeLayout[3];
         cards_data = new CardMetaData[3];
-        //prepare card update thread
-        active = this;
-        running_stuff = Boolean.TRUE;
-        if (handler == null) handler = new Handler();
-        handler.postDelayed(runnable, delayBetweenLayoutUpdates);
     }
 
 
@@ -164,7 +124,7 @@ public class CardStack {
      *
      * @param position the position in the stack of a card.
      */
-    public void setCardMargin(int position) {
+    private void setCardMargin(int position) {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[position].getLayoutParams());
         int card_margin_left = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_left);
         int card_margin_top = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_top);
@@ -185,7 +145,7 @@ public class CardStack {
                 .setInterpolator(new DecelerateInterpolator());
     }
 
-    public void updateAllCardsMargins() {
+    void updateAllCardsMargins() {
         for (int i = 0; i < 3; ++i)
             if (cards[i] != null) setCardMargin(i);
     }
@@ -209,7 +169,7 @@ public class CardStack {
             if (cards[i] != null)
                 rootView.removeView(cards[i]);
     }*/
-    public void removeAllCardViews() {
+    void removeAllCardViews() {
         for (int i = cards.length - 1; i >= 0; --i)
             if (cards[i] != null)
                 rootView.removeView(cards[i]);
@@ -227,7 +187,7 @@ public class CardStack {
      * @param cardData
      * @return
      */
-    public void addCard(int stackIndex, BasicCardFields cardData) {
+    void addCard(int stackIndex, BasicCardFields cardData) {
         if (stackIndex < 0 || stackIndex > 2)
             return;
         if (cardData == null)
@@ -248,16 +208,16 @@ public class CardStack {
         }
     }
 
-    public void clearCard(int card_index) {
+    void clearCard(int card_index) {
         cards[card_index] = null;
         cards_data[card_index] = null;
     }
 
-    public void clearCards(int... card_indexes) {
+    void clearCards(int... card_indexes) {
         for (int i : card_indexes) clearCard(i);
     }
 
-    public void swapCardsOnStack(int source, int destination) {
+    void swapCardsOnStack(int source, int destination) {
         if (source < 0 || source > 2)
             return;
         if (destination < 0 || destination > 2)
@@ -267,13 +227,11 @@ public class CardStack {
     }
 
     private RelativeLayout professionalCard(Professional professional) {
-        RelativeLayout card = createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url);
-        return card;
+        return createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url);
     }
 
     private RelativeLayout requestCard(UserRequest request) {
-        RelativeLayout card = createRequestCard(request.location, request.description, request.title, request.rate);
-        return card;
+        return createRequestCard(request.location, request.description, request.title, request.rate);
     }
 
     protected RelativeLayout createProfessionalCard(//String fullname_text,
@@ -324,7 +282,7 @@ public class CardStack {
         return card;
     }
 
-    protected RelativeLayout createRequestCard(//String fullname_text,
+    private RelativeLayout createRequestCard(//String fullname_text,
                                                //String profession_text,
                                                String location_text,
                                                String description_text,
@@ -335,7 +293,7 @@ public class CardStack {
 
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.request_card, rootView, false);
 
-        //expiration date is set on updateCards() method
+        //expiration date is set on updateCardViews() method
 
         TextView job = (TextView) card.findViewById(R.id.job);
         job.setText(Html.fromHtml(job_text));
@@ -356,11 +314,11 @@ public class CardStack {
         return card;
     }
 
-    public RelativeLayout addMessageCard(int cardIndex, String title, String message) {
+    RelativeLayout addMessageCard(int cardIndex, String title, String message) {
         return addMessageCard(cardIndex, title, message, false);
     }
 
-    public RelativeLayout addMessageCard(int cardIndex, String title, String message, boolean block_backward_iteration) {
+    private RelativeLayout addMessageCard(int cardIndex, String title, String message, boolean block_backward_iteration) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
         ((TextView) card.findViewById(R.id.title)).setText(Html.fromHtml(title));
         ((TextView) card.findViewById(R.id.message)).setText(Html.fromHtml(message));
@@ -373,14 +331,14 @@ public class CardStack {
     }
 
 
-    public void addNoConnectionCard(
+    void addNoConnectionCard(
             int cardIndex,
             //final CardFragment.RequestType retryType,
             View.OnClickListener listener) {
         addNoConnectionCard(cardIndex, false, listener);
     }
 
-    public void addNoConnectionCard(
+    void addNoConnectionCard(
             int cardIndex,
             boolean block_backwards_iteration,
             //final CardFragment.RequestType retryType,
@@ -406,7 +364,7 @@ public class CardStack {
 
     //endregion
 
-    public void replaceCardAt(BasicCardFields professional, int index) {
+    private void replaceCardAt(BasicCardFields professional, int index) {
         if (professional == null) {
             throw new RuntimeException("Null Professional");
         }
@@ -418,7 +376,7 @@ public class CardStack {
                         requestCard((UserRequest) cards_data[index].basicCardFields);
     }
 
-    public void replaceTopCard(BasicCardFields card) {
+    void replaceTopCard(BasicCardFields card) {
         replaceCardAt(card, CardStack.TOP);
         updateAllCardsMargins();
     }
@@ -435,57 +393,63 @@ public class CardStack {
      * user cards = Professional Cards & User Requests Cards
      * non user cards = message cards such as: No Connection ; No Results ; etc...
      */
-    public boolean isUserCard(int index) {
+    private boolean isUserCard(int index) {
         return cards[index] != null && cards_data[index] != null && cards_data[index].basicCardFields != null;
     }
 
-    public boolean isRequestCard(int index) {
+    private boolean isRequestCard(int index) {
         return isUserCard(index) && cards_data[index].basicCardFields.getClass() == UserRequest.class;
     }
 
-    public boolean canIterateBackwards() {
+    boolean canIterateBackwards() {
         return !cards_data[0].blocks_backward_iteration;
     }
 
+    /**
+     * @return true if there was something to update
+     */
+    boolean updateCardViews() {
 
-    public void updateCards() {
-        try {
-            //TODO NOT YET TESTED
-            //Log.d("updateCards", "updating");
-            //if (true) return;
+        //TODO NOT YET TESTED
+        //Log.d("updateCardViews", "updating");
+        //if (true) return;
 
-            //TODO maybe could also try to fetc image again in case its missing ???
-            //TODO separate server date related stuff from this and from HttpRequestTask and place it on some oter class
+        //TODO maybe could also try to fetc image again in case its missing ???
+        //TODO separate server date related stuff from this and from HttpRequestTask and place it on some oter class
 
-            if (cards == null || cards_data == null) return;
-            //update requests time
-            //int timeNow = TimeZone.getTimeZone("UTC").getOffset(System.currentTimeMillis());
-            long timenow = new Date().getTime();
-            for (int i = 0; i < 2; ++i) {
-                if (isRequestCard(i)) {
-                    Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
-                    if (carddate == null) continue;
-                    long cardTime = carddate.getTime(); //TODO get card date
-                    Period p = new Period(timenow, cardTime, PeriodType.standard());
-                    //Days are not supported =( it seems...
-                    //must do calculations by "hand"
-                    long difference = cardTime - timenow;
-                    long days = difference / (24 * 60 * 60 * 1000);
-                    String daysString = "";
-                    if (days > 0) daysString = days + " ";
-                    daysString += fragment.getString(days == 1 ? R.string.day : R.string.days) + " ";
-                    ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
-                            difference < 0 ? fragment.getString(R.string.request_expired_card_note)
-                                    :
-                                    (daysString
-                                            + p.getHours()
-                                            + ":" + p.getMinutes()
-                                            + ":" + p.getSeconds() + " "
-                                            + fragment.getString(R.string.left_to_expire)
-                                    )
-                    );
-                } else break;
-            }
-        }catch (Exception e){e.printStackTrace();} //TODO maybe this is more of a workaround than a solution!
+        boolean ret = false;
+
+        if (cards == null || cards_data == null) return false;
+
+        //update requests time
+        //int timeNow = TimeZone.getTimeZone("UTC").getOffset(System.currentTimeMillis());
+        long timenow = new Date().getTime();
+        for (int i = 0; i < 2; ++i) {
+            if (isRequestCard(i)) {
+                ret = true;
+                Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
+                if (carddate == null) continue;
+                long cardTime = carddate.getTime(); //TODO get card date
+                Period p = new Period(timenow, cardTime, PeriodType.standard());
+                //Days are not supported =( it seems...
+                //must do calculations by "hand"
+                long difference = cardTime - timenow;
+                long days = difference / (24 * 60 * 60 * 1000);
+                String daysString = "";
+                if (days > 0) daysString = days + " ";
+                daysString += fragment.getString(days == 1 ? R.string.day : R.string.days) + " ";
+                ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
+                        difference < 0 ? fragment.getString(R.string.request_expired_card_note)
+                                :
+                                (daysString
+                                        + p.getHours()
+                                        + ":" + p.getMinutes()
+                                        + ":" + p.getSeconds() + " "
+                                        + fragment.getString(R.string.left_to_expire)
+                                )
+                );
+            } else break;
+        }
+        return ret;
     }
 }

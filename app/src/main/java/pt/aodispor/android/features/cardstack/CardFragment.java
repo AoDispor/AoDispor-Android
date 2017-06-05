@@ -70,38 +70,6 @@ public class CardFragment extends Fragment {
 
     private static final String queryProfilesURL = "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}";
 
-    /**
-     * used by preparePage and onHttpRequestSuccessful to know if the request is to get the previous or next page or an enterily new query
-     */
-    @VisibleForTesting
-    @Deprecated
-    protected class RequestType {
-        public int val = 0;
-
-        public final static int prevSet = 0;
-        public final static int nextSet = 1;
-        public final static int newSet = 2;
-        public final static int retry_prevSet = 4 + 0;
-        public final static int retry_nextSet = 4 + 1;
-        public final static int retry_newSet = 4 + 2;
-
-        public boolean isRetry() {
-            return (val & 4) == 4;
-        }
-
-        public boolean isPrev() {
-            return (val & 3) == 0;
-        }
-
-        public boolean isNext() {
-            return (val & 3) == 1;
-        }
-
-        public boolean isNew() {
-            return (val & 3) == 2;
-        }
-    }
-
     //RequestType retryRequestType;
 
     /**
@@ -114,8 +82,6 @@ public class CardFragment extends Fragment {
 
     QueryResult queryResult;
 
-    @VisibleForTesting
-    protected final RequestType requestType = new RequestType();
     /**
      * contains the previous page data
      */
@@ -135,7 +101,7 @@ public class CardFragment extends Fragment {
     @VisibleForTesting
     protected int currentSetCardIndex;
     @VisibleForTesting
-    protected CardStack cardStack;
+    protected CardStackContainer cardStackContainer;
     /**
      * does not allow discard or recover methods to be called before the previous is finished
      */
@@ -154,6 +120,9 @@ public class CardFragment extends Fragment {
     static private LoadingWidget loadingWidget;
     private LinearLayout loadingLL;
 
+
+    ViewsRefresher viewsRefresher;
+
     public LinearLayout getLoadingLayout() {
         //if (loadingLL == null)
         loadingLL = (LinearLayout) rootView.findViewById(R.id.loadingWidgetLayout);
@@ -169,8 +138,9 @@ public class CardFragment extends Fragment {
 
     public void BLOCK_INTERACTIONS() {
         if (NUMB) throw new RuntimeException("NUMB=TRUE NOT EXPECTED");
-        if (cardStack != null && cardStack.cards!=null && cardStack.cards[cardStack.TOP] != null)
-            cardStack.cards[cardStack.TOP].dispatchTouchEvent(MotionEvent.obtain(
+        CardStack cardStack = cardStackContainer.cardStack;
+        if (cardStack != null && cardStack.cards != null && cardStack.cards[CardStack.TOP] != null)
+            cardStack.cards[CardStack.TOP].dispatchTouchEvent(MotionEvent.obtain(
                     0, 0,
                     MotionEvent.ACTION_UP,
                     0, 0, 0
@@ -185,18 +155,6 @@ public class CardFragment extends Fragment {
         NUMB = false;
     }
 
-    /*private static GeoLocation geoLocation = null;
-
-    public void updateGeoLocation() {
-        updateGeoLocation(null);
-    }
-
-    public void updateGeoLocation(Context context) {
-        if (geoLocation == null) geoLocation = new GeoLocation();
-
-        if (context != null) geoLocation.updateLatLon(context);
-        else geoLocation.updateLatLon(getContext());
-    }*/
 
     private String searchQuery = "";
 
@@ -206,7 +164,9 @@ public class CardFragment extends Fragment {
     public CardFragment() {
         blockAccess = false;
         loadingWidget = new LoadingWidget();
-        cardStack = new CardStack();
+        cardStackContainer = new CardStackContainer();
+        viewsRefresher = new ViewsRefresher(cardStackContainer);
+        //cardStack = new CardStack();
     }
 
     /**
@@ -216,8 +176,7 @@ public class CardFragment extends Fragment {
      * @return the CardFragment object created.
      */
     public static CardFragment newInstance() {
-        CardFragment fragment = new CardFragment();
-        return fragment;
+        return new CardFragment();
     }
 
     /**
@@ -231,6 +190,7 @@ public class CardFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater i, ViewGroup c, Bundle savedInstanceState) {
+        final CardStack cardStack = cardStackContainer.cardStack;
         currentSetCardIndex = 0;
         inflater = i;
         container = c;
@@ -303,6 +263,7 @@ public class CardFragment extends Fragment {
         return rootView;
     }
 
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
             switch (resultCode) {
@@ -338,6 +299,7 @@ public class CardFragment extends Fragment {
      * to be called when doing a new search or retrying to load the same search
      */
     public void prepareNewStack(boolean retry) {
+        CardStack cardStack = cardStackContainer.cardStack;
         currentSetCardIndex = 0;
         nextSet = null;
         previousSet = null;
@@ -351,6 +313,7 @@ public class CardFragment extends Fragment {
      * to be called after receiving an answer (or not) from API
      */
     public void setupNewStack(QueryResult queryResult) {
+        CardStack cardStack = cardStackContainer.cardStack;
         this.queryResult = queryResult;
 
         if (cardStack.areCardViewsInitialized()) cardStack.removeAllCardViews();
@@ -410,6 +373,7 @@ public class CardFragment extends Fragment {
         }
         cardStack.updateAllCardsMargins();
         rootView.addView(cardStack.getCardAt(0));
+        viewsRefresher.startTask();
     }
 
 
@@ -445,7 +409,8 @@ public class CardFragment extends Fragment {
          */
         ZERO {
             public void updateCardStack(final CardFragment cf) {
-                cf.rootView.addView(cf.cardStack.getCardAt(CardStack.TOP));
+                CardStack cardStack = cf.cardStackContainer.cardStack;
+                cf.rootView.addView(cardStack.getCardAt(CardStack.TOP));
                 //blockAccess = false; -> done in SwipeListener
             }
 
@@ -455,15 +420,16 @@ public class CardFragment extends Fragment {
         , ONE {
             public void updateCardStack(final CardFragment cf) {
                 //cf.cardStack.setCardMargin(1);
-                cf.rootView.addView(cf.cardStack.getCardAt(1));
-                cf.rootView.addView(cf.cardStack.getCardAt(CardStack.TOP));
+                CardStack cardStack = cf.cardStackContainer.cardStack;
+                cf.rootView.addView(cardStack.getCardAt(1));
+                cf.rootView.addView(cardStack.getCardAt(CardStack.TOP));
 
                 if (cf.activity instanceof MainActivity) {
-                    SwipeListener listener = new SwipeListener(cf.cardStack.getCardAt(CardStack.TOP), ((MainActivity) cf.activity).getViewPager(), cf);
-                    cf.cardStack.getCardAt(CardStack.TOP).setOnTouchListener(listener);
+                    SwipeListener listener = new SwipeListener(cardStack.getCardAt(CardStack.TOP), ((MainActivity) cf.activity).getViewPager(), cf);
+                    cardStack.getCardAt(CardStack.TOP).setOnTouchListener(listener);
                 }
 
-                cf.cardStack.clearCard(2);
+                cardStack.clearCard(2);
                 //blockAccess = false; -> done in SwipeListener
             }
         },
@@ -472,7 +438,8 @@ public class CardFragment extends Fragment {
          */
         INSET {
             public void updateCardStack(final CardFragment cf) {
-                cf.cardStack.addCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+                CardStack cardStack = cf.cardStackContainer.cardStack;
+                cardStack.addCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -481,7 +448,8 @@ public class CardFragment extends Fragment {
          */
         LAST {
             public void updateCardStack(final CardFragment cf) {
-                cf.cardStack.addMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));
+                CardStack cardStack = cf.cardStackContainer.cardStack;
+                cardStack.addMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -490,13 +458,14 @@ public class CardFragment extends Fragment {
          */
         LOADED {
             public void updateCardStack(final CardFragment cf) {
+                CardStack cardStack = cf.cardStackContainer.cardStack;
                 //negative when there are still cards from the previous set on the pile
                 cf.currentSetCardIndex = cf.currentSetCardIndex - cf.currentSet.data.size();
                 Log.d("updateCardStack", "currentSetCardIndex: " + Integer.toString(cf.currentSetCardIndex));
                 cf.previousSet = cf.currentSet;
                 cf.currentSet = cf.nextSet;
                 cf.nextSet = null;
-                cf.cardStack.addCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
+                cardStack.addCard(2, cf.currentSet.data.get(cf.currentSetCardIndex + 2));
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },
@@ -505,7 +474,8 @@ public class CardFragment extends Fragment {
          */
         MISSING {
             public void updateCardStack(final CardFragment cf) {
-                cf.cardStack.addNoConnectionCard(2, new View.OnClickListener() {
+                CardStack cardStack = cf.cardStackContainer.cardStack;
+                cardStack.addNoConnectionCard(2, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         //cf.requestType = RequestType.retry_nextSet;
@@ -531,6 +501,7 @@ public class CardFragment extends Fragment {
 
     public void CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate() {
         //update cards display
+        CardStack cardStack = cardStackContainer.cardStack;
         RelativeLayout topCard = cardStack.getCardAt(CardStack.TOP);
         rootView.addView(cardStack.getCardAt(2));
         rootView.addView(cardStack.getCardAt(1));
@@ -553,7 +524,7 @@ public class CardFragment extends Fragment {
     }
 
     public CardStackStateOnDiscard getCardStackStateOnDiscard() {
-
+        CardStack cardStack = cardStackContainer.cardStack;
         //no more cards below top card
         if (cardStack.getCardAt(1) == null) return CardStackStateOnDiscard.ZERO;
 
@@ -571,7 +542,7 @@ public class CardFragment extends Fragment {
 
         if (currentSet.meta.pagination.getLinks() != null && currentSet.meta.pagination.getLinks().getNext() != null) {
             if (nextSet != null) {
-                return CardStackStateOnDiscard.INSET.LOADED; //already have the next page information
+                return CardStackStateOnDiscard.LOADED; //already have the next page information
             } else {
                 return CardStackStateOnDiscard.MISSING; //content failed to get next page/(card set) on time
             }
@@ -591,6 +562,7 @@ public class CardFragment extends Fragment {
      */
     public void discardTopCard() {
         //blockAccess = true; -> done in SwipeListener
+        CardStack cardStack = cardStackContainer.cardStack;
         currentSetCardIndex++;
         cardStack.removeAllCardViews();
         cardStack.swapCardsOnStack(1, 0);
@@ -600,6 +572,7 @@ public class CardFragment extends Fragment {
         Log.d("discardTopCard", "STATE = " + state.toString());
         state.updateCardStack(this);
         cardStack.updateAllCardsMargins();
+        viewsRefresher.startTask();
         //blockAccess = false; -> done in SwipeListener
     }
 
@@ -609,7 +582,7 @@ public class CardFragment extends Fragment {
      */
     public void restorePreviousCard() {
         if (blockAccess || queryResult != QueryResult.successful ||
-                !cardStack.canIterateBackwards()
+                !cardStackContainer.cardStack.canIterateBackwards()
                 ) {
             return; //don't make anything while animation plays
         }
@@ -620,13 +593,13 @@ public class CardFragment extends Fragment {
 
         blockAccess = true;
 
-        CardStack originalCardStack = new CardStack(cardStack);
+        CardStack originalCardStack = new CardStack(cardStackContainer.cardStack);
 
         int originalIndex = currentSetCardIndex;
-        cardStack.swapCardsOnStack(1, 2);
-        cardStack.swapCardsOnStack(0, 1);
+        cardStackContainer.cardStack.swapCardsOnStack(1, 2);
+        cardStackContainer.cardStack.swapCardsOnStack(0, 1);
 
-        cardStack.getCardAt(CardStack.TOP).setOnTouchListener(null);
+        cardStackContainer.cardStack.getCardAt(CardStack.TOP).setOnTouchListener(null);
 
         currentSetCardIndex--;
         if (currentSetCardIndex >= 0) { //can get previous card from currentSet
@@ -635,7 +608,7 @@ public class CardFragment extends Fragment {
                 blockAccess = false;
                 return;
             }
-            cardStack.addCard(0, currentSet.data.get(currentSetCardIndex));
+            cardStackContainer.cardStack.addCard(0, currentSet.data.get(currentSetCardIndex));
             if (currentSetCardIndex < AppDefinitions.MIN_NUMBER_OFCARDS_2LOAD) {//load in background if possible
                 nextSet = null;
                 System.gc();//try to keep only 2 sets at maximum
@@ -649,7 +622,7 @@ public class CardFragment extends Fragment {
             currentSet = previousSet;
             previousSet = null;
             System.gc();// no need to keep 3 sets stored
-            cardStack.addCard(0, currentSet.data.get(currentSetCardIndex));
+            cardStackContainer.cardStack.addCard(0, currentSet.data.get(currentSetCardIndex));
         } else {
             if (currentSetCardIndex < 0) {//needs to get card from previous set immediately.
                 nextSet = null;
@@ -661,10 +634,10 @@ public class CardFragment extends Fragment {
                         case emptySet:
                             break;
                         case none: //when reached pile start do not change pile state
-                            cardStack = originalCardStack;
+                            cardStackContainer.cardStack = originalCardStack;
                             currentSetCardIndex = originalIndex;
                             if (activity instanceof MainActivity) {
-                                RelativeLayout topCard = cardStack.getCardAt(cardStack.TOP);
+                                RelativeLayout topCard = cardStackContainer.cardStack.getCardAt(CardStack.TOP);
                                 SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
                                 topCard.setOnTouchListener(listener);
                             }
@@ -672,7 +645,7 @@ public class CardFragment extends Fragment {
                             blockAccess = false;
                             return;
                         case error: //did not receive answer
-                            cardStack.addNoConnectionCard(0, true,
+                            cardStackContainer.cardStack.addNoConnectionCard(0, true,
                                     new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
@@ -688,16 +661,16 @@ public class CardFragment extends Fragment {
                     }
                 }
                 if (previousSet != null) {//if set was received or was already loaded
-                    cardStack.addCard(0, previousSet.data.get(previousSet.data.size() + currentSetCardIndex));
+                    cardStackContainer.cardStack.addCard(0, previousSet.data.get(previousSet.data.size() + currentSetCardIndex));
                 }
             }
         }
         originalCardStack.removeAllCardViews();
-        RelativeLayout topCard = cardStack.getCardAt(CardStack.TOP);
-        if (cardStack.getCardAt(2) != null) {
-            rootView.addView(cardStack.getCardAt(2));
+        RelativeLayout topCard = cardStackContainer.cardStack.getCardAt(CardStack.TOP);
+        if (cardStackContainer.cardStack.getCardAt(2) != null) {
+            rootView.addView(cardStackContainer.cardStack.getCardAt(2));
         }
-        rootView.addView(cardStack.getCardAt(1));
+        rootView.addView(cardStackContainer.cardStack.getCardAt(1));
         rootView.addView(topCard);
 
         // if (activity instanceof MainActivity
@@ -707,7 +680,8 @@ public class CardFragment extends Fragment {
         topCard.setOnTouchListener(listener);
         //}
 
-        cardStack.updateAllCardsMargins();
+        cardStackContainer.cardStack.updateAllCardsMargins();
+        viewsRefresher.startTask();
 
         topCard.setX(800 * -1);
         topCard.setY(700 * -1);
@@ -738,21 +712,15 @@ public class CardFragment extends Fragment {
 
     //region api RELATED
 
-    /**
-     * send a new search query
-     * <br>will wait for task to end or timeout/error (blocking)
-     *
-     * @return true if received query result on time
-     */
     public void prepareNewSearchQuery(boolean retry) {
 
         final GeoLocation geoLocation = GeoLocation.getInstance();
 
-        requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
+        //requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
 
         HttpRequestTask request;
 
-        if (searchQuery == null || searchQuery == "") {
+        if (searchQuery == null || searchQuery.equals("")) {
             request = new HttpRequestTask(SearchQueryResult.class, null,
                     "https://api.aodispor.pt/profiles/?query=&lat={lat}&lon={lon}", geoLocation.getLatitude(), geoLocation.getLongitude());
         } else request = new HttpRequestTask(SearchQueryResult.class, null,
@@ -785,9 +753,14 @@ public class CardFragment extends Fragment {
      * @param retry indicates that the page requested should have already been loaded, this will inform the HttpRequest implementation that there is only one card visible (others should be added)
      */
     public void prepareNextPage(boolean retry) {
-        if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null) ;
-        requestType.val = retry ? RequestType.retry_nextSet : RequestType.nextSet;
-        Links links = currentSet.meta.pagination.getLinks();
+        //if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null) ;
+        //requestType.val = retry ? RequestType.retry_nextSet : RequestType.nextSet;
+        Links links = null;
+        try {
+            links = currentSet.meta.pagination.getLinks();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (links == null)
             return;
         String link = links.getNext();
@@ -809,7 +782,7 @@ public class CardFragment extends Fragment {
     public void preparePreviousPage() {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null)
             return;
-        requestType.val = RequestType.prevSet;
+        //requestType.val = RequestType.prevSet;
         Links links = currentSet.meta.pagination.getLinks();
         if (links == null)
             return;
@@ -829,7 +802,7 @@ public class CardFragment extends Fragment {
     public QueryResult preparePreviousPageI() {
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null)
             return QueryResult.none;
-        requestType.val = RequestType.prevSet;
+        //requestType.val = RequestType.prevSet;
         Links links = currentSet.meta.pagination.getLinks();
         if (links == null)
             return QueryResult.none;
@@ -887,7 +860,7 @@ public class CardFragment extends Fragment {
                     previousSet = currentSet;
                     currentSet = (SearchQueryResult) answer;
                     nextSet = null;
-                    cardStack.replaceTopCard(currentSet.data.get(0));
+                    cardStackContainer.cardStack.replaceTopCard(currentSet.data.get(0));
                 }
             };
 
@@ -953,12 +926,44 @@ public class CardFragment extends Fragment {
     //region CARD ACTIONS
 
     void phoneCallTopCard() {
-        BasicCardFields p = cardStack.getCardInfoAt(cardStack.TOP);
+        BasicCardFields p = cardStackContainer.cardStack.getCardInfoAt(CardStack.TOP);
         Answers.getInstance().logCustom(new CustomEvent("Telefonema").putCustomAttribute("string_id", p.string_id));
         startActivity(new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", p.phone, null)));
     }
 
 //endregion
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        viewsRefresher.startTask();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewsRefresher.startTask();
+    }
+
+    @Override
+    public void onPause() {
+        viewsRefresher.stopTask();
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        viewsRefresher.stopTask();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        viewsRefresher.stopTask();
+        super.onDestroy();
+    }
+
 
 //region PERMISSIONS
 

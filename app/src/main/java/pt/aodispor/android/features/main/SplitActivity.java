@@ -11,7 +11,9 @@ import com.crashlytics.android.answers.Answers;
 
 import io.fabric.sdk.android.Fabric;
 import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.features.main.LoginDataPreferences;
+import pt.aodispor.android.R;
+import pt.aodispor.android.api.aodispor.BasicRequestInfo;
+import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.features.login.OnBoardingActivity;
 
 public class SplitActivity extends Activity {
@@ -19,6 +21,8 @@ public class SplitActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        BasicRequestInfo.setToken(getResources().getString(R.string.ao_dispor_api_key));
 
         Fabric.with(this, new Answers(), new Crashlytics());
 
@@ -31,8 +35,9 @@ public class SplitActivity extends Activity {
         if (preferences.get().hasValidPair()) {
             // Guardar username e password no AppDefinitions para a API poder usar
             // FIXME devia ser qualquer coisa mais segura...
-            AppDefinitions.phoneNumber = preferences.get().telephone();
-            AppDefinitions.userPassword = preferences.get().password();
+            UserData.getInstance().setUserLoginAuth(
+                    preferences.get().telephone()
+                    , preferences.get().password());
             AppDefinitions.smsLoginDone = true;
             activityClass = MainActivity.class;
         } else {

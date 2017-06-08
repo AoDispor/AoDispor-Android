@@ -12,7 +12,7 @@ import pt.aodispor.android.AppDefinitions;
  * This allows control of the ViewPager swipe functionality.
  */
 public class MyViewPager extends ViewPager {
-    private boolean enabled;
+//    private boolean enabled;
 
     /**
      * The MyViewPager constructor. This is used by the application when creating a myViewPager.
@@ -21,7 +21,7 @@ public class MyViewPager extends ViewPager {
      */
     public MyViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.enabled = true;
+        //this.enabled = true;
     }
 
     /**
@@ -31,9 +31,9 @@ public class MyViewPager extends ViewPager {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (AppDefinitions.smsLoginDone && this.enabled) {
+        /*if (AppDefinitions.smsLoginDone && this.enabled) {
             return super.onTouchEvent(event);
-        }
+        }*/
         return false;
     }
 
@@ -44,9 +44,9 @@ public class MyViewPager extends ViewPager {
      */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (AppDefinitions.smsLoginDone && this.enabled) {
+     /*   if (AppDefinitions.smsLoginDone && this.enabled) {
             return super.onInterceptTouchEvent(event);
-        }
+        }*/
         return false;
     }
 
@@ -54,7 +54,7 @@ public class MyViewPager extends ViewPager {
      * This method sets the enable status flag to true or false.
      * @param enabled the boolean value for the status flag.
      */
-    public void setSwipeEnabled(boolean enabled) {
+  /*  public void setSwipeEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
+    }*/
 }

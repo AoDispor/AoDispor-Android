@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @JsonSubTypes.Type(name = "professional", value = Professional.class)
 })*/
 //@JsonDeserialize(using = CardDeserializer.class)
-public abstract class BasicCardFields extends ApiJSON {
+public abstract class BasicCardFields extends AODISPOR_JSON_WEBAPI {
     @JsonProperty("full_name") public String full_name;
     @JsonProperty("title") public String title;
     @JsonProperty("description") public String description;

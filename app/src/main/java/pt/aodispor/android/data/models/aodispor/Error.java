@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Error extends ApiJSON {
+public class Error extends AODISPOR_JSON_WEBAPI {
     @JsonProperty("message")
     public String message;
     @JsonProperty("status_code")

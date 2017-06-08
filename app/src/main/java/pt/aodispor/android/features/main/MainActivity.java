@@ -3,7 +3,6 @@ package pt.aodispor.android.features.main;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 
@@ -31,11 +30,10 @@ import java.util.Arrays;
 
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
-import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.features.cardstack.CardFragment;
-import pt.aodispor.android.features.cardstack.CardStack;
 import pt.aodispor.android.features.cardstack.GeoLocation;
 import pt.aodispor.android.features.login.Advanceable;
+import pt.aodispor.android.utils.TypefaceManager;
 
 /**
  * This class serves as the main activity for the application which extends AppCompatActivity.
@@ -61,20 +59,16 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO arranjar uma maneira de centralizar esta cena do token
-        HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
-
         if (savedInstanceState == null) {
             DefaultLayoutPromptView promptView = (DefaultLayoutPromptView) findViewById(R.id.prompt_view);
             Amplify.getSharedInstance().promptIfReady(promptView);
         }
 
-        installFonts();
-
         startPagerAndMainContent();
 
         TextView titleView = (TextView) findViewById(R.id.app_title);
-        titleView.setTypeface(AppDefinitions.dancingScriptRegular);
+        //titleView.setTypeface(AppDefinitions.dancingScriptRegular);
+        TypefaceManager.singleton.setTypeface(titleView, TypefaceManager.singleton.DANCING_SCRIPT);
         titleView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,23 +139,6 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
     }
 
-    /**
-     * Returns this activity's custom ViewPager.
-     *
-     * @return the custom ViewPager.
-     */
-    public MyViewPager getViewPager() {
-        return mViewPager;
-    }
-
-    public void installFonts() {
-        AppDefinitions.dancingScriptRegular = Typeface.createFromAsset(getAssets(), "fonts/dancing-script-ot/DancingScript-Regular.otf");
-        AppDefinitions.yanoneKaffeesatzBold = Typeface.createFromAsset(getAssets(), "fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Bold.otf");
-        AppDefinitions.yanoneKaffeesatzLight = Typeface.createFromAsset(getAssets(), "fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Light.otf");
-        AppDefinitions.yanoneKaffeesatzRegular = Typeface.createFromAsset(getAssets(), "fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Regular.otf");
-        AppDefinitions.yanoneKaffeesatzThin = Typeface.createFromAsset(getAssets(), "fonts/Yanone-Kaffeesatz/YanoneKaffeesatz-Thin.otf");
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         handleIntent(intent);
@@ -188,7 +165,7 @@ public class MainActivity extends AppCompatActivity
 
         TabPagerAdapter mSectionsPagerAdapter;
         mSectionsPagerAdapter = new TabPagerAdapter(getSupportFragmentManager()
-        //, AppDefinitions.smsLoginDone? 4 : 2
+                //, AppDefinitions.smsLoginDone? 4 : 2
         );
 
         //android.support.v4.view.ViewPager cannot be cast to pt.aodispor.android.MyViewPager
@@ -248,13 +225,6 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-
-        if (!AppDefinitions.smsLoginDone) {
-            //profileView.setVisibility(View.INVISIBLE);
-            //stackView.setVisibility(View.INVISIBLE);
-            mViewPager.setSwipeEnabled(false); // impedir o swipe se o utilizador não estiver loggado
-            mViewPager.setEnabled(false);
-        }
     }
 
 
@@ -290,12 +260,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        /**
-         * Close the search view if its already open.
-         *
-         if(!searchView.isIconified()) {
-         closeSearchView();
-         }*/
         searchView.setIconified(true);
         if (mViewPager.getCurrentItem() == TabPagerAdapter.cardStackItem) {
             CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();

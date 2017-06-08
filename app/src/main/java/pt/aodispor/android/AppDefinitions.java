@@ -1,6 +1,5 @@
 package pt.aodispor.android;
 
-import android.app.Application;
 import android.graphics.Typeface;
 
 import java.text.SimpleDateFormat;
@@ -16,33 +15,18 @@ public class AppDefinitions {
 
     //region DEBUG/DEVELOPMENT ONLY
 
-    public static final String URL_MY_PROFILE = "https://api.aodispor.pt/profiles/me";
-    public static final String URL_UPLOAD_IMAGE = "https://api.aodispor.pt/users/me/profile/avatar";
-
     /**
      * set true to skip login related dialogs
      * <br>the phone number used is equal to the test phone number
      * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
-    public static final boolean SKIP_LOGIN = false;
+    public static final boolean SKIP_LOGIN = true;
 
     public static final String testPhoneNumber = "+351" + "911793861";
-    public static final String testPassword = "103968";
+    public static final String testPassword = "943813";
 
     //endregion
 
-
-    //region Typefaces
-
-    /**
-     * used in AoDispor logo/title
-     */
-    public static Typeface dancingScriptRegular;
-    public static Typeface yanoneKaffeesatzBold;
-    public static Typeface yanoneKaffeesatzLight;
-    public static Typeface yanoneKaffeesatzRegular;
-    public static Typeface yanoneKaffeesatzThin;
-    //endregion
 
     static final public String TIMEDATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     static final public SimpleDateFormat TIMAEDATE_FORMATER =
@@ -57,10 +41,9 @@ public class AppDefinitions {
             "+447903571480"
     };
 
-    /**
+    /*
      * Number of milliseconds needed for a error to occur in requests
-     */
-    public static final int TIMEOUT = 20000;
+    public static final int TIMEOUT = 20000;*/
 
     public static final int QUERY_MIN_LENGTH = 5;
 
@@ -80,12 +63,12 @@ public class AppDefinitions {
     /**
      * Phone Number used on login
      */
-    public static String phoneNumber = "";
+    //public static String phoneNumber = "";
 
     /**
      * Password used to login. Professional profile editing is blocked without the correct password.
      */
-    public static String userPassword = "";
+    //public static String userPassword = "";
 
     /**
      * used to block certain features when user has not loggedin with the sms code

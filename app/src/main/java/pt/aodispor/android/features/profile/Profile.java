@@ -33,8 +33,10 @@ import java.io.InputStream;
 
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
+import pt.aodispor.android.api.aodispor.RequestBuilder;
+import pt.aodispor.android.utils.TypefaceManager;
 import pt.aodispor.android.utils.Utility;
-import pt.aodispor.android.data.models.aodispor.ApiJSON;
+import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.Professional;
 import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
@@ -44,12 +46,12 @@ import pt.aodispor.android.data.models.aodispor.meta.PaymentType;
 
 import static android.app.Activity.RESULT_OK;
 
-public class Profile extends Fragment implements LocationDialog.LocationDialogListener, NewPriceDialog.PriceDialogListener {
+public class Profile extends Fragment implements LocationDialog.LocationDialogListener, PriceDialog.PriceDialogListener {
     private static final int SELECT_PICTURE = 0;
     private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
     private Profile thisObject;
-    private TextView imageView, nameView, professionView, locationView, priceView, descriptionView, noConnectionView;
+    private TextView imageView, noConnectionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
     private ImageView profileImage, noConnectionImg;
     private View root;
@@ -57,8 +59,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     private int rate = -1;
     private boolean isFinal;
     private CurrencyType currency = null;
-    private PaymentType type =null;
-    private Uri tempUri;
+    private PaymentType type = null;
 
     //static boolean profileLoaded = false;
     static final int WAIT_4RETRY_GET_PROFILE = 5000;
@@ -73,20 +74,16 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     Context context;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(!AppDefinitions.smsLoginDone) return null;//TODO quick fix, might not be the best solution
+        if (!AppDefinitions.smsLoginDone)
+            return null;//TODO quick fix, might not be the best solution
 
         context = this.getContext();
-        HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
+        //should be done in the activity startup HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
         root = inflater.inflate(R.layout.profile, container, false);
 
         // Get Text Views
         imageView = (TextView) root.findViewById(R.id.imageText);
-        nameView = (TextView) root.findViewById(R.id.name);
-        professionView = (TextView) root.findViewById(R.id.profession);
-        priceView = (TextView) root.findViewById(R.id.price);
-        locationView = (TextView) root.findViewById(R.id.location);
-        descriptionView = (TextView) root.findViewById(R.id.description);
         noConnectionView = (TextView) root.findViewById(R.id.profile_not_loaded_text);
 
         // Get Edit Text Views
@@ -115,7 +112,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         priceEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NewPriceDialog dialog = NewPriceDialog.newInstance(rate, isFinal, type, currency);
+                PriceDialog dialog = PriceDialog.newInstance(rate, isFinal, type, currency);
                 dialog.setListener(thisObject);
                 dialog.show(Profile.this.getFragmentManager(), PRICE_DIALOG_TAG);
             }
@@ -167,7 +164,11 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     public void POST_Profile() {
         previous = UserData.getInstance().getProfileState();
         Professional p = UserData.getInstance().getProfileState();
-        if (p == null) Log.e("POST_Profile", "NULL OBJECT!");
+
+        if (p == null) {
+            Log.e("POST_Profile", "NULL OBJECT!");
+            return;
+        }
 
         p.full_name = nameEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
         p.title = professionEdit.getText().toString().trim().replaceAll("\\s{2,}", " ");
@@ -185,21 +186,19 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         if (currency != null) p.currency = currency.getAPICode();
         p.description = descriptionEdit.getText().toString();
 
-        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, AppDefinitions.URL_MY_PROFILE);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-        request.setJSONBody(p);
-        request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildUpdateUserProfileInfosRequest(p);
+        request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
             @Override
-            public void exec(ApiJSON answer) {
+            public void exec(AODISPOR_JSON_WEBAPI answer) {
                 UserData.getInstance().updateProfileState(
                         (Professional) ((SearchQueryResult) answer).data.get(0)
                 )
                 ;
             }
         });
-        request.addOnFailHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+        request.addOnFailHandlers(new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
             @Override
-            public void exec(ApiJSON answer) {
+            public void exec(AODISPOR_JSON_WEBAPI answer) {
                 updateView(previous);
                 Toast.makeText(getContext(), "Não foi possível atualizar dados...", Toast.LENGTH_SHORT).show();
             }
@@ -208,18 +207,16 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     }
 
     void PUT_Image(final Bitmap image) {
-        HttpRequestTask imageRequest = HttpRequestTask.PUT(SearchQueryResult.class, AppDefinitions.URL_UPLOAD_IMAGE);
-        imageRequest.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-        imageRequest.setBitmapBody(Utility.convertBitmapToBinary(image));
-        imageRequest.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> imageRequest = RequestBuilder.buildUpdateUserProfilePhotoRequest(image);
+        imageRequest.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
             @Override
-            public void exec(ApiJSON answer) {
+            public void exec(AODISPOR_JSON_WEBAPI answer) {
                 profileImage.setImageBitmap(image);
             }
         });
-        imageRequest.addOnEndHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+        imageRequest.addOnEndHandlers(new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
             @Override
-            public void exec(ApiJSON answer) {
+            public void exec(AODISPOR_JSON_WEBAPI answer) {
                 ImageLoader.getInstance().clearDiskCache();
             }
         });
@@ -234,7 +231,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
                     try {
                         File tempFile = File.createTempFile("crop", "", context.getCacheDir());
                         tempFile.deleteOnExit();
-                        tempUri = Uri.fromFile(tempFile);
+                        Uri tempUri = Uri.fromFile(tempFile);
                         UCrop.Options options = new UCrop.Options();
                         options.setLogoColor(ContextCompat.getColor(context, R.color.aoDispor2));
                         options.setToolbarColor(ContextCompat.getColor(context, R.color.aoDispor));
@@ -269,13 +266,11 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
      * Makes a GET HTTP request to get user profile information.
      */
     public void getProfileInfo() {
-        HttpRequestTask request = HttpRequestTask.POST(SearchQueryResult.class, AppDefinitions.URL_MY_PROFILE);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildGetUserProfileRequest();
         request.addOnSuccessHandlers(updateLocalUserProfile);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-        Log.d("QWE",AppDefinitions.phoneNumber + "_" + AppDefinitions.userPassword);
-        request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted() {
+        request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
             @Override
-            public void exec(ApiJSON answer) {
+            public void exec(AODISPOR_JSON_WEBAPI answer) {
                 //show stuff
                 Utility.apply2AllChildrenBFS(getView(), new Utility.IViewModifier() {
                     @Override
@@ -291,9 +286,9 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
             }
         });
         request.addOnFailHandlers(
-                new HttpRequestTask.IOnHttpRequestCompleted() {
+                new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                     @Override
-                    public void exec(ApiJSON answer) {
+                    public void exec(AODISPOR_JSON_WEBAPI answer) {
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             @Override
@@ -325,7 +320,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         rate = p;
         isFinal = f;
         type = t;
-        currency = c ;
+        currency = c;
         String priceTag = rate + " " + currency.getSymbol();
         priceTag += "/" + type.convertToStringToDisplay();
 
@@ -381,29 +376,17 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     }
 
     private void setFonts() {
-        // Text Views
-        imageView.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        nameView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        professionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        priceView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        locationView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        descriptionView.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-
-        // Edit Views
-        nameEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        professionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        locationEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        priceEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
-        descriptionEdit.setTypeface(AppDefinitions.yanoneKaffeesatzBold);
+        TypefaceManager.singleton.setTypeface( root.findViewById(R.id.profile_base) , TypefaceManager.singleton.YANONE[1]);
+        TypefaceManager.singleton.setTypeface( imageView, TypefaceManager.singleton.YANONE[0]);
     }
 
     /**
      * updates UserData and Profile View
      */
     private final HttpRequestTask.IOnHttpRequestCompleted updateLocalUserProfile =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON answer) {
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
                     Professional professional = (Professional) ((SearchQueryResult) answer).data.get(0);
                     UserData.getInstance().updateProfileState(professional);
                     updateView(professional);

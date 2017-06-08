@@ -29,7 +29,7 @@ import pt.aodispor.android.data.models.aodispor.meta.PaymentType;
 /**
  * Custom Dialog Fragment for editing price information.
  */
-public class NewPriceDialog extends DialogFragment {
+public class PriceDialog extends DialogFragment {
     private PriceDialogListener listener;
     private int buttonChosen;
     private Button[] buttons;
@@ -40,8 +40,8 @@ public class NewPriceDialog extends DialogFragment {
     //private Spinner currencySpinner;
     private EnumSpinner<CurrencyType> currencySpinner;
 
-    public static NewPriceDialog newInstance(int r, boolean f, PaymentType pt, CurrencyType c) {
-        NewPriceDialog pd = new NewPriceDialog();
+    public static PriceDialog newInstance(int r, boolean f, PaymentType pt, CurrencyType c) {
+        PriceDialog pd = new PriceDialog();
         Bundle args = new Bundle();
         args.putInt("rate", r);
         args.putBoolean("final", f);
@@ -63,7 +63,6 @@ public class NewPriceDialog extends DialogFragment {
         // Set variables
         rate = getArguments().getInt("rate");
         priceType = PaymentType.values()[getArguments().getInt("type")];
-        // TODO currency spinner
 
         // Get Views
         priceView = (EditText) root.findViewById(R.id.price_input);
@@ -131,7 +130,7 @@ public class NewPriceDialog extends DialogFragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         currencySpinner.setAdapter(adapter);
         currencySpinner.setAdapter(spa);*/
-        currencySpinner = new EnumSpinner<CurrencyType>(root.getContext(),
+        currencySpinner = new EnumSpinner<>(root.getContext(),
                 (Spinner) root.findViewById(R.id.currency_spinner),
                 CurrencyType.values());
 
@@ -146,11 +145,11 @@ public class NewPriceDialog extends DialogFragment {
             int newRate = 0;
             try {
                 newRate = Integer.parseInt(priceView.getText().toString());
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             boolean isFinal = priceSwitch.isChecked();
             PaymentType newPriceType = PaymentType.values()[buttonChosen];
-            CurrencyType newCurrency = (CurrencyType) currencySpinner.getSelectedItem();
+            CurrencyType newCurrency = currencySpinner.getSelectedItem();
             listener.onPriceChanged(newRate, isFinal, newPriceType, newCurrency);
         }
     }

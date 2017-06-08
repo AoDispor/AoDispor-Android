@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.features.main.MyViewPager;
+//import pt.aodispor.android.features.main.MyViewPager;
 import pt.aodispor.android.R;
 
 /**
@@ -18,7 +18,7 @@ import pt.aodispor.android.R;
  */
 class SwipeListener implements View.OnTouchListener {
     private View view;
-    private MyViewPager viewPager;
+    //private MyViewPager viewPager;
     private CardFragment cardFragment;
     private TextView discard;
     private float initialX, initialY;
@@ -31,9 +31,9 @@ class SwipeListener implements View.OnTouchListener {
      * @param vp the MyViewPager object that controls the pager.
      * @param cf the CradFragment object where this card is on.
      */
-    SwipeListener(View v, MyViewPager vp, CardFragment cf) {
+    SwipeListener(View v, /*MyViewPager vp,*/ CardFragment cf) {
         view = v;
-        viewPager = vp;
+        //viewPager = vp;
         cardFragment = cf;
         discard = (TextView) view.findViewById(R.id.discard);
         //enableCall = false;
@@ -64,7 +64,7 @@ class SwipeListener implements View.OnTouchListener {
                 //enableCall = true;
                 initialX = x;
                 initialY = y;
-                viewPager.setSwipeEnabled(false);
+                //viewPager.setSwipeEnabled(false);
                 view.animate().cancel();
                 view.clearAnimation();
                 break;
@@ -102,7 +102,7 @@ class SwipeListener implements View.OnTouchListener {
                                 public void onAnimationEnd(Animator animation) {
                                     view.setEnabled(true);
                                     if(discard!=null) discard.setAlpha(0);
-                                    viewPager.setSwipeEnabled(true);
+                  //                  viewPager.setSwipeEnabled(true);
                                 }
 
                                 @Override
@@ -130,7 +130,7 @@ class SwipeListener implements View.OnTouchListener {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
                                     cardFragment.discardTopCard();
-                                    viewPager.setSwipeEnabled(true);
+                    //                viewPager.setSwipeEnabled(true);
                                     CardFragment.blockAccess = false;
                                 }
 

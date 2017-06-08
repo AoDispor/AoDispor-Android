@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,10 +28,11 @@ import com.github.karthyks.runtimepermissions.PermissionActivity;
 import java.util.concurrent.TimeUnit;
 
 import pt.aodispor.android.AppDefinitions;
+import pt.aodispor.android.api.aodispor.RequestBuilder;
 import pt.aodispor.android.features.shared.LoadingWidget;
 import pt.aodispor.android.features.main.MainActivity;
 import pt.aodispor.android.R;
-import pt.aodispor.android.data.models.aodispor.ApiJSON;
+import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
 import pt.aodispor.android.data.models.aodispor.BasicCardFields;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.Links;
@@ -68,7 +68,7 @@ public class CardFragment extends Fragment {
     //private LocationManager locationManager;
     public static final int REQUEST_CODE = 111;//TODO document what request_code is...
 
-    private static final String queryProfilesURL = "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}";
+    //private static final String queryProfilesURL = "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}";
 
     //RequestType retryRequestType;
 
@@ -334,7 +334,7 @@ public class CardFragment extends Fragment {
                 }
 
                 if (activity instanceof MainActivity) {
-                    SwipeListener listener = new SwipeListener(cardStack.getCardAt(0), ((MainActivity) activity).getViewPager(), this);
+                    SwipeListener listener = new SwipeListener(cardStack.getCardAt(0),/* ((MainActivity) activity).getViewPager(), */this);
                     cardStack.getCardAt(0).setOnTouchListener(listener);
                 }
 
@@ -423,7 +423,7 @@ public class CardFragment extends Fragment {
                 cf.rootView.addView(cardStack.getCardAt(CardStack.TOP));
 
                 if (cf.activity instanceof MainActivity) {
-                    SwipeListener listener = new SwipeListener(cardStack.getCardAt(CardStack.TOP), ((MainActivity) cf.activity).getViewPager(), cf);
+                    SwipeListener listener = new SwipeListener(cardStack.getCardAt(CardStack.TOP), /*((MainActivity) cf.activity).getViewPager(),*/ cf);
                     cardStack.getCardAt(CardStack.TOP).setOnTouchListener(listener);
                 }
 
@@ -509,7 +509,7 @@ public class CardFragment extends Fragment {
         if (activity instanceof MainActivity
                 && cardStack.getCardInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
                 ) {
-            SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
+            SwipeListener listener = new SwipeListener(topCard, /*((MainActivity) activity).getViewPager(),*/ this);
             topCard.setOnTouchListener(listener);
         }
 
@@ -626,6 +626,7 @@ public class CardFragment extends Fragment {
                 nextSet = null;
                 System.gc();
                 if (previousSet == null) {//if previous set was not yet loaded
+                    //TODO preparePreviousPageI should be done ideally via Callback
                     switch (preparePreviousPageI()) { //TODO->NOT TESTED i think???
                         case successful:
                             break;
@@ -636,7 +637,7 @@ public class CardFragment extends Fragment {
                             currentSetCardIndex = originalIndex;
                             if (activity instanceof MainActivity) {
                                 RelativeLayout topCard = cardStackContainer.cardStack.getCardAt(CardStack.TOP);
-                                SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
+                                SwipeListener listener = new SwipeListener(topCard, /*((MainActivity) activity).getViewPager(),*/ this);
                                 topCard.setOnTouchListener(listener);
                             }
 
@@ -674,7 +675,7 @@ public class CardFragment extends Fragment {
         // if (activity instanceof MainActivity
         //       && cardStack.getCardInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
         //     ) {
-        SwipeListener listener = new SwipeListener(topCard, ((MainActivity) activity).getViewPager(), this);
+        SwipeListener listener = new SwipeListener(topCard, /*((MainActivity) activity).getViewPager(),*/ this);
         topCard.setOnTouchListener(listener);
         //}
 
@@ -714,21 +715,7 @@ public class CardFragment extends Fragment {
 
         final GeoLocation geoLocation = GeoLocation.getInstance();
 
-        //requestType.val = retry ? RequestType.retry_newSet : RequestType.newSet;//not needed, unlike nextSet, should remain here anyways because it might be useful for debugging later
-
-        HttpRequestTask request;
-
-        if (searchQuery == null || searchQuery.equals("")) {
-            request = new HttpRequestTask(SearchQueryResult.class, null,
-                    "https://api.aodispor.pt/profiles/?query=&lat={lat}&lon={lon}", geoLocation.getLatitude(), geoLocation.getLongitude());
-        } else request = new HttpRequestTask(SearchQueryResult.class, null,
-                queryProfilesURL, searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude());
-
-        if (DEV_force2ndPage) {
-            request = new HttpRequestTask(SearchQueryResult.class, null,
-                    queryProfilesURL + "&page={page}", searchQuery, geoLocation.getLatitude(), geoLocation.getLongitude(), "2");
-            currentSetCardIndex = 10;
-        }
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildCardStackRequest(searchQuery,geoLocation);
 
         request.addOnSuccessHandlers(onNewQuery);
         request.addOnSuccessHandlers(closeLoading);
@@ -765,7 +752,7 @@ public class CardFragment extends Fragment {
         if (link == null)
             return;
         Log.d("LOAD NEXT BACKGROUND", "STARTED");
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, link);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.GET(SearchQueryResult.class, link);
         request.addOnSuccessHandlers(retry ? onPrevPageRetry : onNextPage);
         if (retry) {
             request.addOnSuccessHandlers(closeLoading);
@@ -788,7 +775,7 @@ public class CardFragment extends Fragment {
         if (link == null)
             return;
         Log.d("LOAD PREV BACKGROUND", "STARTED");
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, link);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.GET(SearchQueryResult.class, link);
         request.addOnSuccessHandlers(onPrevPage);
         //TODO implement retry later
         request.execute();
@@ -798,6 +785,7 @@ public class CardFragment extends Fragment {
      * try to load previous page immediately! will wait for task to end or error (blocking)
      */
     public QueryResult preparePreviousPageI() {
+        //TODO should not be blocking, not used yet so no problem -> REDO THIS METHOD!
         if (currentSet == null || currentSet.meta == null || currentSet.meta.pagination == null)
             return QueryResult.none;
         //requestType.val = RequestType.prevSet;
@@ -808,11 +796,11 @@ public class CardFragment extends Fragment {
         if (link == null)
             return QueryResult.none;
         Log.d("LOAD PREV IMMIDIATE", "STARTED");
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, null, link);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.GET(SearchQueryResult.class, link);
 
         SearchQueryResult result;
         try {
-            result = (SearchQueryResult) request.execute().get(AppDefinitions.TIMEOUT, TimeUnit.MILLISECONDS);
+            result = (SearchQueryResult) request.execute().get(20000, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             Log.e("preparePreviousPageI", e.toString());
             return QueryResult.error;
@@ -826,34 +814,34 @@ public class CardFragment extends Fragment {
     }
 
 
-    private final HttpRequestTask.IOnHttpRequestCompleted onPrevPage =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onPrevPage =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON answer) {
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
                     previousSet = (SearchQueryResult) answer;
                 }
             };
 
-    private final HttpRequestTask.IOnHttpRequestCompleted onPrevPageRetry =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onPrevPageRetry =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON answer) {
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
                     throw new RuntimeException("Not Implemented");
                 }
             };
 
-    private final HttpRequestTask.IOnHttpRequestCompleted onNextPage =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onNextPage =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON answer) {
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
                     nextSet = (SearchQueryResult) answer;
                 }
             };
 
-    private final HttpRequestTask.IOnHttpRequestCompleted onNextPageRetry =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onNextPageRetry =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON answer) {
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
                     //TODO not yet tested
                     previousSet = currentSet;
                     currentSet = (SearchQueryResult) answer;
@@ -862,10 +850,10 @@ public class CardFragment extends Fragment {
                 }
             };
 
-    private final HttpRequestTask.IOnHttpRequestCompleted onNewQuery =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onNewQuery =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON answer) {
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
                     //TODO review this later
                     if (answer != null) {
                         SearchQueryResult result = (SearchQueryResult) answer;
@@ -893,26 +881,26 @@ public class CardFragment extends Fragment {
                 }
             };
 
-    private final HttpRequestTask.IOnHttpRequestCompleted setupErrorStack =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> setupErrorStack =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON data) {
+                public void exec(AODISPOR_JSON_WEBAPI data) {
                     setupNewStack(QueryResult.error);
                 }
             };
 
-    private final HttpRequestTask.IOnHttpRequestCompleted closeLoadingResetVisibility =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> closeLoadingResetVisibility =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON data) {
+                public void exec(AODISPOR_JSON_WEBAPI data) {
                     loadingWidget.endLoading(true);
                 }
             };
 
-    private final HttpRequestTask.IOnHttpRequestCompleted closeLoading =
-            new HttpRequestTask.IOnHttpRequestCompleted() {
+    private final HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> closeLoading =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
-                public void exec(ApiJSON dta) {
+                public void exec(AODISPOR_JSON_WEBAPI dta) {
                     loadingWidget.endLoading(false);
                 }
             };

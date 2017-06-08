@@ -1,12 +1,12 @@
 package pt.aodispor.android.features.cardstack;
 
+import android.graphics.Typeface;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,11 +20,12 @@ import org.joda.time.PeriodType;
 
 import java.util.Date;
 
-import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.data.models.aodispor.BasicCardFields;
 import pt.aodispor.android.data.models.aodispor.Professional;
 import pt.aodispor.android.data.models.aodispor.UserRequest;
+import pt.aodispor.android.utils.HtmlUtil;
+import pt.aodispor.android.utils.TypefaceManager;
 
 
 public class CardStack {
@@ -61,10 +62,14 @@ public class CardStack {
     protected LayoutInflater inflater = null;
     protected RelativeLayout rootView;
 
+    private static Typeface typeface = null;
+
     void setBasicVariables(Fragment fragment, LayoutInflater inflater, RelativeLayout rootView) {
         if (this.fragment == null) this.fragment = fragment;
         if (this.inflater == null) this.inflater = inflater;
         if (this.rootView == null) this.rootView = rootView;
+        if (typeface != null)
+            typeface = TypefaceManager.singleton.getTypeFace(TypefaceManager.singleton.load(rootView.getContext(), TypefaceManager.singleton.YANONE[0]));
     }
 
     @VisibleForTesting
@@ -95,6 +100,9 @@ public class CardStack {
     public CardStack() {
     }
 
+    /**
+     * makes a 'shallow' clone. arrays are new & not the same even though the elements inside are initially the same
+     */
     CardStack(CardStack cardStack) {
         fragment = cardStack.fragment;
         inflater = cardStack.inflater;
@@ -245,32 +253,32 @@ public class CardStack {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.professional_card, rootView, false);
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
-        profession.setText(Html.fromHtml(profession_text));
-        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        profession.setText(HtmlUtil.fromHtml(profession_text));
+        profession.setTypeface(typeface);
 
         TextView location = (TextView) card.findViewById(R.id.location);
-        location.setText(Html.fromHtml(location_text));
-        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        location.setText(HtmlUtil.fromHtml(location_text));
+        location.setTypeface(typeface);
 
         TextView description = (TextView) card.findViewById(R.id.description);
         description.setText(Html.fromHtml(description_text));
         //description.setMovementMethod(new ScrollingMovementMethod());
 
         TextView price = (TextView) card.findViewById(R.id.price);
-        price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        price.setTypeface(typeface);
         price.setText(Html.fromHtml(price_value));
 
         switch (payment_type) {
             case "H":
-                price.setText(Html.fromHtml(price_value + " " + currency_type + "/h"));
+                price.setText(HtmlUtil.fromHtml(price_value + " " + currency_type + "/h"));
                 price.setTextColor(fragment.getResources().getColor(R.color.by_hour));
                 break;
             case "S":
-                price.setText(Html.fromHtml(price_value + " " + currency_type));
+                price.setText(HtmlUtil.fromHtml(price_value + " " + currency_type));
                 price.setTextColor(fragment.getResources().getColor(R.color.by_service));
                 break;
             case "D":
-                price.setText(Html.fromHtml(price_value + " por dia"));
+                price.setText(HtmlUtil.fromHtml(price_value + " por dia"));
         }
 
         ImageView avatar = (ImageView) card.findViewById(R.id.profile_image);
@@ -283,11 +291,11 @@ public class CardStack {
     }
 
     private RelativeLayout createRequestCard(//String fullname_text,
-                                               //String profession_text,
-                                               String location_text,
-                                               String description_text,
-                                               String job_text,
-                                               String price_value_text
+                                             //String profession_text,
+                                             String location_text,
+                                             String description_text,
+                                             String job_text,
+                                             String price_value_text
     ) {
         //TODO not yet complete
 
@@ -296,20 +304,20 @@ public class CardStack {
         //expiration date is set on updateCardViews() method
 
         TextView job = (TextView) card.findViewById(R.id.job);
-        job.setText(Html.fromHtml(job_text));
-        job.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        job.setText(HtmlUtil.fromHtml(job_text));
+        job.setTypeface(typeface);
 
         TextView location = (TextView) card.findViewById(R.id.location);
-        location.setText(Html.fromHtml(location_text));
-        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        location.setText(HtmlUtil.fromHtml(location_text));
+        location.setTypeface(typeface);
 
         TextView description = (TextView) card.findViewById(R.id.description);
-        description.setText(Html.fromHtml(description_text));
+        description.setText(HtmlUtil.fromHtml(description_text));
         //description.setMovementMethod(new ScrollingMovementMethod());
 
         TextView price = (TextView) card.findViewById(R.id.price);
-        price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
-        price.setText(Html.fromHtml(price_value_text));
+        price.setTypeface(typeface);
+        price.setText(HtmlUtil.fromHtml(price_value_text));
 
         return card;
     }
@@ -320,8 +328,8 @@ public class CardStack {
 
     private RelativeLayout addMessageCard(int cardIndex, String title, String message, boolean block_backward_iteration) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
-        ((TextView) card.findViewById(R.id.title)).setText(Html.fromHtml(title));
-        ((TextView) card.findViewById(R.id.message)).setText(Html.fromHtml(message));
+        ((TextView) card.findViewById(R.id.title)).setText(HtmlUtil.fromHtml(title));
+        ((TextView) card.findViewById(R.id.message)).setText(HtmlUtil.fromHtml(message));
         cards[cardIndex] = card;
         //cards_data[cardIndex] = null;
         cards_data[cardIndex] = block_backward_iteration ?

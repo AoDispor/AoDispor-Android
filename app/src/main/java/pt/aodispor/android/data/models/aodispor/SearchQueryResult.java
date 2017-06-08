@@ -16,7 +16,7 @@ import java.util.List;
 import pt.aodispor.android.data.models.aodispor.parsing.CardDeserializer;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SearchQueryResult extends ApiJSON {
+public class SearchQueryResult extends AODISPOR_JSON_WEBAPI {
     /**
      * list of professionals
      */

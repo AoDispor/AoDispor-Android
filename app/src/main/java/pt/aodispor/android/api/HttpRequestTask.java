@@ -1,8 +1,6 @@
 package pt.aodispor.android.api;
 
 import android.os.AsyncTask;
-import android.util.Base64;
-import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,78 +13,53 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
-import pt.aodispor.android.AppDefinitions;
-import pt.aodispor.android.data.models.aodispor.ApiJSON;
-import pt.aodispor.android.data.models.aodispor.Error;
+import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
 
-//TODO 2b generic later
-public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
-    public static final int GET_REQUEST = 0;
-    public static final int POST_REQUEST = 1;
-    public static final int PUT_REQUEST = 2;
-    private static String token = null;
+//TODO not suited for all purposes but more flexible than before
+//using a generic type instead of Object type might not have been the best decision
+//hopefully will bring more awareness to the developer of the types expected but will require a bit of extra work
+public class HttpRequestTask<Z> extends AsyncTask<Void, Void, Z> {
 
-    /*public interface HttpRequest2<X> extends HttpRequest<X>{
-        void onHttpRequestComplete();
-    }*/
-
-    /**
-     * indicates that the task is using a new implementation that
-     * works as replacement for the new implementation to come later on
-     */
-    private boolean usingTransitionVersion = false;
-
-
-    public interface IOnHttpRequestCompleted {
-        void exec(ApiJSON answer);//TODO 2b generic later
+    public interface IOnHttpRequestCompleted<A> {
+        void exec(A answer);
     }
 
-    //private Delegator el;
-    private ArrayList<IOnHttpRequestCompleted> onEnd;
-    private ArrayList<IOnHttpRequestCompleted> onSuccess;
-    private ArrayList<IOnHttpRequestCompleted> onFail;
+    private ArrayList<IOnHttpRequestCompleted<Z>> onEnd;
+    private ArrayList<IOnHttpRequestCompleted<Z>> onSuccess;
+    private ArrayList<IOnHttpRequestCompleted<Z>> onFail;
 
-    private void addHandlers(ArrayList<IOnHttpRequestCompleted> list, IOnHttpRequestCompleted[] array) {
-        usingTransitionVersion = true;
+    private void addHandlers(ArrayList<IOnHttpRequestCompleted<Z>> list, IOnHttpRequestCompleted<Z>[] array) {
         list.addAll(Arrays.asList(array));
         //for (IOnHttpRequestCompleted handler : array) list.add(handler);
     }
 
-    public void addOnEndHandlers(IOnHttpRequestCompleted... handlers) {
+    @SafeVarargs
+    public final void addOnEndHandlers(IOnHttpRequestCompleted<Z>... handlers) {
         if (onEnd == null) {
-            onEnd = new ArrayList<IOnHttpRequestCompleted>();
+            onEnd = new ArrayList<>();
         }
         addHandlers(onEnd, handlers);
     }
 
-    public void addOnSuccessHandlers(IOnHttpRequestCompleted... handlers) {
+
+    @SafeVarargs
+    public final void addOnSuccessHandlers(IOnHttpRequestCompleted<Z>... handlers) {
         if (onSuccess == null) {
-            onSuccess = new ArrayList<IOnHttpRequestCompleted>();
+            onSuccess = new ArrayList<>();
         }
         addHandlers(onSuccess, handlers);
     }
 
-    public void addOnFailHandlers(IOnHttpRequestCompleted... handlers) {
+    @SafeVarargs
+    public final void addOnFailHandlers(IOnHttpRequestCompleted<Z>... handlers) {
         if (onFail == null) {
-            onFail = new ArrayList<IOnHttpRequestCompleted>();
+            onFail = new ArrayList<>();
         }
         addHandlers(onFail, handlers);
     }
-
-
-    public static void setToken(String token) {
-        if (HttpRequestTask.token == null) HttpRequestTask.token = token;
-    }
-
-    //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
-    private static final String serverTimeZone = "UTC";
 
     /**
      * tells the api how to deserialize the response
@@ -95,92 +68,91 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     private String url;
     private String[] urlVariables;
     //error can't be detected with handler (would need to use the systems time to find out error occurrences)
-    //private boolean error = false;
     private boolean error = false;
 
     public boolean gotError() {
         return error;
     }
 
-    private HttpEntity<?> entityReq;
     private HttpMethod method;
-    private ApiJSON body;
+    //private AODISPOR_JSON_WEBAPI body;
+    private Object body;
     private byte[] bitmapBody;
     private HttpHeaders httpHeaders;
-    private RestTemplate template;
 
-    /**
-     * handler that executes after an answer is received.
-     * <br>using the handler allows the application to run without waiting for a error or an answer.
-     * <br>can be set to null
-     */
-    private HttpRequest postExecute;
+    //in milliseconds
+    static final int DEFAULT_READ_TIMEOUT = 20000;
+    static final int DEFAULT_CONNECTION_TIMEOUT = 20000;
+    private int readTimeout = DEFAULT_READ_TIMEOUT;
+    private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
-    /**
-     * passed to postExecute method to identify nuances or process certain data
-     */
-    private int type;
-
-    /**
-     * Creates a request task. The request must then be started to with execute.
-     * <br>A GET request is used by default, use setMethod to change this.
-     * <br>The Body is empty by default. Use setJSONBody to define the body.
-     * <br>Verify if addAPIAuthentication is needed
-     * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
-     *
-     * @param answer   answer type expected, must e deserializable
-     * @param executor the instance that implements the HttpRequest. Only needed to run request on background (can be null).
-     * @param url      request destination
-     */
-    public HttpRequestTask(Class answer, HttpRequest executor, String url) {
-        answerType = answer;
-        postExecute = executor;
-        this.url = url;
-        urlVariables = new String[]{};
-        method = HttpMethod.GET;
-        httpHeaders = new HttpHeaders();
+    public void setTimeouts(int read, int connection) {
+        readTimeout = read;
+        connectionTimeout = connection;
     }
 
-    /**
-     * Creates a request task. The request must then be started to with execute.
-     * <br>A GET request is used by default, use setMethod to change this.
-     * <br>The Body is empty by default. Use setJSONBody to define the body.
-     * <br>Verify if addAPIAuthentication is needed
-     * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
-     *
-     * @param answer   answer type expected, must e deserializable
-     * @param executor the instance that implements the HttpRequest. Only needed to run request on background (can be null).
-     * @param url      request destination
-     * @param uv       url variables
-     */
-    public HttpRequestTask(Class answer, HttpRequest executor, String url, String... uv) {
-        answerType = answer;
-        postExecute = executor;
-        this.url = url;
-        urlVariables = uv;
-        method = HttpMethod.GET;
-        httpHeaders = new HttpHeaders();
+    private Class<Z> error_class;
+
+    public void setErrorClass(Class<Z> error) {
+        error_class = error;
     }
+
 
     private HttpRequestTask() {
     }
 
-    static public HttpRequestTask POST(Class answer, String url, String... uv) {
-        HttpRequestTask request = new HttpRequestTask();
+    /**
+     * Creates a request task. The request must then be started to with execute.
+     * <br>A GET request is used by default, use setMethod to change this.
+     * <br>The Body is empty by default. Use setJSONBody to define the body.
+     * <br>Verify if addAPIAuthentication is needed
+     * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
+     *
+     * @param answer answer type expected, must e deserializable
+     * @param url    request destination
+     */
+    static public <A> HttpRequestTask<A> GET(Class answer, String url) {
+        HttpRequestTask<A> request = new HttpRequestTask<>();
+        request.answerType = answer;
+        request.url = url;
+        request.urlVariables = new String[]{};
+        request.method = HttpMethod.GET;
+        request.httpHeaders = new HttpHeaders();
+        return request;
+    }
+
+    /**
+     * Creates a request task. The request must then be started to with execute.
+     * <br>A GET request is used by default, use setMethod to change this.
+     * <br>The Body is empty by default. Use setJSONBody to define the body.
+     * <br>Verify if addAPIAuthentication is needed
+     * <br>Use setType if 'executor' (httpRequest) can receive different answers and/or implements different behaviours
+     *
+     * @param answer answer type expected, must e deserializable
+     * @param url    request destination
+     * @param uv     url variables
+     */
+    static public <A> HttpRequestTask<A> GET(Class answer, String url, String... uv) {
+        HttpRequestTask<A> request = HttpRequestTask.GET(answer, url);
+        request.urlVariables = uv;
+        return request;
+    }
+
+
+    static public <A> HttpRequestTask<A> POST(Class answer, String url, String... uv) {
+        HttpRequestTask<A> request = new HttpRequestTask<A>();
         request.method = HttpMethod.POST;
         request.answerType = answer;
-        //request.postExecute = executor;
         request.url = url;
         request.urlVariables = uv;
         request.httpHeaders = new HttpHeaders();
         return request;
     }
 
-    static public HttpRequestTask PUT(Class answer, String url, String... uv) {
-        HttpRequestTask request = new HttpRequestTask();
+    static public <A> HttpRequestTask<A> PUT(Class answer, String url, String... uv) {
+        HttpRequestTask<A> request = new HttpRequestTask<A>();
         request.method = HttpMethod.PUT;
         request.answerType = answer;
-        //request.postExecute = executor;
         request.url = url;
         request.urlVariables = uv;
         request.httpHeaders = new HttpHeaders();
@@ -188,58 +160,46 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     }
 
     @Override
-    protected ApiJSON doInBackground(Void... params) {
-
-        //TODO JUST A REMAINDER WHILE THE CODE HASN'T BEEN CLEANED
-        //TODO remove these logs later
-        boolean newCallIsUsed = !(onSuccess == null && onFail == null && onEnd == null);
-        boolean oldCallIsUsed = postExecute != null;
-        if (!newCallIsUsed && !oldCallIsUsed)
-            Log.d("", "no action after request");
-        if (oldCallIsUsed) {
-            Log.w("", "using old implementation");
-            if (newCallIsUsed)
-                Log.w("", "using both old and new implementation");
-        }
+    protected Z doInBackground(Void... params) {
 
         Object answer;//temp before assigning response: may not return ApiJSON
         try {
-            prepareHeaders();
             SimpleClientHttpRequestFactory cf = new SimpleClientHttpRequestFactory();
-            cf.setConnectTimeout(AppDefinitions.TIMEOUT);
-            cf.setReadTimeout(AppDefinitions.TIMEOUT);
-            template = new RestTemplate(cf);
+            cf.setConnectTimeout(connectionTimeout);
+            cf.setReadTimeout(readTimeout);
+            RestTemplate template = new RestTemplate(cf);
             if (answerType == null)
                 answerType = String.class;
             try {
-                ApiJSON response = null;
+                //ApiJSON response = null;
                 switch (method) {
                     case POST:
-                        entityReq = new HttpEntity<>(body, httpHeaders);
+                        HttpEntity<?> entityReq = new HttpEntity<>(body, httpHeaders);
                         answer = template.postForObject(url, entityReq, answerType);
-                        if (ApiJSON.class.isAssignableFrom(answerType))
-                            response = (ApiJSON) answer;
+                        //if (ApiJSON.class.isAssignableFrom(answerType))
+                        //    response = (ApiJSON) answer;
                         break;
                     case PUT:
                         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                         entityReq = new HttpEntity<>(bitmapBody, httpHeaders);
                         answer = template.exchange(url, HttpMethod.PUT, entityReq, answerType, urlVariables).getBody();
-                        if (ApiJSON.class.isAssignableFrom(answerType))
-                            response = (ApiJSON) answer;
+                        //if (ApiJSON.class.isAssignableFrom(answerType))
+                        //    response = (ApiJSON) answer;
                         break;
                     default:
                         entityReq = new HttpEntity<>(httpHeaders);
-                        response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
+                        answer = template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
+                        //response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
                         //if (answerType != null && ApiJSON.class.isAssignableFrom(answerType))
                         //response = (ApiJSON) answer;
                         break;
                 }
-                return response;
+
+                return (Z) answer;
             } catch (HttpStatusCodeException e) {
                 error = true;
-
                 ObjectMapper mapper = new ObjectMapper();
-                return mapper.readValue(e.getResponseBodyAsString(), Error.class);
+                return mapper.readValue(e.getResponseBodyAsString(), error_class);
             } catch (RestClientException re) {
                 error = true;
                 re.printStackTrace();
@@ -253,80 +213,19 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
     }
 
     @Override
-    protected void onPostExecute(ApiJSON data) {
-        if (usingTransitionVersion) {
-            if (error) {
-                if (onFail != null)
-                    for (IOnHttpRequestCompleted handler : onFail) handler.exec(data);
-            } else {
-                if (onSuccess != null)
-                    for (IOnHttpRequestCompleted handler : onSuccess) handler.exec(data);
-            }
-            if (onEnd != null)
-                for (IOnHttpRequestCompleted handler : onEnd) handler.exec(data);
-            return;
-        }
-        //IF IS USING OLDER VERSION see code below
-
-        if (postExecute == null)
-            return;
-        if (/*error || */error) {
-            //if (data == null)
-            //    return;
-            postExecute.onHttpRequestFailed(data, type);
+    protected void onPostExecute(Z data) {
+        if (error) {
+            if (onFail != null)
+                for (IOnHttpRequestCompleted<Z> handler : onFail) handler.exec(data);
         } else {
-            if (data == null)
-                return;
-            postExecute.onHttpRequestSuccessful(data, type);
+            if (onSuccess != null)
+                for (IOnHttpRequestCompleted<Z> handler : onSuccess) handler.exec(data);
         }
-        /*if(postExecute.getClass()==HttpRequest2.class){
-            ((HttpRequest2)postExecute).onHttpRequestComplete();
-        }*/
+        if (onEnd != null)
+            for (IOnHttpRequestCompleted<Z> handler : onEnd) handler.exec(data);
     }
 
-    private String getLocalDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.UK);
-        //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
-        dateFormat.setTimeZone(TimeZone.getTimeZone(serverTimeZone));
-        return dateFormat.format(new Date());
-    }
-
-    private void prepareHeaders() {
-        final String date = getLocalDate();
-        MediaType[] mediaTypes = {MediaType.APPLICATION_JSON};
-        httpHeaders.setAccept(Arrays.asList(mediaTypes));
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("API-Authorization", token + date);
-    }
-
-    /**
-     * TODO refactor to extra or some other name
-     */
-    public void setType(int t) {
-        type = t;
-    }
-
-    /*public void setMethod(int m) {
-        switch (m) {
-            case POST_REQUEST:
-                method = HttpMethod.POST;
-                break;
-            case GET_REQUEST:
-                method = HttpMethod.GET;
-                break;
-            case PUT_REQUEST:
-                method = HttpMethod.PUT;
-        }
-    }*/
-
-    /**
-     * TODO refactor to extra or some other name
-     */
-    public int getType() {
-        return type;
-    }
-
-    public void setJSONBody(ApiJSON b) {
+    public void setJSONBody(Object b) {
         body = b;
     }
 
@@ -334,12 +233,12 @@ public class HttpRequestTask extends AsyncTask<Void, Void, ApiJSON> {
         bitmapBody = b;
     }
 
-    /**
-     * Use this method before executing request if it is a Registered used relate operation that needs credentials
-     */
-    public void addAPIAuthentication(String phone, String password) {
-        String encode = Base64.encodeToString((phone + ":" + password).getBytes(), Base64.DEFAULT);
-        httpHeaders.set("Authorization", "Basic " + encode);
+    public void setHeader(HttpHeaders headers) {
+        this.httpHeaders = headers;
+    }
+
+    public void addHeader(String name, String value) {
+        this.httpHeaders.add(name, value);
     }
 
 }

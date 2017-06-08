@@ -16,12 +16,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import pt.aodispor.android.R;
-import pt.aodispor.android.data.models.aodispor.ApiJSON;
+import pt.aodispor.android.api.aodispor.RequestBuilder;
+import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
 import pt.aodispor.android.data.models.aodispor.CPPQueryResult;
-import pt.aodispor.android.api.HttpRequest;
 import pt.aodispor.android.api.HttpRequestTask;
 
-public class LocationDialog extends DialogFragment implements HttpRequest {
+public class LocationDialog extends DialogFragment {
     private LocationDialogListener listener;
     private EditText postalCodePrefix, postalCodeSuffix;
     private TextView locationName;
@@ -71,9 +71,9 @@ public class LocationDialog extends DialogFragment implements HttpRequest {
                     String suffix = postalCodeSuffix.getText().toString();
                     locationName.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
-                    String url = "https://api.aodispor.pt/location/{cp4}/{cp3}";
-                    HttpRequestTask request = new HttpRequestTask(CPPQueryResult.class, locationDialog, url, prefix, suffix);
-                    request.setType(HttpRequest.GET_LOCATION);
+                    HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildLocationRequest(prefix,suffix);
+                    request.addOnSuccessHandlers(onRequestSuccess);
+                    request.addOnFailHandlers(onRequestFailed);
                     request.execute();
                 } else {
                     progressBar.setVisibility(View.GONE);
@@ -96,11 +96,10 @@ public class LocationDialog extends DialogFragment implements HttpRequest {
     }
 
 
-
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        if(listener != null) {
+        if (listener != null) {
             listener.onDismiss(set, locationName.getText().toString(), postalCodePrefix.getText().toString(), postalCodeSuffix.getText().toString());
         }
     }
@@ -109,28 +108,34 @@ public class LocationDialog extends DialogFragment implements HttpRequest {
         listener = l;
     }
 
-    @Override
-    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
-        if(postalCodeSuffix.length() == 3 && postalCodePrefix.length() == 4) {
-            if(type == HttpRequest.GET_LOCATION) {
-                CPPQueryResult result = (CPPQueryResult) answer;
-                if (result != null && result.data != null) {
-                    progressBar.setVisibility(View.GONE);
-                    locationName.setText(result.data.getLocalidade());
-                    locationName.setVisibility(View.VISIBLE);
-                    set = true;
-                }
-            }
-        }
-    }
 
-    @Override
-    public void onHttpRequestFailed(ApiJSON errorData, int type) {
-        set = false;
-        locationName.setText(R.string.empty);
-        progressBar.setVisibility(View.GONE);
-        locationName.setVisibility(View.VISIBLE);
-    }
+    HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onRequestSuccess =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
+                @Override
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
+
+                    if (postalCodeSuffix.length() == 3 && postalCodePrefix.length() == 4) {
+                        CPPQueryResult result = (CPPQueryResult) answer;
+                        if (result != null && result.data != null) {
+                            progressBar.setVisibility(View.GONE);
+                            locationName.setText(result.data.getLocalidade());
+                            locationName.setVisibility(View.VISIBLE);
+                            set = true;
+                        }
+                    }
+                }
+            };
+
+    HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onRequestFailed =
+            new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
+                @Override
+                public void exec(AODISPOR_JSON_WEBAPI answer) {
+                    set = false;
+                    locationName.setText(R.string.empty);
+                    progressBar.setVisibility(View.GONE);
+                    locationName.setVisibility(View.VISIBLE);
+                }
+            };
 
     public interface LocationDialogListener {
         void onDismiss(boolean set, String locationName, String prefix, String suffix);

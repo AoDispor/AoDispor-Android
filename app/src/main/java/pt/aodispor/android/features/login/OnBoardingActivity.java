@@ -3,7 +3,7 @@ package pt.aodispor.android.features.login;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.support.annotation.VisibleForTesting;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -20,38 +20,29 @@ import com.lamudi.phonefield.PhoneEditText;
 import com.redbooth.WelcomeCoordinatorLayout;
 
 import pt.aodispor.android.AppDefinitions;
+import pt.aodispor.android.api.aodispor.RequestBuilder;
+import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.features.main.LoginData;
 import pt.aodispor.android.features.main.LoginDataPreferences;
 import pt.aodispor.android.features.main.MainActivity;
 import pt.aodispor.android.R;
-import pt.aodispor.android.data.models.aodispor.ApiJSON;
-import pt.aodispor.android.api.HttpRequest;
+import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.Professional;
-import pt.aodispor.android.data.models.aodispor.Register;
 import pt.aodispor.android.data.models.aodispor.Error;
 import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
 import pt.aodispor.android.utils.Permission;
 import pt.aodispor.android.utils.Utility;
 
-public class OnBoardingActivity extends AppCompatActivity implements HttpRequest, Advanceable {
-    private static final String REGISTER_URL = "https://api.aodispor.pt/users/register";
-    private static final String MYSELF_URL = "https://api.aodispor.pt/users/me";
+public class OnBoardingActivity extends AppCompatActivity implements Advanceable {
 
     /**
      * stores last sms received from AoDispor before sending a new sms request)
      */
     String[] prevSMS = null;
 
-    @VisibleForTesting
-    protected enum RequestType {
-        register, validate
-    }
-
-    @VisibleForTesting
-    protected OnBoardingActivity.RequestType requestType;
-
     String phoneNumber;
+    String loginCode;
     WelcomeCoordinatorLayout coordinatorLayout;
 
     private Button newUserButton;
@@ -61,12 +52,11 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_on_boarding);
 
-        HttpRequestTask.setToken(getResources().getString(R.string.ao_dispor_api_key));
-
         if (AppDefinitions.SKIP_LOGIN) {
-            AppDefinitions.smsLoginDone=true;
-            AppDefinitions.phoneNumber = AppDefinitions.testPhoneNumber;
-            AppDefinitions.userPassword = AppDefinitions.testPassword;
+            AppDefinitions.smsLoginDone = true;
+            UserData.getInstance().setUserLoginAuth(
+                    AppDefinitions.testPhoneNumber,
+                    AppDefinitions.testPassword);
             showMainActivity();
             return;
         }
@@ -137,11 +127,11 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
 
                 if (valid) {
                     coordinatorLayout.setCurrentPage(coordinatorLayout.getPageSelected() + 1, true);
-                    AppDefinitions.phoneNumber = phoneNumberField.getPhoneNumber();
-                    //TODO may add code t check SMSs
+                    phoneNumber = phoneNumberField.getPhoneNumber();
+                    //TODO may add code to check SMSs
                     //prevSMS = Utility.getLastMessage(getApplicationContext(), AppDefinitions.PASSWORD_SMS_PHONES);
-                    sendRegistrationSMS();
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    sendRegistrationSMS(phoneNumber);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(validate.getWindowToken(), 0);
                 }
             }
@@ -154,18 +144,20 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         // Campo de texto para a password
         validationCodeField.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editable.toString().length() == 6) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (editable.toString().length() == 6) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(validate.getWindowToken(), 0);
 
-                    AppDefinitions.userPassword = editable.toString();
+                    loginCode = editable.toString();
                     validatePassword();
                 }
             }
@@ -185,7 +177,7 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(validate.getWindowToken(), 0);
 
-                AppDefinitions.userPassword = validation_code.getText().toString();
+                loginCode = validation_code.getText().toString();
                 validatePassword();
             }
         });
@@ -193,8 +185,8 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         sendAnother.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO may add code t check SMSs
-                sendRegistrationSMS();
+                //TODO may add code to check SMSs
+                sendRegistrationSMS(phoneNumber);
             }
         });
         // Saltar
@@ -212,23 +204,21 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
     }
 
     private void validatePassword() {
-        requestType = RequestType.validate;
-        HttpRequestTask request = new HttpRequestTask(SearchQueryResult.class, OnBoardingActivity.this, MYSELF_URL);
-        request.addAPIAuthentication(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildValidationRequest(phoneNumber, loginCode);
+        request.addOnSuccessHandlers(onValidationSuccess);
+        request.addOnFailHandlers(onRequestError);
         request.execute();
     }
 
-    private void sendRegistrationSMS() {
-        requestType = RequestType.register;
-        HttpRequestTask request_register = HttpRequestTask.POST(String.class, null, REGISTER_URL);
-        //        new HttpRequestTask(String.class, null, REGISTER_URL);
-        //request_register.setMethod(HttpRequestTask.POST_REQUEST);
-        request_register.setJSONBody(new Register(AppDefinitions.phoneNumber));
-        request_register.execute();
+    private void sendRegistrationSMS(String phoneNumber) {
+        HttpRequestTask<String> request = RequestBuilder.buildSmsRequest(phoneNumber);
+        request.addOnSuccessHandlers(onRegisterSuccess);
+        //request.addOnFailHandlers(onRequestError);
+        request.execute();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         advance(requestCode, permissions, grantResults);
     }
 
@@ -257,36 +247,45 @@ public class OnBoardingActivity extends AppCompatActivity implements HttpRequest
         }
     }
 
-    @Override
-    public void onHttpRequestSuccessful(ApiJSON answer, int type) {
-        switch (requestType) {
-            case register:
-                //do things with the register field
-            case validate:
-                SearchQueryResult getProfile = (SearchQueryResult) answer;
-                Professional p = (Professional) getProfile.data.get(0);
+    HttpRequestTask.IOnHttpRequestCompleted<String> onRegisterSuccess = new HttpRequestTask.IOnHttpRequestCompleted<String>() {
+        @Override
+        public void exec(String answer) {
 
-                if (p == null) {
-                    AppDefinitions.userPassword = "";
-                    return;
-                }
-
-                LoginDataPreferences preferences = new LoginDataPreferences(getApplicationContext());
-                LoginData loginData = new LoginDataPreferences.LoginDataImpl(AppDefinitions.phoneNumber, AppDefinitions.userPassword);
-                preferences.edit().put(loginData).apply();
-
-                AppDefinitions.smsLoginDone=true;
-
-                showMainActivity();
-            default:
-                break;
         }
-    }
+    };
 
-    @Override
-    public void onHttpRequestFailed(ApiJSON errorData, int type) {
-        Error error = (Error) errorData;
-        Toast.makeText(this, error.message, Toast.LENGTH_LONG).show();
-    }
+    HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onValidationSuccess = new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
+        @Override
+        public void exec(AODISPOR_JSON_WEBAPI answer) {
+            SearchQueryResult getProfile = (SearchQueryResult) answer;
+            Professional p = (Professional) getProfile.data.get(0);
+
+            if (p == null) {
+                loginCode="";
+                return;
+            }
+
+            LoginDataPreferences preferences = new LoginDataPreferences(getApplicationContext());
+            LoginData loginData = new LoginDataPreferences.LoginDataImpl(phoneNumber, loginCode);
+            preferences.edit().put(loginData).apply();
+
+            UserData.getInstance().setUserLoginAuth(phoneNumber, loginCode);
+
+            AppDefinitions.smsLoginDone = true;
+
+            showMainActivity();
+        }
+    };
+
+    HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI> onRequestError = new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
+        @Override
+        public void exec(AODISPOR_JSON_WEBAPI answer) {
+            try {
+                Error error = (Error) answer;
+                Toast.makeText(OnBoardingActivity.this, error.message, Toast.LENGTH_LONG).show();
+            } catch (Exception ignored) {
+            }
+        }
+    };
 
 }

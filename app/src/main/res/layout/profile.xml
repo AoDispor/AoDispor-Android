@@ -10,7 +10,9 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/profile_base"
+        >
 
             <TextView
                 android:id="@+id/profile_not_loaded_text"

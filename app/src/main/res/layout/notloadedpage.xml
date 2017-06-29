@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/not_loaded_page_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="UseCompoundDrawables">
+
+    <TextView
+        android:id="@+id/not_loaded_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/no_response_from_AoDispor"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/not_loaded_img"
+        android:layout_width="wrap_content"
+        android:layout_height="350dp"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/fimdebusca"
+        tools:ignore="ContentDescription" />
+
+</LinearLayout>

@@ -24,11 +24,11 @@ public class CardStackTestClass extends CardStack{
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
         profession.setText(Html.fromHtml(profession_text));
-        profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        //profession.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView location = (TextView) card.findViewById(R.id.location);
         location.setText(Html.fromHtml(location_text));
-        location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        //location.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
 
         TextView description = (TextView) card.findViewById(R.id.description);
         description.setText(Html.fromHtml(description_text));
@@ -36,7 +36,7 @@ public class CardStackTestClass extends CardStack{
 
         TextView price = (TextView) card.findViewById(R.id.price);
 
-        price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
+        //price.setTypeface(AppDefinitions.yanoneKaffeesatzRegular);
         price.setText(Html.fromHtml(price_value));
 
         switch (payment_type) {

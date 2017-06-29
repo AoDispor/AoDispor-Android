@@ -82,7 +82,7 @@ public class TypefaceManager {
             ((TextView) v).setTypeface(typeface);
         }
 
-        Utility.apply2AllChildrenBFS(v, new Utility.IViewModifier() {
+        ViewUtils.apply2AllChildrenBFS(v, new ViewUtils.IViewModifier() {
             @Override
             public void apply(View vv) {
                 if (vv instanceof TextView) {

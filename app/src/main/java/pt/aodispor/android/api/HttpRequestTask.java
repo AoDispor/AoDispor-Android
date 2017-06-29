@@ -1,6 +1,7 @@
 package pt.aodispor.android.api;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -138,6 +139,12 @@ public class HttpRequestTask<Z> extends AsyncTask<Void, Void, Z> {
         return request;
     }
 
+    static public <A> HttpRequestTask<A> DELETE(Class answer, String url, String... uv) {
+        HttpRequestTask<A> request = new HttpRequestTask<A>();
+        request.method = HttpMethod.DELETE;
+        request.urlVariables = uv;
+        return request;
+    }
 
     static public <A> HttpRequestTask<A> POST(Class answer, String url, String... uv) {
         HttpRequestTask<A> request = new HttpRequestTask<A>();
@@ -186,8 +193,15 @@ public class HttpRequestTask<Z> extends AsyncTask<Void, Void, Z> {
                         //if (ApiJSON.class.isAssignableFrom(answerType))
                         //    response = (ApiJSON) answer;
                         break;
+                    case DELETE:
+                        entityReq = new HttpEntity<>(httpHeaders);
+                        answer = template.exchange(url, HttpMethod.DELETE, entityReq, answerType, urlVariables).getBody();
+                        break;
                     default:
                         entityReq = new HttpEntity<>(httpHeaders);
+
+                        //Log.d("ZZ",template.exchange(url, HttpMethod.GET, entityReq, String.class, urlVariables).getBody().toString()+"_");
+
                         answer = template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
                         //response = (ApiJSON) template.exchange(url, HttpMethod.GET, entityReq, answerType, urlVariables).getBody();
                         //if (answerType != null && ApiJSON.class.isAssignableFrom(answerType))

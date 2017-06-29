@@ -5,7 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import pt.aodispor.android.features.cardstack.CardFragment;
-import pt.aodispor.android.features.profile.Profile;
+import pt.aodispor.android.features.profile.ProfileFragment;
+import pt.aodispor.android.features.userrequest.UserRequestFragment;
 
 /**
  * Custom FragmentPagerAdapter class to control any sort of fragment class and to select the text
@@ -16,7 +17,7 @@ class TabPagerAdapter extends FragmentPagerAdapter {
      * Number of pages this adapter supports.
      */
     @SuppressWarnings("FieldCanBeLocal")
-    private final int NUMBER_OF_PAGES = 3;
+    private final int NUMBER_OF_PAGES = 4;
 
     static final int cardStackItem = 1;
     static final int AboutItem = 0;
@@ -24,10 +25,10 @@ class TabPagerAdapter extends FragmentPagerAdapter {
     static final int RequestsItem = 3;
 
     //TODO mudar se necessário private ProfileFragment profileFragment;
-    private Profile userProfileFragment;
+    private ProfileFragment userProfileFragment;
     private AboutAoDisporFragment aboutAoDisporFragment;
     private CardFragment cardFragment;
-    //private UserRequestFragment requestFormFragment;
+    private UserRequestFragment requestFormFragment;
 
     /**
      * The TabPagerAdapter constructor.
@@ -58,31 +59,21 @@ class TabPagerAdapter extends FragmentPagerAdapter {
                 aboutAoDisporFragment = (AboutAoDisporFragment) f;
                 break;
             case 2:
-                f = new Profile();
+                f = new ProfileFragment();
                 //f = ProfileFragment.newInstance();
                 //TODO mudar se necessário profileFragment = (ProfileFragment) f;
                 //profileFragment = (ProfileFragment) f;
-                userProfileFragment = (Profile) f;
+                userProfileFragment = (ProfileFragment) f;
                 break;
             case 3:
-                // f = requestFormFragment.newInstance();
-                // requestFormFragment = (UserRequestFragment) f;
+                f = new UserRequestFragment();
+                requestFormFragment = (UserRequestFragment) f;
                 break;
         }
         return f;
     }
 
-    /* TODO mudar se necessário
-    public ProfileFragment getProfileFragment() {
-        return profileFragment;
-    }
-    */
-
-    public Profile getUserProfileFragment() {
-        return userProfileFragment;
-    }
-
-    public CardFragment getCardFragment() {
+    CardFragment getCardFragment() {
         return cardFragment;
     }
 

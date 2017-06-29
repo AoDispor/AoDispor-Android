@@ -182,24 +182,4 @@ public abstract class Utility {
     }
 
 
-    public interface IViewModifier {
-        public void apply(View v);
-    }
-
-    static public void apply2AllChildrenBFS(View v, IViewModifier mod) {
-        List<View> unvisited = new ArrayList<View>();
-        unvisited.add(v);
-
-        while (!unvisited.isEmpty()) {
-            View child = unvisited.remove(0);
-            if (!(child instanceof ViewGroup)) {
-                mod.apply(child);
-                continue;
-            }
-            ViewGroup group = (ViewGroup) child;
-            final int childCount = group.getChildCount();
-            for (int i = 0; i < childCount; i++) unvisited.add(group.getChildAt(i));
-        }
-    }
-
 }

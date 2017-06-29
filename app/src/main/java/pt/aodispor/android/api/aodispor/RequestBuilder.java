@@ -2,13 +2,10 @@ package pt.aodispor.android.api.aodispor;
 
 import android.graphics.Bitmap;
 import android.util.Base64;
+import android.util.Log;
 
 import pt.aodispor.android.api.HttpRequestTask;
-import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
-import pt.aodispor.android.data.models.aodispor.CPPQueryResult;
-import pt.aodispor.android.data.models.aodispor.Professional;
-import pt.aodispor.android.data.models.aodispor.Register;
-import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
+import pt.aodispor.android.data.models.aodispor.*;
 import pt.aodispor.android.features.cardstack.GeoLocation;
 import pt.aodispor.android.utils.Utility;
 
@@ -44,6 +41,37 @@ public class RequestBuilder {
     private static final BasicRequestInfo URL_LOCATION = new BasicRequestInfo(
             "https://api.aodispor.pt/location/{cp4}/{cp3}", false
     );
+
+    // region User Requests -----------------------------------------------------------------
+    private static final BasicRequestInfo CREATE_REQUEST = new BasicRequestInfo(
+            "https://api.aodispor.pt/pedidos", true
+    );
+    private static final BasicRequestInfo GET_REQUEST = new BasicRequestInfo(
+            "https://api.aodispor.pt/users/me/pedido", true
+    );
+    private static final BasicRequestInfo DELETE_REQUEST = new BasicRequestInfo(
+            "https://api.aodispor.pt/pedidos/{uuid}", true //request id
+    );
+
+    public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildCreateUserRequest(UserRequestCreationData user_request) {
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.POST(UserRequestCreationData.class, CREATE_REQUEST.URL);
+        GET_REQUEST.setHeaders(request);
+        request.setJSONBody(user_request);
+        return request;
+    }
+
+    public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildGetUserRequest() {
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.GET(UserRequests.class, GET_REQUEST.URL);
+        GET_REQUEST.setHeaders(request);
+        return request;
+    }
+
+    public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildDeleteUserRequest(String uuid) {
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.DELETE(String.class, DELETE_REQUEST.URL, uuid);
+        DELETE_REQUEST.setHeaders(request);
+        return request;
+    }
+    //endregion
 
     public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildCardStackRequest(final String searchQuery, final GeoLocation geoLocation) {
         HttpRequestTask<AODISPOR_JSON_WEBAPI> request;

@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         setNavState(navigationView);
+
+        setCardStackAsView();
     }
 
     private void setNavState(NavigationView navigationView) {
@@ -171,7 +173,7 @@ public class MainActivity extends AppCompatActivity
         //android.support.v4.view.ViewPager cannot be cast to pt.aodispor.android.MyViewPager
         mViewPager = (MyViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem);
+        //mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem);
 
         searchView = (SearchView) findViewById(R.id.searchView);
         EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -217,7 +219,8 @@ public class MainActivity extends AppCompatActivity
                         cardFrag.setSearchQuery(query);
                         cardFrag.prepareNewStack();
                     }
-                    mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem, true);
+                    setCardStackAsView();
+
                     closeSearchView();
                 } else {
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_bar_toast), Toast.LENGTH_SHORT).show();
@@ -281,7 +284,7 @@ public class MainActivity extends AppCompatActivity
         searchView.setQuery(query, false);
         cardFrag.setSearchQuery(query);
         cardFrag.prepareNewStack();
-        mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem, true);
+        setCardStackAsView();
         searchView.clearFocus();
     }
 
@@ -304,8 +307,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_profile) {
             mViewPager.setCurrentItem(TabPagerAdapter.ProfileItem);
         } else if (id == R.id.nav_requests) {
-            //TODO ADD LATER -> mViewPager.setCurrentItem(TabPagerAdapter.);
-            return false;
+            mViewPager.setCurrentItem(TabPagerAdapter.RequestsItem);
         } else if (id == R.id.nav_login) {
             Intent showSplitActivityActivity = new Intent(MainActivity.this, SplitActivity.class);
             showSplitActivityActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -315,5 +317,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setCardStackAsView() {
+        mViewPager.setCurrentItem(TabPagerAdapter.cardStackItem);
+        NavigationView nav = (NavigationView) findViewById(R.id.nav_view);
+        nav.getMenu().findItem(R.id.nav_search).setChecked(true);
     }
 }

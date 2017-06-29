@@ -67,6 +67,11 @@
     <string name="smsvalidation_textbox">Insira código de validação</string>
     <string name="smsvalidation_button">Validar</string>
 
+    <!-- User Requests Fragment -->
+    <string name="missing_fields_toast">todos os campos têm que estar preenchidos</string>
+    <string name="request_uploaded_successfully">pedido enviado com sucesso</string>
+    <string name="request_upload_failed">o envio do pedido falhou</string>
+
     <!-- Permissions Messages
     23>= versions display an informative dialog box before showing the system permission dialog
     23< versions aks "permission" in a single dialog box (system permissions were already given when app was instaled, just makes the actions clear to the user)
@@ -148,7 +153,7 @@
     <string name="nav_aboutus">Sobre o AoDispor</string>
 
 
-    <string name="no_response_from_AoDispo">Sem resposta de AoDispor</string>
+    <string name="no_response_from_AoDispor">Sem resposta de AoDispor</string>
     <string name="professional_image_contentdescription">Imagem do profissional</string>
 
     <string name="about_aodispor_text">

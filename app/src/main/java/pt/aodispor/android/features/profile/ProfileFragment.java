@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,6 @@ import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.api.aodispor.RequestBuilder;
 import pt.aodispor.android.utils.TypefaceManager;
-import pt.aodispor.android.utils.Utility;
 import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.Professional;
@@ -43,17 +43,19 @@ import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
 import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.data.models.aodispor.meta.CurrencyType;
 import pt.aodispor.android.data.models.aodispor.meta.PaymentType;
+import pt.aodispor.android.utils.ViewUtils;
 
 import static android.app.Activity.RESULT_OK;
 
-public class Profile extends Fragment implements LocationDialog.LocationDialogListener, PriceDialog.PriceDialogListener {
+public class ProfileFragment extends Fragment implements LocationDialog.LocationDialogListener, PriceDialog.PriceDialogListener {
     private static final int SELECT_PICTURE = 0;
     private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
-    private Profile thisObject;
-    private TextView imageView, noConnectionView;
+    private ProfileFragment thisObject;
+    private TextView imageView;
+    private LinearLayout noConnectionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
-    private ImageView profileImage, noConnectionImg;
+    private ImageView profileImage;//, noConnectionImg;
     private View root;
     private String prefix, suffix; //cp4 & cp3
     private int rate = -1;
@@ -84,7 +86,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
 
         // Get Text Views
         imageView = (TextView) root.findViewById(R.id.imageText);
-        noConnectionView = (TextView) root.findViewById(R.id.profile_not_loaded_text);
+        noConnectionView = (LinearLayout) root.findViewById(R.id.not_loaded_page_layout);
 
         // Get Edit Text Views
         nameEdit = (EditText) root.findViewById(R.id.nameEdit);
@@ -95,7 +97,6 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
 
         // Get image
         profileImage = (ImageView) root.findViewById(R.id.profileImage);
-        noConnectionImg = (ImageView) root.findViewById(R.id.profile_not_loaded_img);
 
         setFonts();
 
@@ -105,7 +106,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
             public void onClick(View view) {
                 LocationDialog dialog = new LocationDialog();
                 dialog.setListener(thisObject);
-                dialog.show(Profile.this.getFragmentManager(), LOCATION_TAG);
+                dialog.show(ProfileFragment.this.getFragmentManager(), LOCATION_TAG);
             }
         });
 
@@ -114,7 +115,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
             public void onClick(View view) {
                 PriceDialog dialog = PriceDialog.newInstance(rate, isFinal, type, currency);
                 dialog.setListener(thisObject);
-                dialog.show(Profile.this.getFragmentManager(), PRICE_DIALOG_TAG);
+                dialog.show(ProfileFragment.this.getFragmentManager(), PRICE_DIALOG_TAG);
             }
         });
 
@@ -124,7 +125,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                Profile.this.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+                ProfileFragment.this.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
             }
         });
 
@@ -138,7 +139,7 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         );
 
         //hide stuff until page is loaded
-        Utility.apply2AllChildrenBFS(getView(), new Utility.IViewModifier() {
+        /*Utility.apply2AllChildrenBFS(getView(), new Utility.IViewModifier() {
             @Override
             public void apply(View v) {
                 if (v instanceof EditText
@@ -146,9 +147,9 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
                         || v instanceof ImageView
                         ) v.setVisibility(View.GONE);
             }
-        });
-        noConnectionView.setVisibility(View.VISIBLE);
-        noConnectionImg.setVisibility(View.VISIBLE);
+        });*/
+        ViewUtils.changeVisibilityOfAllViewChildren(getView(),View.GONE);
+        ViewUtils.changeVisibilityOfAllViewChildren(noConnectionView,View.VISIBLE);
 
         getProfileInfo();
 
@@ -271,18 +272,8 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
         request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
             @Override
             public void exec(AODISPOR_JSON_WEBAPI answer) {
-                //show stuff
-                Utility.apply2AllChildrenBFS(getView(), new Utility.IViewModifier() {
-                    @Override
-                    public void apply(View v) {
-                        if (v instanceof EditText
-                                || v instanceof TextView
-                                || v instanceof ImageView
-                                ) v.setVisibility(View.VISIBLE);
-                    }
-                });
-                noConnectionView.setVisibility(View.GONE);
-                noConnectionImg.setVisibility(View.GONE);
+                ViewUtils.changeVisibilityOfAllViewChildren(getView(), View.VISIBLE);
+                ViewUtils.changeVisibilityOfAllViewChildren(noConnectionView, View.GONE);
             }
         });
         request.addOnFailHandlers(
@@ -376,8 +367,8 @@ public class Profile extends Fragment implements LocationDialog.LocationDialogLi
     }
 
     private void setFonts() {
-        TypefaceManager.singleton.setTypeface( root.findViewById(R.id.profile_base) , TypefaceManager.singleton.YANONE[1]);
-        TypefaceManager.singleton.setTypeface( imageView, TypefaceManager.singleton.YANONE[0]);
+        TypefaceManager.singleton.setTypeface(root.findViewById(R.id.profile_base), TypefaceManager.singleton.YANONE[1]);
+        TypefaceManager.singleton.setTypeface(imageView, TypefaceManager.singleton.YANONE[0]);
     }
 
     /**

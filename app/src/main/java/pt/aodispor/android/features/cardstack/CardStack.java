@@ -68,7 +68,7 @@ public class CardStack {
         if (this.fragment == null) this.fragment = fragment;
         if (this.inflater == null) this.inflater = inflater;
         if (this.rootView == null) this.rootView = rootView;
-        if (typeface != null)
+        if (typeface == null)
             typeface = TypefaceManager.singleton.getTypeFace(TypefaceManager.singleton.load(rootView.getContext(), TypefaceManager.singleton.YANONE[0]));
     }
 
@@ -262,6 +262,7 @@ public class CardStack {
 
         TextView description = (TextView) card.findViewById(R.id.description);
         description.setText(Html.fromHtml(description_text));
+        //description.setTypeface(typeface);
         //description.setMovementMethod(new ScrollingMovementMethod());
 
         TextView price = (TextView) card.findViewById(R.id.price);

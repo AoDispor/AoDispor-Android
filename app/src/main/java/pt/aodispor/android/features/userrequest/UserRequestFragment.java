@@ -76,7 +76,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
         context = this.getContext();
         //should be done in the activity startup HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
-        root = inflater.inflate(R.layout.profile, container, false);
+        root = inflater.inflate(R.layout.userrequest, container, false);
 
         // Get Text Views
         noConnectionView = (LinearLayout) root.findViewById(R.id.not_loaded_page_layout);

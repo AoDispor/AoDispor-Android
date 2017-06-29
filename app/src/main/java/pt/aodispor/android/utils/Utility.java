@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import pt.aodispor.android.AoDisporApplication;
+import pt.aodispor.android.AppDefinitions;
+import pt.aodispor.android.R;
 import pt.aodispor.android.data.models.aodispor.Professional;
 
 /**
@@ -181,5 +184,11 @@ public abstract class Utility {
         Log.v("debug", "description:" + p.description);
     }
 
-
+    static public String prettifyDistance(int distanceInMeters) {
+        if (distanceInMeters > 1000) return Integer.toString(distanceInMeters / 1000) + " " +
+                AoDisporApplication.getInstance().getResources().getString(R.string.kilometers_symbol);
+        //else
+        return Integer.toString(distanceInMeters) + " " +
+                AoDisporApplication.getInstance().getResources().getString(R.string.meters);
+    }
 }

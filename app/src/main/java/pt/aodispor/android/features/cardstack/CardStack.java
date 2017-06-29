@@ -1,9 +1,14 @@
 package pt.aodispor.android.features.cardstack;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -20,12 +25,14 @@ import org.joda.time.PeriodType;
 
 import java.util.Date;
 
+import pt.aodispor.android.AoDisporApplication;
 import pt.aodispor.android.R;
 import pt.aodispor.android.data.models.aodispor.BasicCardFields;
 import pt.aodispor.android.data.models.aodispor.Professional;
 import pt.aodispor.android.data.models.aodispor.UserRequest;
 import pt.aodispor.android.utils.HtmlUtil;
 import pt.aodispor.android.utils.TypefaceManager;
+import pt.aodispor.android.utils.Utility;
 
 
 public class CardStack {
@@ -235,7 +242,8 @@ public class CardStack {
     }
 
     private RelativeLayout professionalCard(Professional professional) {
-        return createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url);
+        return createProfessionalCard(professional.title, professional.location, professional.description, professional.rate, professional.currency, professional.type, professional.avatar_url,
+                professional.distance.intValue());
     }
 
     private RelativeLayout requestCard(UserRequest request) {
@@ -249,7 +257,8 @@ public class CardStack {
                                                     String price_value,
                                                     String currency_type,
                                                     String payment_type,
-                                                    String avatar_scr) {
+                                                    String avatar_scr,
+                                                    Integer distance) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.professional_card, rootView, false);
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
@@ -257,7 +266,22 @@ public class CardStack {
         profession.setTypeface(typeface);
 
         TextView location = (TextView) card.findViewById(R.id.location);
-        location.setText(HtmlUtil.fromHtml(location_text));
+        int flag = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+        SpannableString s1 = new SpannableString(HtmlUtil.fromHtml(location_text));
+
+        String distanceDisplay = " ( ? )";
+        if (distance != null) {
+            distanceDisplay = AoDisporApplication.getInstance().getResources().getString(R.string.professional_distance_display)
+                    .replace("XXX",
+                            Utility.prettifyDistance(distance));
+        }
+        SpannableString s2 = new SpannableString(distanceDisplay);
+        s1.setSpan(new ForegroundColorSpan(Color.BLACK), 0, s1.length(), flag);
+        s2.setSpan(new ForegroundColorSpan(Color.LTGRAY), 0, s2.length(), flag);
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(s1);
+        builder.append(s2);
+        location.setText(builder);
         location.setTypeface(typeface);
 
         TextView description = (TextView) card.findViewById(R.id.description);

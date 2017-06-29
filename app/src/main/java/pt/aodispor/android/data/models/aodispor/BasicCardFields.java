@@ -28,5 +28,5 @@ public abstract class BasicCardFields extends AODISPOR_JSON_WEBAPI {
     @JsonProperty("rate") public String rate;
     @JsonProperty("currency") public String currency;
 
-    @JsonProperty("distance") public String distance;
+    @JsonProperty("distance") public Double distance;
 }

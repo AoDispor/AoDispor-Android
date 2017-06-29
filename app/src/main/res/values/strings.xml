@@ -7,7 +7,7 @@
     <string name="navigation_drawer_open">abrir menu de navegação</string>
     <string name="navigation_drawer_close">fechar menu de navegação</string>
 
-    <!-- Register Card -->
+    <!-- Profile Card -->
     <string name="register_name">O seu nome</string>
     <string name="register_location">A sua localização</string>
     <string name="register_price">O seu preço</string>
@@ -22,8 +22,6 @@
     <string name="profile_location_edit_hint">Escreva aqui a sua localização</string>
     <string name="profile_price_edit_hint">Toque aqui para editar o seu valor</string>
     <string name="profile_professionaldescription_edt_hint">Escreva aqui a descrição</string>
-
-    <!-- Profile Card -->
     <string name="profile_price">%1$d €</string>
 
     <!--user request from-->
@@ -91,6 +89,9 @@
     <string name="discard">Descartar</string>string>
     <string name="query_too_short">Palavra demasiado curta</string>
     <string name="cannot_load_image">Não foi possível carregar a sua imagem.</string>
+    <string name="professional_distance_display">&#160;(a XXX)</string>>
+    <string name="meters">metros</string>
+    <string name="kilometers_symbol">km</string>
 
     <!-- Generic Messages -->
     <string name="okay">Certo</string>

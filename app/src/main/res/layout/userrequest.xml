@@ -15,7 +15,7 @@
 
         <include layout="@layout/notloadedpage" />
 
-            <Button
+            <android.widget.Button
                 android:id="@+id/sendUserRequestButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

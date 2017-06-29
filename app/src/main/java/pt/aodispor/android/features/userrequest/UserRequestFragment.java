@@ -193,7 +193,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
     }
 
     private void setFonts() {
-        TypefaceManager.singleton.setTypeface(root.findViewById(R.id.profile_base), TypefaceManager.singleton.YANONE[1]);
+        TypefaceManager.singleton.setTypeface(root.findViewById(R.id.userrequests_base), TypefaceManager.singleton.YANONE[1]);
     }
 
     private final HttpRequestTask.IOnHttpRequestCompleted updateFragmentRequest =

@@ -8,24 +8,22 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/profile_base"
-        android:layout_width="wrap_content"
+        android:id="@+id/userrequests_base"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <include layout="@layout/notloadedpage" />
 
-            <android.widget.Button
-                android:id="@+id/sendUserRequestButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background= "@drawable/button"
-                android:text="Clique aqui para enviar pedido"
-                android:textSize="18sp"
-                android:layout_marginLeft="7sp"
-                android:layout_marginRight="7sp"
-                />
-
+        <android.widget.Button
+            android:id="@+id/sendUserRequestButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7sp"
+            android:layout_marginRight="7sp"
+            android:background="@drawable/button"
+            android:text="Clique aqui para enviar pedido"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/requestName"

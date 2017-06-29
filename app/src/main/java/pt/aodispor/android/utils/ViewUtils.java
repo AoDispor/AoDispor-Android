@@ -31,6 +31,7 @@ public class ViewUtils {
     }
 
     static public void changeVisibilityOfAllViewChildren(View v, final int visibility) {
+        //if(v==null) return;
         apply2AllChildrenBFS(v,
                 new IViewModifier() {
                     @Override

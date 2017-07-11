@@ -19,7 +19,7 @@ public class UserRequest extends BasicCardFields {
         Date ret = null;
         try {
             ret = AppDefinitions.TIMAEDATE_FORMATER.parse(data_expiracao);
-        } catch (Exception e){}
+        } catch (Exception ignored){}
         return ret;
     }
 

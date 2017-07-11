@@ -21,6 +21,7 @@ public class MyViewPager extends ViewPager {
      */
     public MyViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setOffscreenPageLimit(5);
         //this.enabled = true;
     }
 

@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.github.stkent.amplify.tracking.Amplify;
 
+import static pt.aodispor.android.AppDefinitions.FORCE_AMPLIFY;
+
 public class AoDisporApplication extends Application {
 
     private static AoDisporApplication singleton;
@@ -20,6 +22,7 @@ public class AoDisporApplication extends Application {
 
         Amplify.initSharedInstance(this)
                 .setFeedbackEmailAddress(getString(R.string.feedback_email))
+                .setAlwaysShow(FORCE_AMPLIFY)
                 .applyAllDefaultRules();
     }
 }

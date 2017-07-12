@@ -94,25 +94,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/-->
 
-            <com.github.stkent.amplify.prompt.DefaultLayoutPromptView
-                android:id="@+id/prompt_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                app:prompt_view_background_color="@color/aoDisporGreen"
-                app:prompt_view_critical_feedback_question_negative_button_label="@string/amplify_negative_no"
-                app:prompt_view_critical_feedback_question_positive_button_label="@string/amplify_negative_yes"
-                app:prompt_view_critical_feedback_question_title="@string/amplify_negative_question"
-                app:prompt_view_positive_feedback_question_negative_button_label="@string/amplify_positive_no"
-                app:prompt_view_positive_feedback_question_positive_button_label="@string/amplify_positive_yes"
-                app:prompt_view_positive_feedback_question_title="@string/amplify_positive_title"
-                app:prompt_view_thanks_display_time_ms="2000"
-                app:prompt_view_thanks_title="@string/amplify_thanks"
-                app:prompt_view_user_opinion_question_negative_button_label="@string/amplify_question_no"
-                app:prompt_view_user_opinion_question_positive_button_label="@string/amplify_question_yes"
-                app:prompt_view_user_opinion_question_title="@string/amplify_question_title" />
-
-
             <pt.aodispor.android.features.main.MyViewPager
                 android:id="@+id/container"
                 android:layout_width="match_parent"
@@ -127,6 +108,24 @@
             </pt.aodispor.android.features.main.MyViewPager>
 
         </RelativeLayout>
+
+        <com.github.stkent.amplify.prompt.DefaultLayoutPromptView
+            android:id="@+id/prompt_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            app:prompt_view_background_color="@color/aoDisporGreen"
+            app:prompt_view_critical_feedback_question_negative_button_label="@string/amplify_negative_no"
+            app:prompt_view_critical_feedback_question_positive_button_label="@string/amplify_negative_yes"
+            app:prompt_view_critical_feedback_question_title="@string/amplify_negative_question"
+            app:prompt_view_positive_feedback_question_negative_button_label="@string/amplify_positive_no"
+            app:prompt_view_positive_feedback_question_positive_button_label="@string/amplify_positive_yes"
+            app:prompt_view_positive_feedback_question_title="@string/amplify_positive_title"
+            app:prompt_view_thanks_display_time_ms="2000"
+            app:prompt_view_thanks_title="@string/amplify_thanks"
+            app:prompt_view_user_opinion_question_negative_button_label="@string/amplify_question_no"
+            app:prompt_view_user_opinion_question_positive_button_label="@string/amplify_question_yes"
+            app:prompt_view_user_opinion_question_title="@string/amplify_question_title" />
 
     </android.support.design.widget.CoordinatorLayout>
 

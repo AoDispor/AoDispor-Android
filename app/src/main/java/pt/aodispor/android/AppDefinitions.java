@@ -20,13 +20,15 @@ public class AppDefinitions {
      * <br>the phone number used is equal to the test phone number
      * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
-    public static final boolean SKIP_LOGIN = true;
+    public static final boolean SKIP_LOGIN = false;
 
     public static final String testPhoneNumber = "+351" + "911793861";
-    public static final String testPassword = "943813";
+    public static final String testPassword = "835358";
 
     //endregion
 
+    /**always show amplify - for debug purposes*/
+    static final boolean FORCE_AMPLIFY = false;
 
     static final public String TIMEDATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     static final public SimpleDateFormat TIMAEDATE_FORMATER =

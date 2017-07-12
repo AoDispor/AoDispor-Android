@@ -3,6 +3,7 @@ package pt.aodispor.android.view.tests;
 import android.os.Build;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -32,12 +33,13 @@ public class CardFragmentTest {
      * No caso de os testes falharem com o erro "Verify", é devido a uma limitação da versão do Java que usado
      * Para resolver basta editar as Run Configurations do test, no campo VM Options e adicionar a flag -noverify
      */
-/*
+
     @Test
     public void testIrrelevant() {
         return;
     }
 
+    /*
     /*@Test
     public void testSwipeCardOrder1() {
         CardFragmentTestClass fragment = new CardFragmentTestClass();

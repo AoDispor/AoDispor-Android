@@ -180,7 +180,7 @@ public class CardFragment extends Fragment {
     /**
      * This method creates the View of this card stack fragment.
      *
-     * @param i                  the LayoutInflater object to inflate card_zone.xml and card.xml.
+     * @param i                  the LayoutInflater object to inflate card_zone.xml and <card>.xml.
      * @param c                  the root ViewGroup.
      * @param savedInstanceState object with saved states of previously created fragment.
      * @return returns the root view of the fragment. Not to be confused with the root ViewGroup of

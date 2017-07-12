@@ -28,7 +28,6 @@ class SwipeListener implements View.OnTouchListener {
      * The constructor of the SwipeListener.
      *
      * @param v  the card view to control.
-     * @param vp the MyViewPager object that controls the pager.
      * @param cf the CradFragment object where this card is on.
      */
     SwipeListener(View v, /*MyViewPager vp,*/ CardFragment cf) {
@@ -73,7 +72,7 @@ class SwipeListener implements View.OnTouchListener {
                 view.setTranslationX(x - initialX);
                 view.setTranslationY(y - initialY);
                 view.setRotation(view.getX() * 0.05f);
-                if(discard!=null) {
+                if (discard != null) {
                     discard.setRotation(-45);
                     discard.setAlpha(Math.max(
                             3.8f * view.getX() * view.getX() / (view.getWidth() * view.getWidth()),
@@ -101,8 +100,8 @@ class SwipeListener implements View.OnTouchListener {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
                                     view.setEnabled(true);
-                                    if(discard!=null) discard.setAlpha(0);
-                  //                  viewPager.setSwipeEnabled(true);
+                                    if (discard != null) discard.setAlpha(0);
+                                    //                  viewPager.setSwipeEnabled(true);
                                 }
 
                                 @Override
@@ -130,7 +129,7 @@ class SwipeListener implements View.OnTouchListener {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
                                     cardFragment.discardTopCard();
-                    //                viewPager.setSwipeEnabled(true);
+                                    //                viewPager.setSwipeEnabled(true);
                                     CardFragment.blockAccess = false;
                                 }
 

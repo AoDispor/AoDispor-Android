@@ -11,7 +11,7 @@ import pt.aodispor.android.R;
 
 
 public class CardStackTestClass extends CardStack{
-
+/*
     @Override
     protected RelativeLayout createProfessionalCard(String profession_text,
                                                     String location_text,
@@ -53,6 +53,6 @@ public class CardStackTestClass extends CardStack{
         }
 
         return card;
-    }
+    }*/
 
 }

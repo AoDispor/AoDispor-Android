@@ -8,8 +8,7 @@
     android:layout_margin="5dp"
     android:background="@drawable/card"
     android:orientation="vertical"
-    android:padding="0dp"
-    tools:context="pt.aodispor.android.ProfessionalProfileActivity">
+    android:padding="0dp">
 
     <!--include layout="@layout/loading_indicator"/-->
 
@@ -72,5 +71,19 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:scrollbars="vertical" />
+
+    <TextView
+        android:id="@+id/discard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:alpha="0"
+        android:background="@drawable/round_rectangle_red"
+        android:padding="10dp"
+        android:text="@string/discard"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="40sp" />
 
 </RelativeLayout>

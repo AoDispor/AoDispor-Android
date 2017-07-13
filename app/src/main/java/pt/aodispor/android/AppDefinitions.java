@@ -48,6 +48,7 @@ public class AppDefinitions {
     public static final int TIMEOUT = 20000;*/
 
     public static final int QUERY_MIN_LENGTH = 5;
+    public static final int QUERY_MAX_LENGTH = 64;
 
     /**
      * [CardFragment.java] - nextSet loading

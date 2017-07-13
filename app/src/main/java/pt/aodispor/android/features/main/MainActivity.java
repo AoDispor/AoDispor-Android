@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.stkent.amplify.prompt.DefaultLayoutPromptView;
 import com.github.stkent.amplify.tracking.Amplify;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
+import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.features.cardstack.CardFragment;
 import pt.aodispor.android.features.cardstack.GeoLocation;
 import pt.aodispor.android.features.login.Advanceable;
@@ -56,6 +58,17 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        CrashlyticsCore crashlyticsCore = CrashlyticsCore.getInstance();
+        if (AppDefinitions.smsLoginDone) {
+            crashlyticsCore.setString("on_main_activity_oncreate", "logged in");
+            UserData.UserAuthentication auth = UserData.getInstance().getUserLoginAuth();
+            crashlyticsCore.setString("phone", auth.phone_number);
+            crashlyticsCore.setString("validation_code", auth.validation_code);
+        } else {
+            crashlyticsCore.getInstance().setString("on_main_activity_oncreate", "not logged");
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -196,36 +209,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                /**
-                 * Get all the words in the query to get rid of spaces and then
-                 * build another String with all the words in order separated by
-                 * only one space in between each of them.
-                 */
-                String[] words = query.split("\\s+");
-                String newQuery = "";
-                for (int i = 0; i < words.length; i++) {
-                    newQuery += words[i];
-                    if (i < words.length - 1) {
-                        newQuery += " ";
-                    }
-                }
-                if (newQuery.length() >= 5) {
-                    CardFragment cardFrag = null;
-                    for (Object frag : getSupportFragmentManager().getFragments()) {
-                        if (frag instanceof CardFragment) {
-                            cardFrag = (CardFragment) frag;
-                        }
-                    }
-                    if (cardFrag != null) {
-                        cardFrag.setSearchQuery(query);
-                        cardFrag.prepareNewStack();
-                    }
-                    setCardStackAsView();
-
-                    closeSearchView();
-                } else {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_bar_toast), Toast.LENGTH_SHORT).show();
-                }
+                launchSearch(query);
                 return true;
             }
         });
@@ -274,19 +258,43 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void launchSearch(String query) {
-        if (query.length() < AppDefinitions.QUERY_MIN_LENGTH) {
-            Toast.makeText(this, R.string.query_too_short, Toast.LENGTH_SHORT).show();
-            return;
+        /**
+         * Get all the words in the query to get rid of spaces and then
+         * build another String with all the words in order separated by
+         * only one space in between each of them.
+         */
+        String[] words = query.split("\\s+");
+        String newQuery = "";
+        for (int i = 0; i < words.length; i++) {
+            newQuery += words[i];
+            if (i < words.length - 1) {
+                newQuery += " ";
+            }
         }
-        CardFragment cardFrag = null;
-        for (Object frag : getSupportFragmentManager().getFragments())
-            if (frag instanceof CardFragment) cardFrag = (CardFragment) frag;
-        SearchView searchView = (SearchView) findViewById(R.id.searchView);
-        searchView.setQuery(query, false);
-        cardFrag.setSearchQuery(query);
-        cardFrag.prepareNewStack();
-        setCardStackAsView();
-        searchView.clearFocus();
+
+        if (newQuery.length() > AppDefinitions.QUERY_MAX_LENGTH)
+            newQuery = newQuery.substring(0, AppDefinitions.QUERY_MAX_LENGTH);
+
+        if (newQuery.length() >= AppDefinitions.QUERY_MIN_LENGTH) {
+            CrashlyticsCore.getInstance().setString("last_search_made_without_cleanup", query);
+            CrashlyticsCore.getInstance().setString("last_search_made_after_cleanup", newQuery);
+
+            CardFragment cardFrag = null;
+            for (Object frag : getSupportFragmentManager().getFragments()) {
+                if (frag instanceof CardFragment) {
+                    cardFrag = (CardFragment) frag;
+                }
+            }
+            //if (cardFrag != null) {
+            cardFrag.setSearchQuery(newQuery);
+            cardFrag.prepareNewStack();
+            //}
+            setCardStackAsView();
+
+            closeSearchView();
+        } else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_bar_toast), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void closeSearchView() {

@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 
 import android.os.Bundle;
+
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.core.CrashlyticsCore;
 
 import io.fabric.sdk.android.Fabric;
 import pt.aodispor.android.AppDefinitions;
@@ -15,6 +17,8 @@ import pt.aodispor.android.R;
 import pt.aodispor.android.api.aodispor.BasicRequestInfo;
 import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.features.login.OnBoardingActivity;
+
+import static android.provider.Settings.Secure.ANDROID_ID;
 
 public class SplitActivity extends Activity {
 
@@ -25,6 +29,11 @@ public class SplitActivity extends Activity {
         BasicRequestInfo.setToken(getResources().getString(R.string.ao_dispor_api_key));
 
         Fabric.with(this, new Answers(), new Crashlytics());
+
+        try {
+            CrashlyticsCore.getInstance().setUserIdentifier(ANDROID_ID);
+        } catch (Exception ignore) {
+        }
 
         final Class<? extends Activity> activityClass;
         LoginDataPreferences preferences = new LoginDataPreferences(getApplicationContext());

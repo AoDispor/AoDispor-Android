@@ -8,6 +8,7 @@
     <string name="no_pile_end_reset">Voltar ao início</string>
 
     <string name="no_conection_title">Sem conexão</string>
-    <string name="no_conection_msg">Não foi possível receber uma resposta de AoDispor.\nDeseja tentar reconectar-se?</string>
+    <string name="no_conection_msg">Não foi possível receber uma resposta de AoDispor.</string>
+        <!--\nDeseja tentar reconectar-se?</string-->
     <string name="no_conection_try_again">Tentar</string>
 </resources>

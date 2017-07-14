@@ -25,10 +25,12 @@ public class AppDefinitions {
     public static final String testPhoneNumber = "+351" + "911793861";
     public static final String testPassword = "835358";
 
-    //endregion
-
     /**always show amplify - for debug purposes*/
     static final boolean FORCE_AMPLIFY = false;
+
+    public static String aoDisporApiBaseAddress = "https://api.aodispor.pt";
+
+    //endregion
 
     static final public String TIMEDATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     static final public SimpleDateFormat TIMAEDATE_FORMATER =

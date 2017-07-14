@@ -29,6 +29,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.Arrays;
 
+import io.fabric.sdk.android.Fabric;
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.data.local.UserData;
@@ -59,14 +60,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        CrashlyticsCore crashlyticsCore = CrashlyticsCore.getInstance();
-        if (AppDefinitions.smsLoginDone) {
-            crashlyticsCore.setString("on_main_activity_oncreate", "logged in");
-            UserData.UserAuthentication auth = UserData.getInstance().getUserLoginAuth();
-            crashlyticsCore.setString("phone", auth.phone_number);
-            crashlyticsCore.setString("validation_code", auth.validation_code);
-        } else {
-            crashlyticsCore.getInstance().setString("on_main_activity_oncreate", "not logged");
+        if (Fabric.isInitialized()) {
+            CrashlyticsCore crashlyticsCore = CrashlyticsCore.getInstance();
+            if (AppDefinitions.smsLoginDone) {
+                crashlyticsCore.setString("on_main_activity_oncreate", "logged in");
+                UserData.UserAuthentication auth = UserData.getInstance().getUserLoginAuth();
+                crashlyticsCore.setString("phone", auth.phone_number);
+                crashlyticsCore.setString("validation_code", auth.validation_code);
+            } else {
+                crashlyticsCore.setString("on_main_activity_oncreate", "not logged");
+            }
         }
 
         super.onCreate(savedInstanceState);
@@ -276,8 +279,10 @@ public class MainActivity extends AppCompatActivity
             newQuery = newQuery.substring(0, AppDefinitions.QUERY_MAX_LENGTH);
 
         if (newQuery.length() >= AppDefinitions.QUERY_MIN_LENGTH) {
-            CrashlyticsCore.getInstance().setString("last_search_made_without_cleanup", query);
-            CrashlyticsCore.getInstance().setString("last_search_made_after_cleanup", newQuery);
+            if (Fabric.isInitialized()) {
+                CrashlyticsCore.getInstance().setString("last_search_made_without_cleanup", query);
+                CrashlyticsCore.getInstance().setString("last_search_made_after_cleanup", newQuery);
+            }
 
             CardFragment cardFrag = null;
             for (Object frag : getSupportFragmentManager().getFragments()) {

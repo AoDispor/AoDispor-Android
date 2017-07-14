@@ -4,12 +4,14 @@ import android.graphics.Bitmap;
 import android.util.Base64;
 import android.util.Log;
 
+import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.*;
 import pt.aodispor.android.features.cardstack.GeoLocation;
 import pt.aodispor.android.utils.Utility;
 
-//TODO IMPLEMENTAR E FAZER HTTP REQUEST TASK GENERICO
+import static pt.aodispor.android.AppDefinitions.aoDisporApiBaseAddress;
+
 public class RequestBuilder {
 
     //private static AoDisporHttpsRequestsBuilder ourInstance = new AoDisporHttpsRequestsBuilder();
@@ -18,39 +20,39 @@ public class RequestBuilder {
     }
 
     private static final BasicRequestInfo queryProfilesURL = new BasicRequestInfo(
-            "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}", false
+            aoDisporApiBaseAddress + "/profiles/?query={query}&lat={lat}&lon={lon}", false
     );
     private static final BasicRequestInfo queryProfilesURLempty = new BasicRequestInfo(
-            "https://api.aodispor.pt/profiles/?query=&lat={lat}&lon={lon}", false
+            aoDisporApiBaseAddress + "/profiles/?query=&lat={lat}&lon={lon}", false
     );
     private static final BasicRequestInfo REGISTER_URL = new BasicRequestInfo(
-            "https://api.aodispor.pt/users/register", false
+            aoDisporApiBaseAddress + "/users/register", false
     );
     /**
      * for login validation ???
      */
     private static final BasicRequestInfo MYSELF_URL = new BasicRequestInfo(
-            "https://api.aodispor.pt/users/me", false, SearchQueryResult.class
+            aoDisporApiBaseAddress + "/users/me", false, SearchQueryResult.class
     );
     private static final BasicRequestInfo URL_MY_PROFILE = new BasicRequestInfo(
-            "https://api.aodispor.pt/profiles/me", true
+            aoDisporApiBaseAddress + "/profiles/me", true
     );
     private static final BasicRequestInfo URL_UPLOAD_IMAGE = new BasicRequestInfo(
-            "https://api.aodispor.pt/users/me/profile/avatar", true
+            aoDisporApiBaseAddress + "/users/me/profile/avatar", true
     );
     private static final BasicRequestInfo URL_LOCATION = new BasicRequestInfo(
-            "https://api.aodispor.pt/location/{cp4}/{cp3}", false
+            aoDisporApiBaseAddress + "/location/{cp4}/{cp3}", false
     );
 
     // region User Requests -----------------------------------------------------------------
     private static final BasicRequestInfo CREATE_REQUEST = new BasicRequestInfo(
-            "https://api.aodispor.pt/pedidos", true
+            aoDisporApiBaseAddress + "/pedidos", true
     );
     private static final BasicRequestInfo GET_REQUEST = new BasicRequestInfo(
-            "https://api.aodispor.pt/users/me/pedido", true
+            aoDisporApiBaseAddress + "/users/me/pedido", true
     );
     private static final BasicRequestInfo DELETE_REQUEST = new BasicRequestInfo(
-            "https://api.aodispor.pt/pedidos/{uuid}", true //request id
+            aoDisporApiBaseAddress + "/pedidos/{uuid}", true //request id
     );
 
     public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildCreateUserRequest(UserRequestCreationData user_request) {

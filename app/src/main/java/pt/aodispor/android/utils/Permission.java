@@ -17,6 +17,8 @@ import pt.aodispor.android.R;
 
 public final class Permission {
 
+    public static boolean enabled = true;
+
     private static void showMessageOKCancel(final Activity activity, String message,
                                             final String[] permission, final int requestCode) {
         new AlertDialog.Builder(activity)
@@ -48,6 +50,8 @@ public final class Permission {
      * <p>behaviour resulting from accepting/denying the permission (or that starts after either) should be added in onRequestPermissionResult(...)</p>
      */
     public static void requestPermission(final Activity activity, final int requestCode) {
+        if(!enabled) return;
+
         String permission_dialog_message = null;
         final String permission;
         switch (requestCode) {

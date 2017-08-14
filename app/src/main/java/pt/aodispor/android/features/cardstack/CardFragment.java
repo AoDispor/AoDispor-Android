@@ -120,6 +120,7 @@ public class CardFragment extends Fragment {
     private LoadingWidget loadingWidget;
     private LinearLayout loadingLL;
 
+    private String searchQuery = "";
 
     ViewsRefresher viewsRefresher;
 
@@ -128,6 +129,8 @@ public class CardFragment extends Fragment {
         return loadingLL;
     }
 
+
+    //region - fixes for interactions with cards when using a drawer
 
     /**
      * used to check in BLOCKING and UNBLOCKING is done properly
@@ -153,8 +156,8 @@ public class CardFragment extends Fragment {
         NUMB = false;
     }
 
+    //endregion
 
-    private String searchQuery = "";
 
     /**
      * Default constructor for CardFragment class.
@@ -180,7 +183,7 @@ public class CardFragment extends Fragment {
     /**
      * This method creates the View of this card stack fragment.
      *
-     * @param i                  the LayoutInflater object to inflate card_zone.xml and <card>.xml.
+     * @param i                  the LayoutInflater object to inflate cardstack__card_zone.xmlrd_zone.xml and <card>.xml.
      * @param c                  the root ViewGroup.
      * @param savedInstanceState object with saved states of previously created fragment.
      * @return returns the root view of the fragment. Not to be confused with the root ViewGroup of
@@ -192,7 +195,7 @@ public class CardFragment extends Fragment {
         currentSetCardIndex = 0;
         inflater = i;
         container = c;
-        rootView = (RelativeLayout) i.inflate(R.layout.card_zone, container, false);
+        rootView = (RelativeLayout) i.inflate(R.layout.cardstack__card_zone, container, false);
         activity = getActivity();
         cardStack.setBasicVariables(this, i, rootView);
 
@@ -715,7 +718,7 @@ public class CardFragment extends Fragment {
 
         final GeoLocation geoLocation = GeoLocation.getInstance();
 
-        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildCardStackRequest(searchQuery,geoLocation);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildCardStackRequest(searchQuery, geoLocation);
 
         request.addOnSuccessHandlers(onNewQuery);
         request.addOnSuccessHandlers(closeLoading);

@@ -38,7 +38,7 @@ public class RequestBuilder {
             aoDisporApiBaseAddress + "/profiles/me", true
     );
     private static final BasicRequestInfo URL_UPLOAD_IMAGE = new BasicRequestInfo(
-            aoDisporApiBaseAddress + "/users/me/profile/avatar", true
+            aoDisporApiBaseAddress + "/users/me/profile__base/avatar", true
     );
     private static final BasicRequestInfo URL_LOCATION = new BasicRequestInfo(
             aoDisporApiBaseAddress + "/location/{cp4}/{cp3}", false

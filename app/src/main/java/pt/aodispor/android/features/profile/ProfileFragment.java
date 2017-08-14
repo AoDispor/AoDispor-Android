@@ -82,7 +82,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
         context = this.getContext();
         //should be done in the activity startup HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
-        root = inflater.inflate(R.layout.profile, container, false);
+        root = inflater.inflate(R.layout.profile__base, container, false);
 
         // Get Text Views
         imageView = (TextView) root.findViewById(R.id.imageText);
@@ -264,7 +264,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
     }
 
     /**
-     * Makes a GET HTTP request to get user profile information.
+     * Makes a GET HTTP request to get user profile__base information.
      */
     public void getProfileInfo() {
         HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildGetUserProfileRequest();

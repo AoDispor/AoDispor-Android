@@ -5,21 +5,29 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.crashlytics.android.Crashlytics;
+
+import java.util.Date;
 
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.api.aodispor.RequestBuilder;
+import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.data.models.aodispor.*;
 import pt.aodispor.android.features.profile.LocationDialog;
 import pt.aodispor.android.features.profile.ProfileEditText;
+import pt.aodispor.android.utils.TextUtils;
 import pt.aodispor.android.utils.TypefaceManager;
 import pt.aodispor.android.utils.ViewUtils;
 
@@ -27,7 +35,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
 
     private static final String LOCATION_TAG = "location";
     private UserRequestFragment thisObject;
-    private LinearLayout noConnectionView;
+    private LinearLayout noConnectionView, requestActiveView, formView;
     private EditText requestNameEdit, requestDescriptionEdit, locationEdit;
     private View root;
     private String prefix, suffix; //cp4 & cp3
@@ -76,10 +84,12 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
         context = this.getContext();
         //should be done in the activity startup HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
         thisObject = this;
-        root = inflater.inflate(R.layout.userrequest, container, false);
+        root = inflater.inflate(R.layout.user_request__base, container, false);
 
-        // Get Text Views
+        // Get Main Views
         noConnectionView = (LinearLayout) root.findViewById(R.id.not_loaded_page_layout);
+        requestActiveView = (LinearLayout) root.findViewById(R.id.user_requests_active_request);
+        formView = (LinearLayout) root.findViewById(R.id.user_requests_creation_form);
 
         // Get Edit Text Views
         requestNameEdit = (EditText) root.findViewById(R.id.requestNameEdit);
@@ -88,7 +98,8 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
 
         sendRequestButton = (Button) root.findViewById(R.id.sendUserRequestButton);
 
-        setFonts();
+        //Set Fonts
+        TypefaceManager.singleton.setTypeface(root.findViewById(R.id.user_requests_base), TypefaceManager.singleton.YANONE[1]);
 
         //Set Listeners
         sendRequestButton.setOnClickListener(sendRequestButtonAction);
@@ -102,12 +113,15 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
                                         }
         );
 
+        //TODO check STATE !!!
+
         //hide & show views
         ViewUtils.changeVisibilityOfAllViewChildren(getView(), View.GONE);
         ViewUtils.changeVisibilityOfAllViewChildren(noConnectionView, View.VISIBLE);
 
         //web api background call
-        getUserRequest();
+        if (UserData.getInstance().getUserRequest() == null)
+            getUserRequest();
 
         /*Log.d("CC", "Basic "
                 + Base64.encodeToString((
@@ -153,12 +167,11 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
      */
     public void getUserRequest() {
         HttpRequestTask<AODISPOR_JSON_WEBAPI> request = RequestBuilder.buildGetUserRequest();
-        request.addOnSuccessHandlers(updateFragmentRequest);
+        request.addOnSuccessHandlers(processReceivedData);
         request.addOnSuccessHandlers(new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
             @Override
             public void exec(AODISPOR_JSON_WEBAPI answer) {
-                ViewUtils.changeVisibilityOfAllViewChildren(getView(), View.VISIBLE);
-                ViewUtils.changeVisibilityOfAllViewChildren(noConnectionView, View.GONE);
+                setProperView();
             }
         });
         request.addOnFailHandlers(
@@ -192,28 +205,126 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
         }
     }
 
-    private void setFonts() {
-        TypefaceManager.singleton.setTypeface(root.findViewById(R.id.userrequests_base), TypefaceManager.singleton.YANONE[1]);
-    }
-
-    private final HttpRequestTask.IOnHttpRequestCompleted updateFragmentRequest =
+    private final HttpRequestTask.IOnHttpRequestCompleted processReceivedData =
             new HttpRequestTask.IOnHttpRequestCompleted<AODISPOR_JSON_WEBAPI>() {
                 @Override
                 public void exec(AODISPOR_JSON_WEBAPI answer) {
-                    if (answer == null) return;
+
+                    if (answer == null) {
+                        //No valid answer was received
+                        //this should never occur, since an invalid answer should call fail handler
+                        Crashlytics.log(Log.WARN, "UserRequestFragment", "processReceivedData: null answer");
+                        return;
+                    }
+
                     UserRequests requests = ((UserRequests) answer);
-                    if (requests.data == null || requests.data.size() <= 0) return;
-                    updateViewWithAnExistingRequest(requests.data.get(0));
+                    if (requests.data == null || requests.data.size() <= 0) {
+                        //answer was received but the user hasn't got any request
+                        return;
+                    }
+
+                    UserData.getInstance().setUserRequest(requests.data.get(0));
+                    Log.d("request date", requests.data.get(0).data_expiracao);
                 }
             };
 
+    private void setProperView() {
+        ViewUtils.changeVisibilityOfAllViewChildren(getView(), View.GONE);
+        UserRequestTempData request = UserData.getInstance().getUserRequest();
+        if (request != null) {
+            updateViewWithAnExistingRequest(request);
+            ViewUtils.changeVisibilityOfAllViewChildren(requestActiveView, View.VISIBLE);
+        } else {
+            ViewUtils.changeVisibilityOfAllViewChildren(formView, View.VISIBLE);
+        }
+    }
+
     private void updateViewWithAnExistingRequest(UserRequestTempData request) {
-        //TODO to finish
+        /*//TODO to finish
         requestNameEdit.setText(request.titulo);
-        ;
         requestDescriptionEdit.setText(request.codigo_postal_localizacao);
         locationEdit.setText(request.descricao);
-        sendRequestButton.setVisibility(View.GONE);
+
+        //Log.d("",request.data_expiracao);
+
+        sendRequestButton.setVisibility(View.GONE);*/
     }
+
+    private void cleanFormView(UserRequestTempData request) {
+        //TODO to finish
+        requestNameEdit.setText("");
+        requestDescriptionEdit.setText("");
+        locationEdit.setText("");
+    }
+
+    private final static int viewsUpdateInterval = 1000;
+    private Handler handler;
+    /**
+     * should only be started when the user has an active request *
+     */
+    private Runnable updateRequestView = new Runnable() {
+        @Override
+        public void run() {
+            UserRequestTempData request = UserData.getInstance().getUserRequest();
+
+            if (request == null) return;
+
+            long timenow = new Date().getTime();
+            Date carddate = request.getExpirationDate();
+            if (carddate == null) {
+                Crashlytics.log(Log.WARN, "UserRequestFragment", "null carddate");
+            }
+            long cardTime = carddate.getTime();
+
+            String date = TextUtils.timeDifference(timenow, cardTime, getContext());
+
+            //Request expired. change view to a form
+            if (date == null) {
+                ViewUtils.changeVisibilityOfAllViewChildren(getView(), View.GONE);
+                ViewUtils.changeVisibilityOfAllViewChildren(formView, View.VISIBLE);
+                return; //no more updates until new request is sent
+            }
+            //else if date != null
+            //Request is still active. update request view
+            ((TextView) root.findViewById(R.id.expiration_date))
+                    .setText(date);
+
+            if (handler == null) handler = new Handler();
+            handler.postDelayed(this, viewsUpdateInterval);
+        }
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (handler == null) handler = new Handler();
+        handler.postDelayed(updateRequestView, viewsUpdateInterval);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (handler == null) handler = new Handler();
+        handler.postDelayed(updateRequestView, viewsUpdateInterval);
+    }
+
+    @Override
+    public void onPause() {
+        handler.removeCallbacksAndMessages(null);
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        handler.removeCallbacksAndMessages(null);
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        handler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+    }
+
 
 }

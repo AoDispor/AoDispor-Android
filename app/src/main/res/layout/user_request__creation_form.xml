@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_requests_creation_form"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.widget.Button
+        android:id="@+id/sendUserRequestButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="7sp"
+        android:layout_marginRight="7sp"
+        android:background="@drawable/button"
+        android:text="Clique aqui para enviar pedido"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/requestName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingStart="20dp"
+        android:text="De quem precisa?"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/requestNameEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:ems="10"
+        android:hint="Escreva que profissional procura"
+        android:imeOptions="actionDone"
+        android:inputType="textPersonName"
+        android:maxLength="@string/name_maxsize"
+        android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingStart="20dp"
+        android:text="Onde?"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/locationEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="@string/profile_location_edit_hint"
+        android:inputType="text"
+        android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/requestDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingStart="20dp"
+        android:text="@string/userrequest_requestdescription_label"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/requestDescriptionEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:ems="10"
+        android:hint="@string/userrequest_requestdescription_edit_hint"
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine"
+        android:maxLength="@string/description_maxsize"
+        android:padding="20dp"
+        android:textColor="@color/grey3"
+        android:textColorHint="@color/grey3"
+        android:textSize="20sp" />
+</LinearLayout>

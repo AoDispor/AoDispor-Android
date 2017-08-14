@@ -9,6 +9,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -31,6 +33,7 @@ import pt.aodispor.android.data.models.aodispor.BasicCardFields;
 import pt.aodispor.android.data.models.aodispor.Professional;
 import pt.aodispor.android.data.models.aodispor.UserRequest;
 import pt.aodispor.android.utils.HtmlUtil;
+import pt.aodispor.android.utils.TextUtils;
 import pt.aodispor.android.utils.TypefaceManager;
 import pt.aodispor.android.utils.Utility;
 
@@ -259,7 +262,7 @@ public class CardStack {
                                                     String payment_type,
                                                     String avatar_scr,
                                                     Integer distance) {
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.professional_card, rootView, false);
+        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.cards__professional, rootView, false);
 
         TextView profession = (TextView) card.findViewById(R.id.profession);
         profession.setText(HtmlUtil.fromHtml(profession_text));
@@ -324,7 +327,7 @@ public class CardStack {
     ) {
         //TODO not yet complete
 
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.request_card, rootView, false);
+        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.cards__request, rootView, false);
 
         //expiration date is set on updateCardViews() method
 
@@ -352,7 +355,7 @@ public class CardStack {
     }
 
     private RelativeLayout addMessageCard(int cardIndex, String title, String message, boolean block_backward_iteration) {
-        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.message_card, rootView, false);
+        RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.cards__message, rootView, false);
         ((TextView) card.findViewById(R.id.title)).setText(HtmlUtil.fromHtml(title));
         ((TextView) card.findViewById(R.id.message)).setText(HtmlUtil.fromHtml(message));
         cards[cardIndex] = card;
@@ -461,25 +464,16 @@ public class CardStack {
             if (isRequestCard(i)) {
                 ret = true;
                 Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
-                if (carddate == null) continue;
+                if (carddate == null) {
+                    Crashlytics.log(Log.WARN, "CardStack", "null carddate");
+                }
                 long cardTime = carddate.getTime(); //TODO get card date
-                Period p = new Period(timenow, cardTime, PeriodType.standard());
-                //Days are not supported =( it seems...
-                //must do calculations by "hand"
-                long difference = cardTime - timenow;
-                long days = difference / (24 * 60 * 60 * 1000);
-                String daysString = "";
-                if (days > 0) daysString = days + " ";
-                daysString += fragment.getString(days == 1 ? R.string.day : R.string.days) + " ";
+
+                String date = TextUtils.timeDifference(timenow, cardTime, fragment.getContext());
+
                 ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
-                        difference < 0 ? fragment.getString(R.string.request_expired_card_note)
-                                :
-                                (daysString
-                                        + p.getHours()
-                                        + ":" + p.getMinutes()
-                                        + ":" + p.getSeconds() + " "
-                                        + fragment.getString(R.string.left_to_expire)
-                                )
+                        date == null ? fragment.getString(R.string.request_expired_card_note)
+                                : date
                 );
             } else break;
         }

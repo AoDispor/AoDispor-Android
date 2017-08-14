@@ -14,7 +14,7 @@
         android:id="@+id/profile_base"
         >
 
-        <include layout="@layout/notloadedpage" />
+        <include layout="@layout/shared__not_loaded_page" />
 
         <RelativeLayout
             android:layout_width="match_parent"

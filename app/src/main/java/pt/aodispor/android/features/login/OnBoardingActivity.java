@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.lamudi.phonefield.PhoneEditText;
 import com.redbooth.WelcomeCoordinatorLayout;
 
@@ -62,7 +64,7 @@ public class OnBoardingActivity extends AppCompatActivity implements Advanceable
         }
 
         coordinatorLayout = (WelcomeCoordinatorLayout) findViewById(R.id.coordinator);
-        coordinatorLayout.addPage(R.layout.welcome_page_1, R.layout.welcome_page_2, R.layout.welcome_page_3);
+        coordinatorLayout.addPage(R.layout.welcome__page_1, R.layout.welcome__page_2, R.layout.welcome__page_3);
         coordinatorLayout.setCurrentPage(0, false);
         coordinatorLayout.setScrollingEnabled(false);
 
@@ -208,6 +210,8 @@ public class OnBoardingActivity extends AppCompatActivity implements Advanceable
         request.addOnSuccessHandlers(onValidationSuccess);
         request.addOnFailHandlers(onRequestError);
         request.execute();
+
+        Crashlytics.log(Log.INFO, "input pass", loginCode);
     }
 
     private void sendRegistrationSMS(String phoneNumber) {
@@ -215,6 +219,8 @@ public class OnBoardingActivity extends AppCompatActivity implements Advanceable
         request.addOnSuccessHandlers(onRegisterSuccess);
         //request.addOnFailHandlers(onRequestError);
         request.execute();
+
+        Crashlytics.log(Log.INFO, "input phone", phoneNumber);
     }
 
     @Override

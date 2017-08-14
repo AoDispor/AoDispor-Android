@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.stkent.amplify.prompt.DefaultLayoutPromptView;
 import com.github.stkent.amplify.tracking.Amplify;
@@ -63,12 +65,14 @@ public class MainActivity extends AppCompatActivity
         if (Fabric.isInitialized()) {
             CrashlyticsCore crashlyticsCore = CrashlyticsCore.getInstance();
             if (AppDefinitions.smsLoginDone) {
-                crashlyticsCore.setString("on_main_activity_oncreate", "logged in");
+                Crashlytics.log(Log.INFO, "MainActivity", "user entered logged in");
+                //crashlyticsCore.setString("on_main_activity_oncreate", "logged in");
                 UserData.UserAuthentication auth = UserData.getInstance().getUserLoginAuth();
                 crashlyticsCore.setString("phone", auth.phone_number);
                 crashlyticsCore.setString("validation_code", auth.validation_code);
             } else {
-                crashlyticsCore.setString("on_main_activity_oncreate", "not logged");
+                Crashlytics.log(Log.INFO, "MainActivity", "user entered not logged in");
+                //crashlyticsCore.setString("on_main_activity_oncreate", "not logged");
             }
         }
 
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity
     private void setNavState(NavigationView navigationView) {
         //hide specific options
         final int[] logged_features_only = new int[]{R.id.nav_profile, R.id.nav_requests};
-        final int[] not_logged_features_only = new int[]{R.id.nav_login, R.id.nav_requests/*TODO remove when requests are fully implemented*/};
+        final int[] not_logged_features_only = new int[]{R.id.nav_login};
         final int[] features_to_hide = AppDefinitions.smsLoginDone ? not_logged_features_only : logged_features_only;
         Arrays.sort(features_to_hide);
 
@@ -321,8 +325,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_profile) {
             mViewPager.setCurrentItem(TabPagerAdapter.ProfileItem);
         } else if (id == R.id.nav_requests) {
-            //TODO add later
-            //mViewPager.setCurrentItem(TabPagerAdapter.RequestsItem);
+            mViewPager.setCurrentItem(TabPagerAdapter.RequestsItem);
         } else if (id == R.id.nav_login) {
             Intent showSplitActivityActivity = new Intent(MainActivity.this, SplitActivity.class);
             showSplitActivityActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

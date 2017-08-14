@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 //hmmm... ainda não sei se a versão do fasterxml que estamos a usar juntamente com o spring suporta  @JsonSubTypes para poder receber objectos de tipos diferentes.
 
-/** has common variables to Professional and UserRequest Cards */
+/**
+ * has common variables to Professional and UserRequest Cards
+ */
 /*@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
@@ -15,18 +17,45 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 })*/
 //@JsonDeserialize(using = CardDeserializer.class)
 public abstract class BasicCardFields extends AODISPOR_JSON_WEBAPI {
-    @JsonProperty("full_name") public String full_name;
-    @JsonProperty("title") public String title;
-    @JsonProperty("description") public String description;
-    @JsonProperty("phone") public String phone;
-    @JsonProperty("location") public String location;
-    @JsonProperty("string_id") public String string_id;
+    @JsonProperty("full_name")
+    public String full_name;
+    @JsonProperty("title")
+    public String title;
+    @JsonProperty("description")
+    public String description;
+    @JsonProperty("phone")
+    public String phone;
+    @JsonProperty("location")
+    public String location;
+    @JsonProperty("string_id")
+    public String string_id;
 
-    @JsonProperty("cp4") public String cp4;
-    @JsonProperty("cp3") public String cp3;
+    @JsonProperty("cp4")
+    public String cp4;
+    @JsonProperty("cp3")
+    public String cp3;
 
-    @JsonProperty("rate") public String rate;
-    @JsonProperty("currency") public String currency;
+    @JsonProperty("rate")
+    public String rate;
+    @JsonProperty("currency")
+    public String currency;
 
-    @JsonProperty("distance") public Double distance;
+    @JsonProperty("distance")
+    public Double distance;
+
+    void copyFields(BasicCardFields destination) {
+        destination.cp3 = this.cp3;
+        destination.full_name = this.full_name;
+        destination.location = this.location;
+        destination.cp4 = this.cp4;
+        destination.currency = this.currency;
+        destination.description = this.description;
+        destination.phone = this.phone;
+        destination.rate = this.rate;
+        destination.string_id = this.string_id;
+        destination.distance = this.distance;
+        destination.title = this.title;
+    }
+
+
 }

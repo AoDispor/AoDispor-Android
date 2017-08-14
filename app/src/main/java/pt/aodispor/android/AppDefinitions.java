@@ -5,7 +5,7 @@ import android.graphics.Typeface;
 import java.text.SimpleDateFormat;
 
 /**
- * Defines constans and globally used variables
+ * Defines constants and globally used variables
  */
 public class AppDefinitions {
     /* NOTE related to anything that uses [api SearchQueryResult.java]
@@ -20,7 +20,7 @@ public class AppDefinitions {
      * <br>the phone number used is equal to the test phone number
      * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
-    public static final boolean SKIP_LOGIN = false;
+    public static final boolean SKIP_LOGIN = true;
 
     public static final String testPhoneNumber = "+351" + "911793861";
     public static final String testPassword = "835358";
@@ -63,17 +63,7 @@ public class AppDefinitions {
     public static final int DISCARD_ANIMATION_MILLISECONDS = 300;
     public static final int RESTORE_ANIMATION_MILLISECONDS = 300;
 
-    //region USER RELATED DATA
-
-    /**
-     * Phone Number used on login
-     */
-    //public static String phoneNumber = "";
-
-    /**
-     * Password used to login. Professional profile editing is blocked without the correct password.
-     */
-    //public static String userPassword = "";
+    //region USER RELATED
 
     /**
      * used to block certain features when user has not loggedin with the sms code

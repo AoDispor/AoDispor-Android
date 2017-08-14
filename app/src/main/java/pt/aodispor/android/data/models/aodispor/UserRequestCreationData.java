@@ -3,6 +3,9 @@ package pt.aodispor.android.data.models.aodispor;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+/**
+ * data sent by a user to create a request
+ * */
 @JsonSerialize(include= JsonSerialize.Inclusion.ALWAYS)
 public class UserRequestCreationData  extends AODISPOR_JSON_WEBAPI{
 

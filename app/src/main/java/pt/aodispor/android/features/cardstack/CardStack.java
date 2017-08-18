@@ -9,7 +9,6 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -17,13 +16,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
-
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
 
 import java.util.Date;
 
@@ -32,8 +27,8 @@ import pt.aodispor.android.R;
 import pt.aodispor.android.data.models.aodispor.BasicCardFields;
 import pt.aodispor.android.data.models.aodispor.Professional;
 import pt.aodispor.android.data.models.aodispor.UserRequest;
+import pt.aodispor.android.utils.DateUtils;
 import pt.aodispor.android.utils.HtmlUtil;
-import pt.aodispor.android.utils.TextUtils;
 import pt.aodispor.android.utils.TypefaceManager;
 import pt.aodispor.android.utils.Utility;
 
@@ -73,6 +68,7 @@ public class CardStack {
     protected RelativeLayout rootView;
 
     private static Typeface typeface = null;
+    private static String[] periodDisplaySuffixes = null;
 
     void setBasicVariables(Fragment fragment, LayoutInflater inflater, RelativeLayout rootView) {
         if (this.fragment == null) this.fragment = fragment;
@@ -274,7 +270,7 @@ public class CardStack {
 
         String distanceDisplay = " ( ? )";
         if (distance != null) {
-            distanceDisplay = AoDisporApplication.getInstance().getResources().getString(R.string.professional_distance_display)
+            distanceDisplay = AoDisporApplication.getStringResource(R.string.professional_distance_display)
                     .replace("XXX",
                             Utility.prettifyDistance(distance));
         }
@@ -457,23 +453,19 @@ public class CardStack {
 
         if (cards == null || cards_data == null) return false;
 
-        //update requests time
-        //int timeNow = TimeZone.getTimeZone("UTC").getOffset(System.currentTimeMillis());
-        long timenow = new Date().getTime();
+        //update requests time until expiration display
+        long timenow = DateUtils.getServerTime();
         for (int i = 0; i < 2; ++i) {
             if (isRequestCard(i)) {
                 ret = true;
                 Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
-                if (carddate == null) {
-                    Crashlytics.log(Log.WARN, "CardStack", "null carddate");
-                }
                 long cardTime = carddate.getTime(); //TODO get card date
 
-                String date = TextUtils.timeDifference(timenow, cardTime, fragment.getContext());
-
-                ((TextView) cards[i].findViewById(R.id.expiration_date)).setText(
-                        date == null ? fragment.getString(R.string.request_expired_card_note)
-                                : date
+                ((TextView) cards[i].findViewById(R.id.time_until_expiration_date)).setText(
+                        timenow > cardTime ? fragment.getString(R.string.request_expired_card_note)
+                                :
+                                DateUtils.timeDifference(timenow, cardTime)
+                        + " " + fragment.getString(R.string.left_to_expire)
                 );
             } else break;
         }

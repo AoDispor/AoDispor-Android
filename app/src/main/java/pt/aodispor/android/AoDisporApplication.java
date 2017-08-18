@@ -1,6 +1,7 @@
 package pt.aodispor.android;
 
 import android.app.Application;
+import android.support.annotation.NonNull;
 
 import com.github.stkent.amplify.tracking.Amplify;
 
@@ -24,5 +25,10 @@ public class AoDisporApplication extends Application {
                 .setFeedbackEmailAddress(getString(R.string.feedback_email))
                 .setAlwaysShow(FORCE_AMPLIFY)
                 .applyAllDefaultRules();
+    }
+
+    @NonNull
+    static public String getStringResource(int id) {
+        return getInstance().getResources().getString(id);
     }
 }

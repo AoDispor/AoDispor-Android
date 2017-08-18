@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,16 +28,18 @@ import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.data.models.aodispor.*;
 import pt.aodispor.android.features.profile.LocationDialog;
 import pt.aodispor.android.features.profile.ProfileEditText;
-import pt.aodispor.android.utils.TextUtils;
+import pt.aodispor.android.utils.DateUtils;
 import pt.aodispor.android.utils.TypefaceManager;
 import pt.aodispor.android.utils.ViewUtils;
 
 public class UserRequestFragment extends Fragment implements LocationDialog.LocationDialogListener {
 
     private static final String LOCATION_TAG = "location";
-    private UserRequestFragment thisObject;
+    //main views
     private LinearLayout noConnectionView, requestActiveView, formView;
+    //form fields
     private EditText requestNameEdit, requestDescriptionEdit, locationEdit;
+
     private View root;
     private String prefix, suffix; //cp4 & cp3
 
@@ -82,8 +85,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
             return null;//TODO quick fix, might not be the best solution
 
         context = this.getContext();
-        //should be done in the activity startup HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
-        thisObject = this;
+
         root = inflater.inflate(R.layout.user_request__base, container, false);
 
         // Get Main Views
@@ -107,7 +109,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
                                             @Override
                                             public void onClick(View view) {
                                                 LocationDialog dialog = new LocationDialog();
-                                                dialog.setListener(thisObject);
+                                                dialog.setListener(UserRequestFragment.this);
                                                 dialog.show(UserRequestFragment.this.getFragmentManager(), LOCATION_TAG);
                                             }
                                         }
@@ -201,7 +203,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
     public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
         if (set) {
             setLocation(locationName, prefix, suffix);
-            ProfileEditText.runHandler();
+            ProfileEditText.scheduleHandler();
         }
     }
 
@@ -232,15 +234,33 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
         ViewUtils.changeVisibilityOfAllViewChildren(getView(), View.GONE);
         UserRequestTempData request = UserData.getInstance().getUserRequest();
         if (request != null) {
-            updateViewWithAnExistingRequest(request);
             ViewUtils.changeVisibilityOfAllViewChildren(requestActiveView, View.VISIBLE);
+            updateViewWithAnExistingRequest(request);
         } else {
+            cleanFormView();
             ViewUtils.changeVisibilityOfAllViewChildren(formView, View.VISIBLE);
         }
     }
 
     private void updateViewWithAnExistingRequest(UserRequestTempData request) {
-        /*//TODO to finish
+
+        RelativeLayout card_layout = (RelativeLayout) root.findViewById(R.id.request_card);
+
+        ((TextView) card_layout.findViewById(R.id.location)).setText(request.codigo_postal_localizacao);
+        //TODO -> ((TextView) card_layout.findViewById(R.id.price)).setText();
+        ((TextView) card_layout.findViewById(R.id.job)).setText(request.titulo);
+        ((TextView) card_layout.findViewById(R.id.description)).setText(request.descricao);
+
+
+        /*((TextView) card_layout.findViewById(R.id.time_until_expiration_date)).setText(
+                DateUtils.timeDifference()
+        );*/
+
+        //make sure discard note is never shown
+        card_layout.findViewById(R.id.discard).setVisibility(View.GONE);
+
+
+        /*TODO to finish
         requestNameEdit.setText(request.titulo);
         requestDescriptionEdit.setText(request.codigo_postal_localizacao);
         locationEdit.setText(request.descricao);
@@ -250,7 +270,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
         sendRequestButton.setVisibility(View.GONE);*/
     }
 
-    private void cleanFormView(UserRequestTempData request) {
+    private void cleanFormView() {
         //TODO to finish
         requestNameEdit.setText("");
         requestDescriptionEdit.setText("");
@@ -271,12 +291,10 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
 
             long timenow = new Date().getTime();
             Date carddate = request.getExpirationDate();
-            if (carddate == null) {
-                Crashlytics.log(Log.WARN, "UserRequestFragment", "null carddate");
-            }
+
             long cardTime = carddate.getTime();
 
-            String date = TextUtils.timeDifference(timenow, cardTime, getContext());
+            String date = DateUtils.timeDifference(timenow, cardTime);
 
             //Request expired. change view to a form
             if (date == null) {
@@ -286,7 +304,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
             }
             //else if date != null
             //Request is still active. update request view
-            ((TextView) root.findViewById(R.id.expiration_date))
+            ((TextView) root.findViewById(R.id.time_until_expiration_date))
                     .setText(date);
 
             if (handler == null) handler = new Handler();

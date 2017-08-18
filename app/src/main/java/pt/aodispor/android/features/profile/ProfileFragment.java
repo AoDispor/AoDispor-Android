@@ -51,7 +51,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
     private static final int SELECT_PICTURE = 0;
     private static final String LOCATION_TAG = "location";
     private static final String PRICE_DIALOG_TAG = "price-dialog";
-    private ProfileFragment thisObject;
+
     private TextView imageView;
     private LinearLayout noConnectionView;
     private EditText nameEdit, professionEdit, locationEdit, priceEdit, descriptionEdit;
@@ -80,8 +80,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
             return null;//TODO quick fix, might not be the best solution
 
         context = this.getContext();
-        //should be done in the activity startup HttpRequestTask.setToken(context.getResources().getString(R.string.ao_dispor_api_key));
-        thisObject = this;
+
         root = inflater.inflate(R.layout.profile__base, container, false);
 
         // Get Text Views
@@ -105,7 +104,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
             @Override
             public void onClick(View view) {
                 LocationDialog dialog = new LocationDialog();
-                dialog.setListener(thisObject);
+                dialog.setListener(ProfileFragment.this);
                 dialog.show(ProfileFragment.this.getFragmentManager(), LOCATION_TAG);
             }
         });
@@ -114,7 +113,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
             @Override
             public void onClick(View view) {
                 PriceDialog dialog = PriceDialog.newInstance(rate, isFinal, type, currency);
-                dialog.setListener(thisObject);
+                dialog.setListener(ProfileFragment.this);
                 dialog.show(ProfileFragment.this.getFragmentManager(), PRICE_DIALOG_TAG);
             }
         });
@@ -356,14 +355,14 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
     public void onDismiss(boolean set, String locationName, String prefix, String suffix) {
         if (set) {
             setLocation(locationName, prefix, suffix);
-            ProfileEditText.runHandler();
+            ProfileEditText.scheduleHandler();
         }
     }
 
     @Override
     public void onPriceChanged(int rate, boolean isFinal, PaymentType type, CurrencyType currency) {
         setPrice(rate, isFinal, type, currency);
-        ProfileEditText.runHandler();
+        ProfileEditText.scheduleHandler();
     }
 
     private void setFonts() {

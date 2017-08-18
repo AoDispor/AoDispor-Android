@@ -1,4 +1,4 @@
-package pt.aodispor.android.view.base;
+package pt.aodispor.android.base;
 
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;

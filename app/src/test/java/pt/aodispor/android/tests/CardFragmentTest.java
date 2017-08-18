@@ -1,4 +1,4 @@
-package pt.aodispor.android.view.tests;
+package pt.aodispor.android.tests;
 
 import android.os.Build;
 

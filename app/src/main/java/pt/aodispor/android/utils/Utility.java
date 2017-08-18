@@ -186,9 +186,9 @@ public abstract class Utility {
 
     static public String prettifyDistance(int distanceInMeters) {
         if (distanceInMeters > 1000) return Integer.toString(distanceInMeters / 1000) + " " +
-                AoDisporApplication.getInstance().getResources().getString(R.string.kilometers_symbol);
+                AoDisporApplication.getStringResource(R.string.kilometers_symbol);
         //else
         return Integer.toString(distanceInMeters) + " " +
-                AoDisporApplication.getInstance().getResources().getString(R.string.meters);
+                AoDisporApplication.getStringResource(R.string.meters);
     }
 }

@@ -1,4 +1,4 @@
-package pt.aodispor.android.view.base;
+package pt.aodispor.android.base;
 
 import android.support.v7.app.AppCompatActivity;
 

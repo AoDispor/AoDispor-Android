@@ -38,6 +38,7 @@ import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.Links;
 import pt.aodispor.android.data.models.aodispor.UserRequest;
 import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
+import pt.aodispor.android.utils.DateUtils;
 import pt.aodispor.android.utils.Permission;
 
 import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
@@ -52,8 +53,9 @@ import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
 public class CardFragment extends Fragment {
 
     //region DEV_ONLY TESTING
-    static private boolean DEV_force2ndPage = false;
-    static private boolean DEV_injectPedidoMockup = false;
+    static private final boolean DEV_force2ndPage = false;
+    static private final boolean DEV_injectPedidoMockup = true;
+    static private final String injectedMockupDate = "2017-08-20 20:35:56";
     //endregion DEV_ONLY TESTING
 
 
@@ -197,6 +199,7 @@ public class CardFragment extends Fragment {
         container = c;
         rootView = (RelativeLayout) i.inflate(R.layout.cardstack__card_zone, container, false);
         activity = getActivity();
+
         cardStack.setBasicVariables(this, i, rootView);
 
         GeoLocation.getInstance().updateLatLon(this.getContext());
@@ -872,7 +875,7 @@ public class CardFragment extends Fragment {
                                 p.location = "some place";
                                 p.description = "blablabla";
                                 p.rate = "15";
-                                p.data_expiracao = "2017-04-20 20:35:56";//new java.util.Date();
+                                p.data_expiracao = injectedMockupDate;//new java.util.Date();
                                 CardFragment.this.currentSet.data.add(0, p);
                             }
 

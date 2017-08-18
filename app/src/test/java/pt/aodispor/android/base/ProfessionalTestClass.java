@@ -1,4 +1,4 @@
-package pt.aodispor.android.view.base;
+package pt.aodispor.android.base;
 
 import pt.aodispor.android.data.models.aodispor.Professional;
 

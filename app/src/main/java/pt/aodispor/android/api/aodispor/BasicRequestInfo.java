@@ -1,7 +1,6 @@
 package pt.aodispor.android.api.aodispor;
 
 import android.util.Base64;
-import android.util.Log;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -9,17 +8,16 @@ import org.springframework.http.MediaType;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
+import pt.aodispor.android.utils.DateUtils;
 
 public class BasicRequestInfo {
 
     private static String token = null;
-    private static final String serverTimeZone = "UTC";
 
     String URL;
     private boolean needsUserAuth;
@@ -57,9 +55,8 @@ public class BasicRequestInfo {
     }
 
     static private String getLocalDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.UK);
-        //TODO next line might not be needed anymore, just define Locale in definitions... maybe?
-        dateFormat.setTimeZone(TimeZone.getTimeZone(serverTimeZone));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", DateUtils.defaultLocale);
+        dateFormat.setTimeZone(TimeZone.getTimeZone(DateUtils.ADServerTimeZoneName));
         return dateFormat.format(new Date());
     }
 

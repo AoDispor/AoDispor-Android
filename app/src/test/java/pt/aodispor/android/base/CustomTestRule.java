@@ -1,6 +1,6 @@
 //TODO NOT USED
 
-package pt.aodispor.android.view.base;
+package pt.aodispor.android.base;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;

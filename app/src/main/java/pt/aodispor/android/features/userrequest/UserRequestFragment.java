@@ -20,6 +20,7 @@ import com.crashlytics.android.Crashlytics;
 
 import java.util.Date;
 
+import pt.aodispor.android.AoDisporApplication;
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.api.HttpRequestTask;
@@ -28,6 +29,7 @@ import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.data.models.aodispor.*;
 import pt.aodispor.android.features.profile.LocationDialog;
 import pt.aodispor.android.features.profile.ProfileEditText;
+import pt.aodispor.android.features.shared.CardUtils;
 import pt.aodispor.android.utils.DateUtils;
 import pt.aodispor.android.utils.TypefaceManager;
 import pt.aodispor.android.utils.ViewUtils;
@@ -36,7 +38,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
 
     private static final String LOCATION_TAG = "location";
     //main views
-    private LinearLayout noConnectionView, requestActiveView, formView;
+    private ViewGroup noConnectionView, requestActiveView, formView;
     //form fields
     private EditText requestNameEdit, requestDescriptionEdit, locationEdit;
 
@@ -90,7 +92,7 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
 
         // Get Main Views
         noConnectionView = (LinearLayout) root.findViewById(R.id.not_loaded_page_layout);
-        requestActiveView = (LinearLayout) root.findViewById(R.id.user_requests_active_request);
+        requestActiveView = (RelativeLayout) root.findViewById(R.id.user_requests_active_request);
         formView = (LinearLayout) root.findViewById(R.id.user_requests_creation_form);
 
         // Get Edit Text Views
@@ -247,27 +249,22 @@ public class UserRequestFragment extends Fragment implements LocationDialog.Loca
         RelativeLayout card_layout = (RelativeLayout) root.findViewById(R.id.request_card);
 
         ((TextView) card_layout.findViewById(R.id.location)).setText(request.codigo_postal_localizacao);
-        //TODO -> ((TextView) card_layout.findViewById(R.id.price)).setText();
+        //??? ((TextView) card_layout.findViewById(R.id.price)).setText();
         ((TextView) card_layout.findViewById(R.id.job)).setText(request.titulo);
         ((TextView) card_layout.findViewById(R.id.description)).setText(request.descricao);
 
-
-        /*((TextView) card_layout.findViewById(R.id.time_until_expiration_date)).setText(
-                DateUtils.timeDifference()
-        );*/
+        ((TextView) card_layout.findViewById(R.id.time_until_expiration_date)).setText(
+                DateUtils.timeDifference(
+                        DateUtils.getServerTime(), request.getExpirationDate().getTime()
+                )
+                        + "\n" + getResources().getString(R.string.userrequest_created_in)
+                        + request.data_criacao
+        );
 
         //make sure discard note is never shown
         card_layout.findViewById(R.id.discard).setVisibility(View.GONE);
 
-
-        /*TODO to finish
-        requestNameEdit.setText(request.titulo);
-        requestDescriptionEdit.setText(request.codigo_postal_localizacao);
-        locationEdit.setText(request.descricao);
-
-        //Log.d("",request.data_expiracao);
-
-        sendRequestButton.setVisibility(View.GONE);*/
+        CardUtils.setCardMargins(card_layout, 0, false, new RelativeLayout.LayoutParams(card_layout.getLayoutParams()));//,LinearLayout.LayoutParams.class);
     }
 
     private void cleanFormView() {

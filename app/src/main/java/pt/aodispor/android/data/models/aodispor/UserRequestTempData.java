@@ -54,7 +54,7 @@ public class UserRequestTempData extends AODISPOR_JSON_WEBAPI implements Cloneab
                 , this.titulo
                 , this.descricao
                 , this.codigo_postal
-                , this.codigo_postal
+                , this.codigo_postal_localizacao
                 , this.data_criacao
                 , this.data_expiracao
         );

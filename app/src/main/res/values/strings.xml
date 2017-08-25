@@ -27,6 +27,7 @@
     <!--user request from-->
     <string name="userrequest_requestdescription_label">Explique aqui o que precisa que seja feito…</string>
     <string name="userrequest_requestdescription_edit_hint">Escreva aqui a descrição do pedido</string>
+    <string name="userrequest_created_in">pedido criado em&#8230;</string>
 
     <!-- Request Card -->
     <string name="request_expired_card_note">Última oportunidade para responder a este pedido</string>

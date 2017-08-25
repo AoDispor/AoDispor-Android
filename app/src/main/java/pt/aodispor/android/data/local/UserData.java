@@ -37,6 +37,7 @@ public class UserData {
     }
 
     public Professional getProfileState() {
+        if (profile_state == null) return null;
         try {
             return (Professional) profile_state.clone();
         } catch (Exception e) {
@@ -49,6 +50,7 @@ public class UserData {
 
 
     public UserRequestTempData getUserRequest() {
+        if (user_request == null) return null;
         try {
             return (UserRequestTempData) user_request.clone();
         } catch (Exception e) {

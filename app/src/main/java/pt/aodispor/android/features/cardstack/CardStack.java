@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -27,6 +28,7 @@ import pt.aodispor.android.R;
 import pt.aodispor.android.data.models.aodispor.BasicCardFields;
 import pt.aodispor.android.data.models.aodispor.Professional;
 import pt.aodispor.android.data.models.aodispor.UserRequest;
+import pt.aodispor.android.features.shared.CardUtils;
 import pt.aodispor.android.utils.DateUtils;
 import pt.aodispor.android.utils.HtmlUtil;
 import pt.aodispor.android.utils.TypefaceManager;
@@ -132,57 +134,13 @@ public class CardStack {
 
     //region CARD POSITIONING/DISPLAY UTILITIES
 
-    /**
-     * This method sets a card's margin from the stack so that it gives the illusion of seeing the
-     * stack in perspective with the cards on top of each other.
-     *
-     * @param position the position in the stack of a card.
-     */
-    private void setCardMargin(int position) {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[position].getLayoutParams());
-        int card_margin_left = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_left);
-        int card_margin_top = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_top);
-        int card_margin_right = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_right);
-        int card_margin_bottom = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_bottom);
-
-        params.setMargins(card_margin_left, card_margin_top, card_margin_right, card_margin_bottom);
-        cards[position].setLayoutParams(params);
-        cards[position].setTranslationX(fragment.getResources().getDimensionPixelSize(R.dimen.card_offset) * (position + 1));
-        cards[position]
-                .animate()
-                .translationX(fragment.getResources().getDimensionPixelSize(R.dimen.card_offset) * position)
-                .setInterpolator(new DecelerateInterpolator());
-        cards[position].setTranslationY(fragment.getResources().getDimensionPixelSize(R.dimen.card_offset) * (position + 1));
-        cards[position]
-                .animate()
-                .translationY(fragment.getResources().getDimensionPixelSize(R.dimen.card_offset) * position)
-                .setInterpolator(new DecelerateInterpolator());
-    }
-
     void updateAllCardsMargins() {
         for (int i = 0; i < 3; ++i)
-            if (cards[i] != null) setCardMargin(i);
+            if (cards[i] != null) CardUtils.setCardMargins(cards[i], i, true,
+                    new RelativeLayout.LayoutParams(cards[i].getLayoutParams())
+            );
     }
 
-    /**
-     * This method centers the first card of the stack to the center of this fragment.
-     */
-    /*public void centerFirstCard() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cards[0].getLayoutParams());
-        int card_margin_left = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_left);
-        int card_margin_top = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_top);
-        int card_margin_right = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_right);
-        int card_margin_bottom = fragment.getResources().getDimensionPixelSize(R.dimen.card_margin_bottom);
-
-        params.setMargins(card_margin_left, card_margin_top, card_margin_right, card_margin_bottom);
-        cards[0].setLayoutParams(params);
-    }*/
-
-    /*public void removeCardViews(RelativeLayout rootView, RelativeLayout cards[]) {
-        for (int i = cards.length - 1; i >= 0; --i)
-            if (cards[i] != null)
-                rootView.removeView(cards[i]);
-    }*/
     void removeAllCardViews() {
         for (int i = cards.length - 1; i >= 0; --i)
             if (cards[i] != null)
@@ -213,12 +171,17 @@ public class CardStack {
                             professionalCard((Professional) cards_data[stackIndex].basicCardFields) :
                             requestCard((UserRequest) cards_data[stackIndex].basicCardFields);
         } catch (Exception e) {
-            //Execepção aqui nunca deverá acontecer pk qnd a carta não está completa nem sequer é enviada
+            //Excepção aqui nunca deverá acontecer pk qnd a carta não está completa nem sequer é enviada
             //Tipicamente só acontecerá em ambiete de desenvolvimento
             addMessageCard(stackIndex,
                     fragment.getString(R.string.invalid_card_title),
                     fragment.getString(R.string.invalid_card_description),
                     false);
+            String info = "name: " + cardData.full_name + ";\n description:" +
+                    cardData.description + ";\n location:" +
+                    cardData.location + ";\n phone:" +
+                    cardData.phone;
+            Crashlytics.log("Invalid card -> " + info);
         }
     }
 
@@ -339,9 +302,9 @@ public class CardStack {
         description.setText(HtmlUtil.fromHtml(description_text));
         //description.setMovementMethod(new ScrollingMovementMethod());
 
-        TextView price = (TextView) card.findViewById(R.id.price);
-        price.setTypeface(typeface);
-        price.setText(HtmlUtil.fromHtml(price_value_text));
+        //TextView price = (TextView) card.findViewById(R.id.price);
+        //price.setTypeface(typeface);
+        //price.setText(HtmlUtil.fromHtml(price_value_text));
 
         return card;
     }
@@ -459,13 +422,13 @@ public class CardStack {
             if (isRequestCard(i)) {
                 ret = true;
                 Date carddate = ((UserRequest) cards_data[i].basicCardFields).getExpirationDate();
-                long cardTime = carddate.getTime(); //TODO get card date
+                long cardTime = carddate.getTime();
 
                 ((TextView) cards[i].findViewById(R.id.time_until_expiration_date)).setText(
                         timenow > cardTime ? fragment.getString(R.string.request_expired_card_note)
                                 :
                                 DateUtils.timeDifference(timenow, cardTime)
-                        + " " + fragment.getString(R.string.left_to_expire)
+                                        + " " + fragment.getString(R.string.left_to_expire)
                 );
             } else break;
         }

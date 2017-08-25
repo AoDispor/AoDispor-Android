@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/user_requests_creation_form"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -37,7 +36,7 @@
         android:hint="Escreva que profissional procura"
         android:imeOptions="actionDone"
         android:inputType="textPersonName"
-        android:maxLength="@string/name_maxsize"
+        android:maxLength="@integer/name_maxsize"
         android:padding="20dp"
         android:textColor="@color/grey3"
         android:textColorHint="@color/grey3"
@@ -92,7 +91,7 @@
         android:hint="@string/userrequest_requestdescription_edit_hint"
         android:imeOptions="actionDone"
         android:inputType="textMultiLine"
-        android:maxLength="@string/description_maxsize"
+        android:maxLength="@integer/description_maxsize"
         android:padding="20dp"
         android:textColor="@color/grey3"
         android:textColorHint="@color/grey3"

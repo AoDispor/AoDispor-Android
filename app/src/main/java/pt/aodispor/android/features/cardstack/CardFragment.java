@@ -58,7 +58,7 @@ public class CardFragment extends Fragment {
     static private final String injectedMockupDate = "2017-08-20 20:35:56";
     //endregion DEV_ONLY TESTING
 
-
+    /** indicates if CardFragment was started at least once */
     static private boolean started = false;
 
     //MediaPlayer cardShuffleSound;
@@ -877,6 +877,7 @@ public class CardFragment extends Fragment {
                                 p.rate = "15";
                                 p.data_expiracao = injectedMockupDate;//new java.util.Date();
                                 CardFragment.this.currentSet.data.add(0, p);
+                                //CardFragment.this.currentSet.data.add(1, p);
                             }
 
                             setupNewStack(QueryResult.successful);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- professional profile -->
-    <string name="name_maxsize">64</string>
-    <string name="profession_maxsize">32</string>
-    <string name="description_maxsize">256</string>
+    <integer name="name_maxsize">64</integer>
+    <integer name="profession_maxsize">32</integer>
+    <integer name="description_maxsize">256</integer>
 </resources>

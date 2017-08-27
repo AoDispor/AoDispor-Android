@@ -2,9 +2,6 @@ package pt.aodispor.android.features.login;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -33,10 +30,11 @@ import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.Professional;
 import pt.aodispor.android.data.models.aodispor.Error;
 import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
+import pt.aodispor.android.features.shared.AppCompatActivityPP;
 import pt.aodispor.android.utils.Permission;
 import pt.aodispor.android.utils.Utility;
 
-public class OnBoardingActivity extends AppCompatActivity implements Advanceable {
+public class OnBoardingActivity extends AppCompatActivityPP {
 
     /**
      * stores last sms received from AoDispor before sending a new sms request)
@@ -96,7 +94,22 @@ public class OnBoardingActivity extends AppCompatActivity implements Advanceable
                 coordinatorLayout.setCurrentPage(coordinatorLayout.getPageSelected() + 1, true);
                 phoneNumberField.requestFocus();
 
-                Permission.requestPermission(OnBoardingActivity.this, AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
+                Permission.checkPermission(OnBoardingActivity.this,
+                        Permission.PERMISSIONS_REQUEST_PHONENUMBER,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                String phoneNumber = Utility.getPhoneNumber(getBaseContext());
+                                if (phoneNumber == null || phoneNumber.equals("")) return;
+                                final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
+                                phoneNumberField.setPhoneNumber(phoneNumber);
+                                // havendo um número de telefone, enviar a SMS de registo se o número de telefone for válido
+                                newUserButton.callOnClick();
+                            }
+                        },
+                        null
+                        //TODO? maybe add something when not granted
+                );
             }
         });
         // Saltar
@@ -223,36 +236,6 @@ public class OnBoardingActivity extends AppCompatActivity implements Advanceable
         Crashlytics.log(Log.INFO, "input phone", phoneNumber);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        advance(requestCode, permissions, grantResults);
-    }
-
-    /**
-     * Proceeds to next dialog (or ends) the login process.
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    public void advance(int requestCode, String[] permissions, int[] grantResults) {
-        //Realizado dependendo do tipo de permissao
-        switch (requestCode) {
-            case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
-                String phoneNumber = null;
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    phoneNumber = Utility.getPhoneNumber(getApplicationContext());
-                }
-                final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
-                phoneNumberField.setPhoneNumber(phoneNumber);
-                // havendo um número de telefone, enviar a SMS de registo se o número de telefone for válido
-                newUserButton.callOnClick();
-                break;
-            default:
-                break;
-        }
-    }
-
     HttpRequestTask.IOnHttpRequestCompleted<String> onRegisterSuccess = new HttpRequestTask.IOnHttpRequestCompleted<String>() {
         @Override
         public void exec(String answer) {
@@ -267,7 +250,7 @@ public class OnBoardingActivity extends AppCompatActivity implements Advanceable
             Professional p = (Professional) getProfile.data.get(0);
 
             if (p == null) {
-                loginCode="";
+                loginCode = "";
                 return;
             }
 

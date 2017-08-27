@@ -38,7 +38,7 @@ public class RequestBuilder {
             aoDisporApiBaseAddress + "/profiles/me", true
     );
     private static final BasicRequestInfo URL_UPLOAD_IMAGE = new BasicRequestInfo(
-            aoDisporApiBaseAddress + "/users/me/profile__base/avatar", true
+            aoDisporApiBaseAddress + "/users/me/profile/avatar", true
     );
     private static final BasicRequestInfo URL_LOCATION = new BasicRequestInfo(
             aoDisporApiBaseAddress + "/location/{cp4}/{cp3}", false
@@ -108,7 +108,7 @@ public class RequestBuilder {
     }
 
     public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildUpdateUserProfilePhotoRequest(Bitmap image) {
-        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.POST(SearchQueryResult.class, URL_UPLOAD_IMAGE.URL);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.PUT(SearchQueryResult.class, URL_UPLOAD_IMAGE.URL);
         URL_UPLOAD_IMAGE.setHeaders(request);
         request.setBitmapBody(Utility.convertBitmapToBinary(image));
         return request;

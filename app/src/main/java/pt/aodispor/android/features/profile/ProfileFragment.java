@@ -35,6 +35,7 @@ import java.io.InputStream;
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.api.aodispor.RequestBuilder;
+import pt.aodispor.android.utils.Permission;
 import pt.aodispor.android.utils.TypefaceManager;
 import pt.aodispor.android.data.models.aodispor.AODISPOR_JSON_WEBAPI;
 import pt.aodispor.android.api.HttpRequestTask;
@@ -46,6 +47,7 @@ import pt.aodispor.android.data.models.aodispor.meta.PaymentType;
 import pt.aodispor.android.utils.ViewUtils;
 
 import static android.app.Activity.RESULT_OK;
+import static pt.aodispor.android.utils.Permission.PERMISSIONS_REQUEST_STORAGE;
 
 public class ProfileFragment extends Fragment implements LocationDialog.LocationDialogListener, PriceDialog.PriceDialogListener {
     private static final int SELECT_PICTURE = 0;
@@ -121,10 +123,17 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                ProfileFragment.this.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+                Permission.checkPermission(getActivity(), PERMISSIONS_REQUEST_STORAGE,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                ProfileFragment.this.startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+                            }
+                        }, null);
+
             }
         });
 
@@ -147,8 +156,8 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
                         ) v.setVisibility(View.GONE);
             }
         });*/
-        ViewUtils.changeVisibilityOfAllViewChildren(getView(),View.GONE);
-        ViewUtils.changeVisibilityOfAllViewChildren(noConnectionView,View.VISIBLE);
+        ViewUtils.changeVisibilityOfAllViewChildren(getView(), View.GONE);
+        ViewUtils.changeVisibilityOfAllViewChildren(noConnectionView, View.VISIBLE);
 
         getProfileInfo();
 

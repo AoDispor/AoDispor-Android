@@ -1,6 +1,5 @@
 package pt.aodispor.android.features.cardstack;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,7 +36,6 @@ import pt.aodispor.android.api.HttpRequestTask;
 import pt.aodispor.android.data.models.aodispor.Links;
 import pt.aodispor.android.data.models.aodispor.UserRequest;
 import pt.aodispor.android.data.models.aodispor.SearchQueryResult;
-import pt.aodispor.android.utils.DateUtils;
 import pt.aodispor.android.utils.Permission;
 
 import static pt.aodispor.android.AppDefinitions.RESTORE_ANIMATION_MILLISECONDS;
@@ -58,7 +55,9 @@ public class CardFragment extends Fragment {
     static private final String injectedMockupDate = "2017-08-20 20:35:56";
     //endregion DEV_ONLY TESTING
 
-    /** indicates if CardFragment was started at least once */
+    /**
+     * indicates if CardFragment was started at least once
+     */
     static private boolean started = false;
 
     //MediaPlayer cardShuffleSound;
@@ -202,8 +201,6 @@ public class CardFragment extends Fragment {
 
         cardStack.setBasicVariables(this, i, rootView);
 
-        GeoLocation.getInstance().updateLatLon(this.getContext());
-
         ImageButton returnButton = (ImageButton) rootView.findViewById(R.id.returnButton);
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,13 +215,21 @@ public class CardFragment extends Fragment {
             public void onClick(View view) {
                 if (cardStack.getCardInfoAt(CardStack.TOP) == null) return;
 
-                int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
+               /* int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
                 if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                     Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
                     return;
-                }
+                }*/
 
-                phoneCallTopCard();
+                Permission.checkPermission(getActivity(), Permission.PERMISSIONS_CALL_PHONE,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                phoneCallTopCard();
+                            }
+                        }, null);
+
+
             }
         });
 
@@ -258,12 +263,21 @@ public class CardFragment extends Fragment {
             }
         });
 
-        prepareNewStack();
+        Permission.checkPermission(getActivity(), Permission.PERMISSIONS_REQUEST_GPS,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        GeoLocation.getInstance().updateLatLon(CardFragment.this.getContext());
+                        prepareNewSearchQuery(false);
+                    }
+                }, null);
 
-        if (!started) {
+        //prepareNewStack();
+
+        /*if (!started) {
             started = true;
             Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_GPS);
-        }
+        }*/
         return rootView;
     }
 
@@ -956,24 +970,5 @@ public class CardFragment extends Fragment {
         viewsRefresher.stopTask();
         super.onDestroy();
     }
-
-
-//region PERMISSIONS
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //Realizado dependendo do tipo de permissao
-        switch (requestCode) {
-            case AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    phoneCallTopCard();
-                }
-
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-    //endregion
 
 }

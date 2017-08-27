@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
 
 import pt.aodispor.android.AppDefinitions;
-//import java.sql.Date;
 
 /**
  * data used in the card stack cards
@@ -16,8 +15,22 @@ import pt.aodispor.android.AppDefinitions;
 public class UserRequest extends BasicCardFields implements Cloneable {
     //@JsonProperty("data_expiracao") public Date data_expiracao;//TODO pode ser necessario fazer 1 deserializer custom
     //@JsonDeserialize(using = MyDateDeserializer.class)
+
+    //@JsonProperty("uuid")
+    //public String uuid;
+
+    @JsonProperty("data_criacao")
+    public String data_criacao;
+
     @JsonProperty("data_expiracao")
     public String data_expiracao;
+
+    @JsonProperty("codigo_postal")
+    public String codigo_postal;
+    @JsonProperty("codigo_postal_localizacao")
+    public String codigo_postal_localizacao;
+
+
 
     public Date getExpirationDate() {
         Date ret = null;

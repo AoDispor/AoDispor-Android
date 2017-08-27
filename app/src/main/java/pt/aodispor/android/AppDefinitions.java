@@ -20,10 +20,10 @@ public class AppDefinitions {
      * <br>the phone number used is equal to the test phone number
      * even if te user inputs otherwise. (used for DEVELOPMENT AND DEBUG ONLY!)
      */
-    public static final boolean SKIP_LOGIN = true;
+    public static final boolean SKIP_LOGIN = false;
 
     public static final String testPhoneNumber = "+351" + "911793861";
-    public static final String testPassword = "835358";
+    public static final String testPassword = "XXXXXX";
 
     /**always show amplify - for debug purposes*/
     static final boolean FORCE_AMPLIFY = false;
@@ -77,12 +77,4 @@ public class AppDefinitions {
 
     //endregion
 
-    //region PERMISSIONS
-    //used to identify permissions (possibly composite) without using arrays and/or Manifest.permission...
-    public static final int PERMISSION_NOT_REQUESTED = 20;
-    public static final int PERMISSIONS_REQUEST_READ_SMS = 2;
-    public static final int PERMISSIONS_REQUEST_PHONENUMBER = 3;
-    public static final int PERMISSIONS_REQUEST_INTERNET = 4;
-    public static final int PERMISSIONS_REQUEST_GPS = 5;
-    //endregion
 }

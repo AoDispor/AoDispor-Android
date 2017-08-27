@@ -3,6 +3,7 @@ package pt.aodispor.android.features.main;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 
@@ -36,8 +37,7 @@ import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.R;
 import pt.aodispor.android.data.local.UserData;
 import pt.aodispor.android.features.cardstack.CardFragment;
-import pt.aodispor.android.features.cardstack.GeoLocation;
-import pt.aodispor.android.features.login.Advanceable;
+import pt.aodispor.android.features.shared.AppCompatActivityPP;
 import pt.aodispor.android.utils.TypefaceManager;
 
 /**
@@ -48,8 +48,8 @@ import pt.aodispor.android.utils.TypefaceManager;
  * the page switching for the tabbed pages.
  * </p>
  */
-public class MainActivity extends AppCompatActivity
-        implements Advanceable, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivityPP
+        implements NavigationView.OnNavigationItemSelectedListener {
     private MyViewPager mViewPager;
     private SearchView searchView;
     // private ImageView profileView, stackView;
@@ -222,35 +222,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        advance(requestCode, permissions, grantResults);
-    }
-
-    /**
-     * Proceeds to next dialog (or ends) the login process.
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    public void advance(int requestCode, String[] permissions, int[] grantResults) {
-        //Realizado dependendo do tipo de permissao
-        switch (requestCode) {
-            case AppDefinitions.PERMISSIONS_REQUEST_GPS:
-                CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
-                ///cardFragment.updateGeoLocation();
-                GeoLocation.getInstance().updateLatLon(this);
-                cardFragment.prepareNewSearchQuery(false);
-                break;
-            default:
-                if (android.os.Build.VERSION.SDK_INT >= 23)
-                    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    //endregion
 
 
     @Override

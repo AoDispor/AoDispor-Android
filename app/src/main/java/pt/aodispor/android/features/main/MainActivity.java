@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivityPP
     private void setNavState(NavigationView navigationView) {
         //hide specific options
         final int[] logged_features_only = new int[]{R.id.nav_profile, R.id.nav_requests};
-        final int[] not_logged_features_only = new int[]{R.id.nav_login};
+        final int[] not_logged_features_only = new int[]{R.id.nav_login , R.id.nav_requests/*TODO remove*/};
         final int[] features_to_hide = AppDefinitions.smsLoginDone ? not_logged_features_only : logged_features_only;
         Arrays.sort(features_to_hide);
 
@@ -296,7 +296,7 @@ public class MainActivity extends AppCompatActivityPP
         } else if (id == R.id.nav_profile) {
             mViewPager.setCurrentItem(TabPagerAdapter.ProfileItem);
         } else if (id == R.id.nav_requests) {
-            mViewPager.setCurrentItem(TabPagerAdapter.RequestsItem);
+            //mViewPager.setCurrentItem(TabPagerAdapter.RequestsItem);
         } else if (id == R.id.nav_login) {
             Intent showSplitActivityActivity = new Intent(MainActivity.this, SplitActivity.class);
             showSplitActivityActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -51,7 +51,7 @@ public class CardFragment extends Fragment {
 
     //region DEV_ONLY TESTING
     static private final boolean DEV_force2ndPage = false;
-    static private final boolean DEV_injectPedidoMockup = true;
+    static private final boolean DEV_injectPedidoMockup = false;
     static private final String injectedMockupDate = "2017-08-20 20:35:56";
     //endregion DEV_ONLY TESTING
 

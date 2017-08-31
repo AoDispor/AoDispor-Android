@@ -17,7 +17,7 @@ class TabPagerAdapter extends FragmentPagerAdapter {
      * Number of pages this adapter supports.
      */
     @SuppressWarnings("FieldCanBeLocal")
-    private final int NUMBER_OF_PAGES = 4;
+    private final int NUMBER_OF_PAGES = 3;
 
     static final int cardStackItem = 1;
     static final int AboutItem = 0;

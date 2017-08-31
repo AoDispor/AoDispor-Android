@@ -35,16 +35,6 @@ public class AppCompatActivityPP extends AppCompatActivity implements ActivityWi
         }
         onPermissionsGranted = null;
         onAPermissionDenied = null;
-        /*switch (requestCode) {
-            case Permission.PERMISSIONS_REQUEST_GPS:
-                CardFragment cardFragment = ((TabPagerAdapter) mViewPager.getAdapter()).getCardFragment();
-                ///cardFragment.updateGeoLocation();
-                GeoLocation.getInstance().updateLatLon(this);
-                cardFragment.prepareNewSearchQuery(false);
-                break;
-            default: break;*/
-        //if (android.os.Build.VERSION.SDK_INT >= 23)
-        //    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
 

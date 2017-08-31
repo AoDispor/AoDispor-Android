@@ -100,7 +100,11 @@ public class OnBoardingActivity extends AppCompatActivityPP {
                             @Override
                             public void run() {
                                 String phoneNumber = Utility.getPhoneNumber(getBaseContext());
-                                if (phoneNumber == null || phoneNumber.equals("")) return;
+                                if (phoneNumber == null || phoneNumber.equals("")) {
+                                    Toast.makeText(OnBoardingActivity.this.getBaseContext(),"Ao Dispor não conseguio obter número automaticamente",Toast.LENGTH_LONG).show();
+                                    //TODO string
+                                    return;
+                                }
                                 final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
                                 phoneNumberField.setPhoneNumber(phoneNumber);
                                 // havendo um número de telefone, enviar a SMS de registo se o número de telefone for válido

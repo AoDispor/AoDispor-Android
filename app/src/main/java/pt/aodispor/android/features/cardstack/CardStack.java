@@ -178,7 +178,7 @@ public class CardStack {
             addMessageCard(stackIndex,
                     fragment.getString(R.string.invalid_card_title),
                     fragment.getString(R.string.invalid_card_description),
-                    false);
+                    false, R.drawable.fimdebusca);
             String info = "name: " + cardData.full_name + ";\n description:" +
                     cardData.description + ";\n location:" +
                     cardData.location + ";\n phone:" +
@@ -249,13 +249,13 @@ public class CardStack {
         location.setTypeface(typeface);
 
         TextView description = (TextView) card.findViewById(R.id.description);
-        description.setText(Html.fromHtml(description_text));
+        description.setText(HtmlUtil.fromHtml(description_text));
         //description.setTypeface(typeface);
         //description.setMovementMethod(new ScrollingMovementMethod());
 
         TextView price = (TextView) card.findViewById(R.id.price);
         price.setTypeface(typeface);
-        price.setText(Html.fromHtml(price_value));
+        price.setText(HtmlUtil.fromHtml(price_value));
 
         switch (payment_type) {
             case "H":
@@ -311,17 +311,24 @@ public class CardStack {
         return card;
     }
 
-    RelativeLayout addMessageCard(int cardIndex, String title, String message) {
-        return addMessageCard(cardIndex, title, message, false);
+    RelativeLayout addMessageCard(int cardIndex, String title, String message,Integer optionalImageId) {
+        return addMessageCard(cardIndex, title, message, false, optionalImageId);
     }
 
-    private RelativeLayout addMessageCard(int cardIndex, String title, String message, boolean block_backward_iteration) {
+    private RelativeLayout addMessageCard(int cardIndex, String title, String message, boolean block_backward_iteration, Integer optionalImageId) {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.cards__message, rootView, false);
         ((TextView) card.findViewById(R.id.title)).setText(HtmlUtil.fromHtml(title));
         ((TextView) card.findViewById(R.id.message)).setText(HtmlUtil.fromHtml(message));
-        /*card.addView(
-                new ImageView(rootView.getContext());
-        );*/
+        if (optionalImageId != null) {
+            ImageView imageView = new ImageView(rootView.getContext());
+            imageView.setImageResource(optionalImageId);
+            imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT));
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
+            params.addRule(RelativeLayout.BELOW, R.id.message);
+            params.bottomMargin = 50;
+            card.addView(imageView);
+        }
         cards[cardIndex] = card;
         //cards_data[cardIndex] = null;
         cards_data[cardIndex] = block_backward_iteration ?
@@ -329,7 +336,6 @@ public class CardStack {
                 CardMetaData.createNONBlockingCardWithNoInfo();
         return card;
     }
-
 
     void addNoConnectionCard(
             int cardIndex,
@@ -349,7 +355,7 @@ public class CardStack {
         //TODO WORKING NOW
         //TODO WORKING NOW
         //TODO WORKING NOW
-        RelativeLayout card = addMessageCard(cardIndex, fragment.getString(R.string.no_conection_title), fragment.getString(R.string.no_conection_msg), block_backwards_iteration);
+        RelativeLayout card = addMessageCard(cardIndex, fragment.getString(R.string.no_conection_title), fragment.getString(R.string.no_conection_msg), block_backwards_iteration, R.drawable.fimdebusca);
         //LinearLayout loadingLL = (LinearLayout) card.findViewById(R.id.loadingMessage);
        /* Button retryButton = (Button) card.findViewById(R.id.messagecard_retry_button);
         retryButton.setText(R.string.retry);

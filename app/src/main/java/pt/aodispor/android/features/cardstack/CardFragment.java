@@ -340,10 +340,10 @@ public class CardFragment extends Fragment {
                         cardStack.addCard(2, currentSet.data.get(2));
                     } else {
                         cardStack.clearCard(2);
-                        cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));
+                        cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg), R.drawable.fimdebusca);
                     }
                 } else {
-                    cardStack.addMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg));
+                    cardStack.addMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg), R.drawable.fimdebusca);
                     cardStack.clearCard(2);
                 }
 
@@ -362,7 +362,8 @@ public class CardFragment extends Fragment {
                 break;
             case emptySet: //received answer but there aren't any professionals
                 cardStack.addMessageCard(0, getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
-                        (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>");
+                        (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>",
+                        R.drawable.fimdebusca);
                 cardStack.clearCards(1, 2);
                 break;
             case error: //did not receive answer
@@ -379,7 +380,7 @@ public class CardFragment extends Fragment {
                 cardStack.clearCards(1, 2);
                 break;
             default:
-                cardStack.addMessageCard(0, "ERRO", "");//TODO replace with xml defined strings
+                cardStack.addMessageCard(0, "ERRO", "", R.drawable.fimdebusca);//TODO replace with xml defined strings
                 cardStack.clearCards(1, 2);
                 break;
         }
@@ -461,7 +462,7 @@ public class CardFragment extends Fragment {
         LAST {
             public void updateCardStack(final CardFragment cf) {
                 CardStack cardStack = cf.cardStackContainer.cardStack;
-                cardStack.addMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg));
+                cardStack.addMessageCard(2, cf.getString(R.string.pile_end_title), cf.getString(R.string.pile_end_msg), R.drawable.fimdebusca);
                 cf.CardStackOnDiscard_MoreThanTwoCardsVisibleUpdate();
             }
         },

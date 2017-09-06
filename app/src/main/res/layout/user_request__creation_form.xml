@@ -11,7 +11,7 @@
         android:layout_marginLeft="7sp"
         android:layout_marginRight="7sp"
         android:background="@drawable/button"
-        android:text="Clique aqui para enviar pedido"
+        android:text="@string/request_form_send"
         android:textSize="18sp" />
 
     <TextView
@@ -23,7 +23,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingStart="20dp"
-        android:text="De quem precisa?"
+        android:text="@string/request_form_looking_for_label"
         android:textColor="@color/white"
         android:textSize="20sp" />
 
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:ems="10"
-        android:hint="Escreva que profissional procura"
+        android:hint="@string/request_form_looking_for_hint"
         android:imeOptions="actionDone"
         android:inputType="textPersonName"
         android:maxLength="@integer/name_maxsize"
@@ -51,7 +51,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingStart="20dp"
-        android:text="Onde?"
+        android:text="@string/request_form_where_label"
         android:textColor="@color/white"
         android:textSize="20sp" />
 

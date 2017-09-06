@@ -3,6 +3,7 @@ package pt.aodispor.android.features.login;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -35,6 +36,12 @@ import pt.aodispor.android.utils.Permission;
 import pt.aodispor.android.utils.Utility;
 
 public class OnBoardingActivity extends AppCompatActivityPP {
+
+    /**
+     * Delay in milliseconds before skipping to request code page
+     * in case the app gets the phone number is successfully without user input
+     */
+    final static int DELAY_ON_AUTO_PHONE_COMPLETION = 1000;
 
     /**
      * stores last sms received from AoDispor before sending a new sms request)
@@ -108,7 +115,12 @@ public class OnBoardingActivity extends AppCompatActivityPP {
                                 final PhoneEditText phoneNumberField = (PhoneEditText) findViewById(R.id.phone_number);
                                 phoneNumberField.setPhoneNumber(phoneNumber);
                                 // havendo um número de telefone, enviar a SMS de registo se o número de telefone for válido
-                                newUserButton.callOnClick();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        newUserButton.callOnClick();
+                                    }
+                                }, DELAY_ON_AUTO_PHONE_COMPLETION);
                             }
                         },
                         null

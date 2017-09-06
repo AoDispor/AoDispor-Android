@@ -35,7 +35,7 @@ public class RequestBuilder {
             aoDisporApiBaseAddress + "/users/me", false, SearchQueryResult.class
     );
     private static final BasicRequestInfo URL_MY_PROFILE = new BasicRequestInfo(
-            aoDisporApiBaseAddress + "/profiles/me", true
+            aoDisporApiBaseAddress + "/users/me/profile", true
     );
     private static final BasicRequestInfo URL_UPLOAD_IMAGE = new BasicRequestInfo(
             aoDisporApiBaseAddress + "/users/me/profile/avatar", true
@@ -104,7 +104,9 @@ public class RequestBuilder {
     }
 
     public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildGetUserProfileRequest() {
-        return buildUpdateUserProfileInfosRequest(null);
+        HttpRequestTask<AODISPOR_JSON_WEBAPI> request = HttpRequestTask.GET(SearchQueryResult.class, URL_MY_PROFILE.URL);
+                URL_MY_PROFILE.setHeaders(request);
+        return request;
     }
 
     public static HttpRequestTask<AODISPOR_JSON_WEBAPI> buildUpdateUserProfilePhotoRequest(Bitmap image) {

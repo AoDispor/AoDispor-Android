@@ -9,6 +9,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -21,6 +22,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
+import java.text.AttributedCharacterIterator;
 import java.util.Date;
 
 import pt.aodispor.android.AoDisporApplication;
@@ -317,6 +319,9 @@ public class CardStack {
         RelativeLayout card = (RelativeLayout) inflater.inflate(R.layout.cards__message, rootView, false);
         ((TextView) card.findViewById(R.id.title)).setText(HtmlUtil.fromHtml(title));
         ((TextView) card.findViewById(R.id.message)).setText(HtmlUtil.fromHtml(message));
+        /*card.addView(
+                new ImageView(rootView.getContext());
+        );*/
         cards[cardIndex] = card;
         //cards_data[cardIndex] = null;
         cards_data[cardIndex] = block_backward_iteration ?

@@ -67,7 +67,7 @@ public class CardFragment extends Fragment {
     }
 
     //private LocationManager locationManager;
-    public static final int REQUEST_CODE = 111;//TODO document what request_code is...
+    //public static final int REQUEST_CODE = 111;//TODO document what request_code is...
 
     //private static final String queryProfilesURL = "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}";
 
@@ -215,12 +215,6 @@ public class CardFragment extends Fragment {
             public void onClick(View view) {
                 if (cardStack.getCardInfoAt(CardStack.TOP) == null) return;
 
-               /* int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE);
-                if (permissionCheck == PackageManager.PERMISSION_DENIED) {
-                    Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_PHONENUMBER);
-                    return;
-                }*/
-
                 Permission.checkPermission(getActivity(), Permission.PERMISSIONS_CALL_PHONE,
                         new Runnable() {
                             @Override
@@ -282,7 +276,7 @@ public class CardFragment extends Fragment {
     }
 
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    /*public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
             switch (resultCode) {
                 case PermissionActivity.PERMISSION_GRANTED:
@@ -302,7 +296,7 @@ public class CardFragment extends Fragment {
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
+    }*/
 
     //region NAVIGATION/PAGINATION
 

@@ -24,10 +24,14 @@
     <string name="profile_professionaldescription_edt_hint">Escreva aqui a descrição</string>
     <string name="profile_price">%1$d €</string>
 
-    <!--user request from-->
+    <!--user request form-->
     <string name="userrequest_requestdescription_label">Explique aqui o que precisa que seja feito…</string>
     <string name="userrequest_requestdescription_edit_hint">Escreva aqui a descrição do pedido</string>
     <string name="userrequest_created_in">pedido criado em&#8230;</string>
+    <string name="request_form_looking_for_hint">Escreva que profissional procura</string>
+    <string name="request_form_looking_for_label">De quem precisa?</string>
+    <string name="request_form_send">Clique aqui para enviar pedido</string>
+    <string name="request_form_where_label">Onde?</string>
 
     <!-- Request Card -->
     <string name="request_expired_card_note">Última oportunidade para responder a este pedido</string>

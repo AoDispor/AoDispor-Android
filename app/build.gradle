@@ -27,8 +27,8 @@ android {
         applicationId "pt.aodispor.android"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 21
-        versionName "0.9.8"
+        versionCode 23
+        versionName "0.9.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testApplicationId "pt.aodispor.android.test"
         vectorDrawables.useSupportLibrary = true
@@ -74,7 +74,7 @@ dependencies {
 
     compile 'de.hdodenhof:circleimageview:2.1.0'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.6@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true; }
 
     compile 'com.github.karthyks:Runtime-Permissions:f423039e5a'

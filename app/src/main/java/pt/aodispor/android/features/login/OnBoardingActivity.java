@@ -2,6 +2,8 @@ package pt.aodispor.android.features.login;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -19,6 +21,7 @@ import com.crashlytics.android.Crashlytics;
 import com.lamudi.phonefield.PhoneEditText;
 import com.redbooth.WelcomeCoordinatorLayout;
 
+import pt.aodispor.android.AoDisporApplication;
 import pt.aodispor.android.AppDefinitions;
 import pt.aodispor.android.api.aodispor.RequestBuilder;
 import pt.aodispor.android.data.local.UserData;
@@ -54,6 +57,9 @@ public class OnBoardingActivity extends AppCompatActivityPP {
 
     private Button newUserButton;
 
+    SoundPool soundPool;
+    int loginSound;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +78,9 @@ public class OnBoardingActivity extends AppCompatActivityPP {
         coordinatorLayout.addPage(R.layout.welcome__page_1, R.layout.welcome__page_2, R.layout.welcome__page_3);
         coordinatorLayout.setCurrentPage(0, false);
         coordinatorLayout.setScrollingEnabled(false);
+
+        soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+        loginSound = soundPool.load(AoDisporApplication.getInstance().getBaseContext(), R.raw.maj_arp_v1, 0);
 
         // Página 1
         final Button nextButton = (Button) findViewById(R.id.next_button);
@@ -108,7 +117,7 @@ public class OnBoardingActivity extends AppCompatActivityPP {
                             public void run() {
                                 String phoneNumber = Utility.getPhoneNumber(getBaseContext());
                                 if (phoneNumber == null || phoneNumber.equals("")) {
-                                    Toast.makeText(OnBoardingActivity.this.getBaseContext(),"Ao Dispor não conseguio obter número automaticamente",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(OnBoardingActivity.this.getBaseContext(), "Ao Dispor não conseguio obter número automaticamente", Toast.LENGTH_LONG).show();
                                     //TODO string
                                     return;
                                 }
@@ -225,13 +234,13 @@ public class OnBoardingActivity extends AppCompatActivityPP {
     }
 
     private void showMainActivity() {
+        Intent showMainActivity = new Intent(OnBoardingActivity.this, MainActivity.class);
+        showMainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(showMainActivity);
         /*InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if(imm != null){
             imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }*/
-        Intent showMainActivity = new Intent(OnBoardingActivity.this, MainActivity.class);
-        showMainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(showMainActivity);
     }
 
     private void validatePassword() {
@@ -278,7 +287,20 @@ public class OnBoardingActivity extends AppCompatActivityPP {
 
             AppDefinitions.smsLoginDone = true;
 
-            showMainActivity();
+            try {
+                soundPool.play(loginSound, 1, 1, 1, 0, 1);
+                soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+                    @Override
+                    public void onLoadComplete(SoundPool soundPool, int i, int i1) {
+                        soundPool.release();
+                        showMainActivity();
+                    }
+                });
+            }
+            //guarantee that main activity is started
+            catch (Exception ignored) {
+                showMainActivity();
+            }
         }
     };
 

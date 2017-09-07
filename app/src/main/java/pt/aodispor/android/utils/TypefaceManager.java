@@ -15,9 +15,9 @@ public class TypefaceManager {
     private TypefaceManager() {
     }
 
-    public class FontMetaData {
+    private class FontMetaData {
         public final String id;
-        public final String assetPath;
+        final String assetPath;
 
         FontMetaData(String id, String assetPath) {
             this.id = id;

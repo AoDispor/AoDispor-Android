@@ -69,6 +69,8 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
     static final int WAIT_4RETRY_GET_PROFILE = 5000;
     Professional previous;
 
+    //TODO maybe do later... boolean alreadyRegistered;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -227,6 +229,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
             @Override
             public void exec(AODISPOR_JSON_WEBAPI answer) {
                 ImageLoader.getInstance().clearDiskCache();
+
             }
         });
         imageRequest.execute();
@@ -390,6 +393,7 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
                     UserData.getInstance().updateProfileState(professional);
                     updateView(professional);
                     setProfileImageFromUrl(professional.avatar_url);
+                    //alreadyRegistered = isProfessionalRegistered(professional);
                 }
             };
 
@@ -404,4 +408,17 @@ public class ProfileFragment extends Fragment implements LocationDialog.Location
         setPrice(rate, isFinal, type, curr);
         setDescription(professional.description);
     }
+
+    /*public static boolean isProfessionalRegistered(Professional info) {
+        return !(info.full_name == null || info.full_name.equals("")) &&
+                !(info.avatar_url == null || info.avatar_url.equals("")) &&
+                !(info.title == null || info.title.equals("")) &&
+                !(info.currency == null || info.currency.equals("")) &&
+                !(info.type == null || info.type.equals("")) &&
+                !(info.phone == null || info.phone.equals("")) &&
+                !(info.rate == null || info.rate.equals("")) &&
+                !(info.location == null || info.location.equals("")) &&
+                !(info.description == null || info.description.equals(""));
+    }*/
+
 }

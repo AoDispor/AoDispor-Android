@@ -103,7 +103,7 @@ public abstract class Utility {
         return tMgr.getLine1Number();
     }
 
-    public static boolean isProfessionalRegistered(Professional info) {
+    /*public static boolean isProfessionalRegistered(Professional info) {
         return !(info.full_name == null || info.full_name.equals("")) &&
                 !(info.avatar_url == null || info.avatar_url.equals("")) &&
                 !(info.title == null || info.title.equals("")) &&
@@ -112,7 +112,7 @@ public abstract class Utility {
                 !(info.phone == null || info.phone.equals("")) &&
                 !(info.rate == null || info.rate.equals("")) &&
                 !(info.location == null || info.location.equals(""));
-    }
+    }*/
 
     public static boolean isPostalCodeSet(Professional p) {
         return !(p.cp4 == null || p.title.equals(""));

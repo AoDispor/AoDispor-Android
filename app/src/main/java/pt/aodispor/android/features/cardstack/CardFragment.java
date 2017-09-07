@@ -3,10 +3,10 @@ package pt.aodispor.android.features.cardstack;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -21,7 +21,6 @@ import android.widget.RelativeLayout;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.crashlytics.android.answers.ShareEvent;
-import com.github.karthyks.runtimepermissions.PermissionActivity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -55,21 +54,11 @@ public class CardFragment extends Fragment {
     static private final String injectedMockupDate = "2017-08-20 20:35:56";
     //endregion DEV_ONLY TESTING
 
-    /**
-     * indicates if CardFragment was started at least once
-     */
-    static private boolean started = false;
-
     //MediaPlayer cardShuffleSound;
 
     public void setSearchQuery(String query) {
         searchQuery = query;
     }
-
-    //private LocationManager locationManager;
-    //public static final int REQUEST_CODE = 111;//TODO document what request_code is...
-
-    //private static final String queryProfilesURL = "https://api.aodispor.pt/profiles/?query={query}&lat={lat}&lon={lon}";
 
     //RequestType retryRequestType;
 
@@ -199,6 +188,7 @@ public class CardFragment extends Fragment {
         rootView = (RelativeLayout) i.inflate(R.layout.cardstack__card_zone, container, false);
         activity = getActivity();
 
+        loadSounds();
         cardStack.setBasicVariables(this, i, rootView);
 
         ImageButton returnButton = (ImageButton) rootView.findViewById(R.id.returnButton);
@@ -264,39 +254,15 @@ public class CardFragment extends Fragment {
                         GeoLocation.getInstance().updateLatLon(CardFragment.this.getContext());
                         prepareNewSearchQuery(false);
                     }
-                }, null);
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        setupNewStack(QueryResult.error);
+                    }
+                });
 
-        //prepareNewStack();
-
-        /*if (!started) {
-            started = true;
-            Permission.requestPermission(getActivity(), AppDefinitions.PERMISSIONS_REQUEST_GPS);
-        }*/
         return rootView;
     }
-
-
-    /*public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE) {
-            switch (resultCode) {
-                case PermissionActivity.PERMISSION_GRANTED:
-                    //Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
-                    GeoLocation.getInstance().updateLatLon(this.getContext());//updateGeoLocation();//setupLocationManager();
-                    prepareNewStack();
-                    break;
-                case PermissionActivity.PERMISSION_DENIED:
-                    //Toast.makeText(this, "Denied", Toast.LENGTH_SHORT).show();
-                    break;
-                case PermissionActivity.PERMISSION_PERMANENTLY_DENIED:
-                    //Toast.makeText(this, "Permanently denied", Toast.LENGTH_SHORT).show();
-                    //PermissionUtil.openAppSettings(this.getActivity().);
-                    break;
-                default:
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }*/
 
     //region NAVIGATION/PAGINATION
 
@@ -338,13 +304,16 @@ public class CardFragment extends Fragment {
                     cardStack.addCard(1, currentSet.data.get(1));
                     if (currentSet.data.size() > 2) {
                         cardStack.addCard(2, currentSet.data.get(2));
+                        playShuffleAndDealCardsSE(3);
                     } else {
                         cardStack.clearCard(2);
                         cardStack.addMessageCard(2, getString(R.string.pile_end_title), getString(R.string.pile_end_msg), R.drawable.fimdebusca);
+                        soundPool.play(cardSwipeSE, 1, 1, 1, 2, 0);
                     }
                 } else {
                     cardStack.addMessageCard(1, getString(R.string.pile_end_title), getString(R.string.pile_end_msg), R.drawable.fimdebusca);
                     cardStack.clearCard(2);
+                    soundPool.play(cardSwipeSE, 1, 1, 1, 1, 0);
                 }
 
                 if (activity instanceof MainActivity) {
@@ -362,7 +331,7 @@ public class CardFragment extends Fragment {
                 break;
             case emptySet: //received answer but there aren't any professionals
                 cardStack.addMessageCard(0, getString(R.string.no_results_title), getString(R.string.no_results_msg) + "<b>" +
-                        (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>",
+                                (searchQuery.length() > 25 ? (searchQuery.substring(0, 25) + "...") : searchQuery) + "<\\b>",
                         R.drawable.fimdebusca);
                 cardStack.clearCards(1, 2);
                 break;
@@ -384,6 +353,7 @@ public class CardFragment extends Fragment {
                 cardStack.clearCards(1, 2);
                 break;
         }
+        if (queryResult != QueryResult.successful) soundPool.play(cardSwipeSE, 1, 1, 1, 0, 0);
         cardStack.updateAllCardsMargins();
         rootView.addView(cardStack.getCardAt(0));
         viewsRefresher.startTask();
@@ -580,6 +550,7 @@ public class CardFragment extends Fragment {
         cardStack.removeAllCardViews();
         cardStack.swapCardsOnStack(1, 0);
         cardStack.swapCardsOnStack(2, 1);
+        soundPool.play(cardSwipe2SE, 1, 1, 1, 0, 0);
 
         CardStackStateOnDiscard state = getCardStackStateOnDiscard();
         Log.d("discardTopCard", "STATE = " + state.toString());
@@ -686,6 +657,7 @@ public class CardFragment extends Fragment {
         }
         rootView.addView(cardStackContainer.cardStack.getCardAt(1));
         rootView.addView(topCard);
+        soundPool.play(cardSwipeSE, 1, 1, 1, 0, 0);
 
         // if (activity instanceof MainActivity
         //       && cardStack.getCardInfoAt(CardStack.TOP) != null //TODO listener only added in profile cards, for now
@@ -935,6 +907,38 @@ public class CardFragment extends Fragment {
 
 //endregion
 
+    //region sound effects
+
+    SoundPool soundPool;
+    int cardSwipeSE;
+    int cardShuffleSE;
+    int cardSwipe2SE;
+    private void loadSounds() {
+        if (soundPool == null) soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        cardSwipeSE = soundPool.load(CardFragment.this.getContext(), R.raw._1cardswipe, 0);
+        cardShuffleSE = soundPool.load(CardFragment.this.getContext(), R.raw.shuffle, 0);
+        cardSwipe2SE = soundPool.load(CardFragment.this.getContext(),R.raw.swipeout,0);
+    }
+
+    private void playShuffleAndDealCardsSE(final int cards_2deal) {
+        soundPool.play(cardShuffleSE, 1, 1, 1, 0, 0);
+        soundPool.play(cardSwipeSE, 1, 1, 1, cards_2deal - 1, 0);
+        /*soundPool.setOnLoadCompleteListener(
+                new SoundPool.OnLoadCompleteListener() {
+                    @Override
+                    public void onLoadComplete(SoundPool soundPool, int i, int i1) {
+                        soundPool.play(cardSwipeSE, 1, 1, 1, cards_2deal - 1, 0);
+                        soundPool.setOnLoadCompleteListener(null);
+                    }
+                }
+        );*/
+    }
+
+    /*private void playCardSwipeSE(int times) {
+        soundPool.play(cardSwipeSE, 1, 1, 1, times - 1, 0);
+    }*/
+
+    //endregion
 
     @Override
     public void onStart() {
